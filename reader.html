@@ -89,6 +89,11 @@ select.sel{font:inherit;font-weight:500;color:var(--ink);background:var(--fill);
   border-radius:999px;padding:12px 34px;font-size:14px;font-weight:600;cursor:pointer}
 .more:hover{background:var(--fill-strong)}
 .empty{text-align:center;color:var(--mut);padding:60px 0}
+.skel{border-radius:var(--radius);background:var(--card);box-shadow:var(--shadow);padding:18px 22px;margin-bottom:12px}
+.skel i{display:block;height:14px;border-radius:7px;margin:10px 0;
+  background:linear-gradient(90deg,var(--fill) 25%,var(--fill-strong) 50%,var(--fill) 75%);
+  background-size:200% 100%;animation:sk 1.2s infinite}
+@keyframes sk{to{background-position:-200% 0}}
 .foot{margin-top:40px;font-size:12px;color:var(--mut);text-align:center}
 /* 站内阅读弹窗 */
 .modal-bk{position:fixed;inset:0;z-index:100;background:rgba(0,0,0,.45);
@@ -148,7 +153,11 @@ select.sel{font:inherit;font-weight:500;color:var(--ink);background:var(--fill);
 <div class="chips-label">来源</div>
 <div class="chips scrollx" id="srcChips"></div>
 <div class="count" id="count"></div>
-<div class="list" id="list"></div>
+<div class="list" id="list">
+<div class="skel"><i style="width:65%"></i><i style="width:92%"></i><i style="width:38%"></i></div>
+<div class="skel"><i style="width:72%"></i><i style="width:88%"></i><i style="width:45%"></i></div>
+<div class="skel"><i style="width:58%"></i><i style="width:95%"></i><i style="width:33%"></i></div>
+</div>
 <div id="tlwrap"></div>
 <button class="more" id="moreBtn" hidden>加载更多</button>
 <div class="foot">数据来自 584 个中文独立博客 RSS · 由 Jev 做相关性/分类/质量初筛，仅供浏览参考</div>
@@ -163,7 +172,7 @@ select.sel{font:inherit;font-weight:500;color:var(--ink);background:var(--fill);
 </div>
 <script>
 const BUCKET={"news":"📰 新闻","models":"🤖 模型","trending":"🔥 开源","interests":"🎯 深度","voices":"👀 言论"};
-let DATA=[], VIEW=[], shown=0; const PAGE=30;
+let DATA=[], VIEW=[], shown=0, tlShown=0, tlLastDay=""; const PAGE=30;
 let fBucket="all", fSource="all", fQ="", fSort="score", fView="list";
 function score(a){return a.jev.relevance*(1+a.jev.quality/5);}
 function esc(s){return (s||"").replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));}
@@ -204,23 +213,37 @@ function renderList(reset){
   if(!r.length)document.getElementById("list").innerHTML='<div class="empty">没有匹配的文章，换个条件试试</div>';
 }
 /* ---- 时间线视图 ---- */
-function renderTimeline(){
+function renderTimeline(reset){
   const r=filtered().slice().sort((x,y)=>new Date(y.published)-new Date(x.published));
-  VIEW=r;
-  let html="",lastDay="";
-  r.forEach((a,gi)=>{
-    const dk=dayKey(a.published);
-    if(dk!==lastDay){if(lastDay)html+="</div>";html+=`<div class="tl-day-h">${dayLabel(a.published)}</div><div class="tl">`;lastDay=dk;}
+  if(reset){tlShown=0;tlLastDay="";document.getElementById("tlwrap").innerHTML="";VIEW=[];}
+  const slice=r.slice(tlShown,tlShown+PAGE);
+  slice.forEach(a=>VIEW.push(a));
+  const wrap=document.getElementById("tlwrap");
+  let html="",curDay=null,curLabel="";
+  const flush=()=>{
+    if(!html)return;
+    const last=wrap.lastElementChild;
+    if(curDay===tlLastDay&&last&&last.classList&&last.classList.contains("tl")){
+      last.insertAdjacentHTML("beforeend",html);  // 跨页同天：续进上一页的组
+    }else{
+      wrap.insertAdjacentHTML("beforeend",`<div class="tl-day-h">${curLabel}</div><div class="tl">${html}</div>`);
+    }
+    tlLastDay=curDay;html="";
+  };
+  slice.forEach((a,k)=>{
+    const gi=tlShown+k,dk=dayKey(a.published);
+    if(dk!==curDay){flush();curDay=dk;curLabel=dayLabel(a.published);}
     html+=`<div class="tl-item" data-i="${gi}"><div class="tl-dot"></div>
       <div class="tl-time">${fmtTime(a.published).split(" ")[1]||""}</div>
       <div class="tl-title">${esc(a.title)}</div>
       <div class="tl-src">${esc(a.source)} · ${BUCKET[a.jev.bucket]||""} · 推荐 ${score(a).toFixed(2)}${a.body?" · 📖":""}</div>
       ${a.summary?`<div class="tl-sum">${esc(a.summary)}</div>`:""}</div>`;
   });
-  if(lastDay)html+="</div>";
-  document.getElementById("tlwrap").innerHTML=html||'<div class="empty">没有匹配的文章，换个条件试试</div>';
-  document.getElementById("moreBtn").hidden=true;
+  flush();
+  tlShown+=slice.length;
+  document.getElementById("moreBtn").hidden=tlShown>=r.length;
   setCount(r.length);
+  if(!r.length)wrap.innerHTML='<div class="empty">没有匹配的文章，换个条件试试</div>';
 }
 function setCount(n){
   document.getElementById("count").textContent=`共 ${n} 篇`+(fSource!=="all"?` · ${fSource}`:"")+(fQ?`（“${fQ}”）`:"");
@@ -229,7 +252,7 @@ function render(reset){
   const isList=fView==="list";
   document.getElementById("list").style.display=isList?"":"none";
   document.getElementById("tlwrap").style.display=isList?"none":"";
-  if(isList)renderList(reset);else renderTimeline();
+  if(isList)renderList(reset);else renderTimeline(reset);
 }
 /* ---- 站内阅读弹窗 ---- */
 let modalIdx=-1;
@@ -290,7 +313,8 @@ document.getElementById("list").addEventListener("click",e=>{
 document.getElementById("tlwrap").addEventListener("click",e=>{
   const it=e.target.closest(".tl-item");if(!it)return;openModal(parseInt(it.dataset.i,10));});
 theme();initChips();
-fetch("reader_data.json").then(r=>r.json()).then(d=>{
+const RCACHE="reader-data-v1";
+function applyData(d){
   DATA=d.articles||[];
   document.getElementById("stN").textContent=DATA.length;
   document.getElementById("stS").textContent=new Set(DATA.map(a=>a.source)).size;
@@ -300,7 +324,13 @@ fetch("reader_data.json").then(r=>r.json()).then(d=>{
     document.getElementById("dateline").textContent=`${t.getFullYear()}年${t.getMonth()+1}月${t.getDate()}日 · 独立博客聚合`;
   }catch(e){}
   render(true);
-}).catch(()=>{document.getElementById("list").innerHTML='<div class="empty">数据加载失败，请稍后刷新重试</div>';});
+}
+try{const c=JSON.parse(localStorage.getItem(RCACHE));  // 先吐旧数据，首屏不等网络
+  if(c&&c.articles&&c.articles.length)applyData(c);}catch(e){}
+fetch("reader_data.json").then(r=>r.json()).then(d=>{
+  try{localStorage.setItem(RCACHE,JSON.stringify(d));}catch(e){}
+  applyData(d);  // 后台拿到新数据再刷新
+}).catch(()=>{if(!DATA.length)document.getElementById("list").innerHTML='<div class="empty">数据加载失败，请稍后刷新重试</div>';});
 </script>
 </body>
 </html>
