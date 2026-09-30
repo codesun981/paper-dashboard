@@ -254,7 +254,7 @@ footer a{color:var(--acc);text-decoration:none}
 <div class="wrap">
 <header class="top">
 <div>
-<div class="dateline">2026年9月30日 星期三</div>
+<div class="dateline">2026年10月1日 星期四</div>
 <h1>☀️ 每日看板</h1>
 <div class="sub">论文 · 兴趣追踪 · 新闻 · 开源趋势 · 大佬动态 —— 每天 08:00 / 12:00 / 22:00 自动更新</div>
 </div>
@@ -366,6 +366,7 @@ function showTab(name){
     const b = document.querySelector('[data-tab="' + t + '"]');
     if (b) b.classList.toggle('on', t === name);
   });
+  ensureTab(name);  // 懒渲染：首次切到某 tab 时才渲染
   if (('' + location.hash).slice(1) !== name){
     try{ history.replaceState(null, '', '#' + name); }catch(e){}
   }
@@ -723,15 +724,17 @@ function renderModels(){
   document.getElementById('mdList').innerHTML = html || '<div class="empty">今日暂无模型数据。</div>';
 }
 
-render();
-renderModels();
-renderLibrary();
-renderXDots();
-renderInterests();
-renderNews();
-renderTrending();
-renderX();
-showTab(('' + location.hash).slice(1) || 'papers');
+/* ---------- tab 懒渲染：首屏只渲染当前 tab，其余切换时按需渲染 ---------- */
+const TAB_RENDER = {papers: render, models: renderModels, library: renderLibrary,
+  interests: renderInterests, news: renderNews, trending: renderTrending, x: renderX};
+const TAB_DONE = {};
+function ensureTab(name){
+  if (!TAB_DONE[name] && TAB_RENDER[name]){ TAB_RENDER[name](); TAB_DONE[name] = 1; }
+}
+renderXDots();  // tab 栏小圆点不受懒渲染影响，照常初始化
+const _initTab = ('' + location.hash).slice(1);
+ensureTab(PANES.includes(_initTab) ? _initTab : 'papers');
+showTab(_initTab || 'papers');
 
 /* ---------- archive modal（历史归档弹窗） ---------- */
 const ARCH_PREFIX = location.pathname.indexOf('/archive/') >= 0 ? '' : 'archive/';
@@ -809,8 +812,8 @@ function switchRun(label){
   // 该版次有差异数据则用之，否则回退到最新合并状态
   NEWS = (r && r.news) ? r.news : NEWS_LATEST;
   XW = (r && r.x) ? r.x : XW_LATEST;
-  if (typeof renderNews === 'function') renderNews();
-  if (typeof renderX === 'function') renderX();
+  if (typeof renderNews === 'function'){ renderNews(); TAB_DONE.news = 1; }
+  if (typeof renderX === 'function'){ renderX(); TAB_DONE.x = 1; }
   if (typeof renderXDots === 'function') renderXDots();
 }
 document.querySelectorAll('.run-switch button').forEach(b =>
