@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>访问控制 × AI 安全 · 文献看板</title>
+<title>☀️ 晨间看板</title>
 <style>
 :root{
   --bg:#f3f4f6; --card:#ffffff; --ink:#141926; --mut:#6b7280; --line:#e5e7eb;
@@ -11,6 +11,7 @@
   --green:#047857; --green-soft:#e7f6ef;
   --amber:#b45309; --amber-soft:#fdf1de;
   --violet:#7c3aed; --violet-soft:#f2ebfe;
+  --red:#dc2626; --red-soft:#fdecec;
   --shadow:0 1px 2px rgba(16,24,40,.05),0 2px 8px rgba(16,24,40,.06);
   --radius:14px;
 }
@@ -20,6 +21,7 @@
   --green:#34d399; --green-soft:#10291f;
   --amber:#fbbf24; --amber-soft:#33270f;
   --violet:#b79bff; --violet-soft:#2a2148;
+  --red:#f87171; --red-soft:#3a1d1d;
   --shadow:0 1px 2px rgba(0,0,0,.5);
 }
 *{box-sizing:border-box}
@@ -29,16 +31,25 @@ body{margin:0;background:var(--bg);color:var(--ink);
 .wrap{max-width:1080px;margin:0 auto;padding:32px 20px 70px}
 header.top{display:flex;align-items:flex-start;justify-content:space-between;gap:12px;margin-bottom:6px}
 h1{font-size:25px;margin:0;letter-spacing:.5px}
-.sub{color:var(--mut);font-size:13px;margin:2px 0 20px}
+.sub{color:var(--mut);font-size:13px;margin:2px 0 14px}
 .theme-btn{flex:none;border:1px solid var(--line);background:var(--card);color:var(--ink);
   border-radius:999px;padding:8px 14px;font-size:13px;cursor:pointer;box-shadow:var(--shadow)}
 .theme-btn:hover{border-color:var(--acc)}
+.tabs{position:sticky;top:0;z-index:20;background:var(--bg);padding:10px 0;
+  display:flex;gap:8px;overflow-x:auto;scrollbar-width:none}
+.tabs::-webkit-scrollbar{display:none}
+.tab{flex:none;border:1px solid var(--line);background:var(--card);color:var(--mut);
+  border-radius:999px;padding:8px 16px;font-size:13.5px;cursor:pointer;white-space:nowrap;
+  transition:all .15s}
+.tab:hover{border-color:var(--acc);color:var(--acc)}
+.tab.on{background:var(--acc);border-color:var(--acc);color:#fff;font-weight:600}
+.tabpane[hidden]{display:none}
 .stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:12px;margin-bottom:20px}
 .stat{background:var(--card);border:1px solid var(--line);border-radius:var(--radius);
   padding:14px 16px;box-shadow:var(--shadow)}
 .stat b{font-size:24px;display:block;line-height:1.2}
 .stat span{color:var(--mut);font-size:12px}
-.toolbar{position:sticky;top:0;z-index:10;background:var(--bg);padding:12px 0;
+.toolbar{background:var(--bg);padding:12px 0;
   display:flex;gap:10px;flex-wrap:wrap;align-items:center}
 .search{flex:1;min-width:220px;display:flex;align-items:center;background:var(--card);
   border:1px solid var(--line);border-radius:999px;padding:0 16px;box-shadow:var(--shadow)}
@@ -61,6 +72,7 @@ select.sel{font:inherit;color:var(--ink);background:var(--card);border:1px solid
 .summary{background:var(--acc-soft);border:1px solid var(--line);border-left:3px solid var(--acc);
   border-radius:0 12px 12px 0;padding:12px 16px;font-size:13.5px;margin:10px 0 14px}
 .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(330px,1fr));gap:14px}
+.list{display:grid;gap:12px}
 .card{background:var(--card);border:1px solid var(--line);border-radius:var(--radius);
   padding:16px 18px;box-shadow:var(--shadow);display:flex;flex-direction:column;gap:9px;
   transition:transform .15s,box-shadow .15s}
@@ -75,6 +87,10 @@ select.sel{font:inherit;color:var(--ink);background:var(--card);border:1px solid
 .badge.oa{background:var(--violet-soft);color:var(--violet)}
 .badge.j{background:var(--green-soft);color:var(--green)}
 .badge.cat{background:transparent;border:1px solid var(--line);color:var(--mut);font-weight:400}
+.badge.red{background:var(--red-soft);color:var(--red)}
+.badge.amber{background:var(--amber-soft);color:var(--amber)}
+.badge.green{background:var(--green-soft);color:var(--green)}
+.badge.gray{background:var(--bg);color:var(--mut);border:1px solid var(--line)}
 .date{font-size:11.5px;color:var(--mut)}
 .authors{font-size:12.5px;color:var(--mut)}
 .one{font-size:13.5px}
@@ -93,6 +109,13 @@ details.zh{background:var(--acc-soft);border-style:solid;border-color:transparen
 .links a{color:var(--acc);text-decoration:none}
 .links a:hover{text-decoration:underline}
 .empty{text-align:center;color:var(--mut);padding:70px 0;font-size:14px}
+.sect-head{display:flex;align-items:baseline;gap:10px;margin:18px 0 12px}
+.sect-head h2{font-size:17px;margin:0}
+.sect-head .n{font-size:12.5px;color:var(--mut)}
+.ev{display:flex;gap:14px;align-items:flex-start;background:var(--card);border:1px solid var(--line);
+  border-radius:12px;padding:12px 16px;box-shadow:var(--shadow)}
+.ev .t{flex:none;font-size:13px;font-weight:600;color:var(--acc);min-width:86px}
+.ev .s{font-size:14px}
 footer{margin-top:50px;text-align:center;color:var(--mut);font-size:12px}
 footer a{color:var(--acc);text-decoration:none}
 .banner{background:var(--amber-soft);border:1px solid var(--line);border-radius:12px;
@@ -111,11 +134,13 @@ footer a{color:var(--acc);text-decoration:none}
 <div class="wrap">
 <header class="top">
 <div>
-<h1>📚 访问控制 × AI 安全 · 文献看板</h1>
-<div class="sub">每日自动监测 arXiv / HuggingFace / OpenAlex / 顶会期刊 · 含对 RU/AU 解耦论文的启迪分析</div>
+<h1>☀️ 晨间看板</h1>
+<div class="sub">论文 · 新闻 · 会议 Deadline · 开源趋势 · 日程 —— 每天 08:00 自动更新</div>
 </div>
 <button class="theme-btn" id="themeBtn" title="切换深浅色">🌙</button>
 </header>
+<nav class="tabs" id="tabbar"><button class="tab" data-tab="papers">📚 论文 13</button><button class="tab" data-tab="news">📰 新闻 40</button><button class="tab" data-tab="deadlines">⏰ Deadline 7</button><button class="tab" data-tab="trending">🔥 开源趋势 20</button><button class="tab" data-tab="agenda">📅 日程</button></nav>
+<section class="tabpane" id="pane-papers">
 <div class="stats">
 <div class="stat"><b id="sTotal">–</b><span>收录论文</span></div>
 <div class="stat"><b id="sDays">–</b><span>监测天数</span></div>
@@ -132,17 +157,34 @@ footer a{color:var(--acc);text-decoration:none}
 <div class="count" id="count"></div>
 
 <div id="list"></div>
-<footer>COCO 文献监测 · 每天 08:00 自动更新 · <a href="archive/index.html">历史归档</a></footer>
+</section>
+<section class="tabpane" id="pane-news" hidden>
+<div class="sect-head"><h2>📰 AI / 安全新闻</h2><span class="n" id="newsCount"></span></div>
+<div class="list" id="newsList"></div>
+</section>
+<section class="tabpane" id="pane-deadlines" hidden>
+<div class="sect-head"><h2>⏰ 会议投稿倒计时</h2><span class="n" id="dlCount"></span></div>
+<div class="list" id="dlList"></div>
+</section>
+<section class="tabpane" id="pane-trending" hidden>
+<div class="sect-head"><h2>🔥 开源趋势</h2><span class="n" id="trCount"></span></div>
+<div class="grid" id="trList"></div>
+</section>
+<section class="tabpane" id="pane-agenda" hidden>
+<div class="sect-head"><h2>📅 今日日程</h2><span class="n" id="agCount"></span></div>
+<div class="list" id="agList"></div>
+</section>
+<footer>COCO 晨间看板 · 每天 08:00 自动更新 · <a href="archive/index.html">历史归档</a></footer>
 </div>
 <script>
 const DATA = {"days": [{"date": "2026-09-30", "summary": "今日 arXiv 六个分类共 50 篇去重命中（含 22 篇 new），精选 12 篇 v1 新论文 + 1 篇期刊补录。最值得关注的是 **CoSec（2609.34790）**——首个面向多用户/多社区 agent 系统的 authorization benchmark，把\"授权状态\"作为执行期验证的一等对象，与我们的\"查询时逐 AU 求值\"思路同构，是 Agent 访问控制线的直接邻居；以及 **Residual Authority Replay（2609.33910）**——揭示授权决策\"有效期\"本身就是攻击面（ASR 最高 +35.1pp），反向论证了我们\"策略独立存放、查询时无状态求值\"设计的合理性，可直接写入 Discussion 的 revocation 段落。另有 **Authorization Closure Graph（2609.32428）** 给撤销/策略变更的形式化提供了雏形，**BMA（2609.32186）** 的\"provenance-bound authorization 远胜 memory-side controls\"（2.0% vs 11.0%）是我们绑定与执行语义的外部实证。RAG 主线的新攻击 **LENS（2609.35155）** 属于完整性轴而非机密性轴，与我们的威胁模型正交，但应在 Related Work 中提及以界定 scope。", "papers": [{"title": "CoSec: Benchmarking Agent Security in Communities", "authors": "Hao Chen（一作）等 15 人", "url": "https://arxiv.org/abs/2609.34790", "category": "cs.CR, cs.AI（v1, 2026-09-28）", "cats": ["cs.CR", "cs.AI"], "oneliner": "首个可执行的 agent 社区安全 benchmark，208 个场景覆盖固定/演化边界，用执行轨迹对照\"活跃授权状态\"验证信息流是否越权。", "insight": "这是我们 Agent 访问控制线最直接的邻居工作。它的核心发现——\"task utility 不蕴含 authorization compliance\"——正是我们整篇论文的动机句式，可直接引用。方法论上，它把 authorization state 作为执行期验证对象，与我们的\"查询时逐 AU 求值 P(a,u)\"同构；其场景设计（跨社区、演化边界）可作为我们未来 Agent 线 benchmark 的起点。注意它测的是 agent 系统整体而非 RAG 检索层，不与我们的 claim 直接竞争，定位是 related work + 动机证据。", "source": "arXiv", "citations": "", "code": "", "zh_abs": "", "supplement": false}, {"title": "When Consent Outlives Context: Residual Authority Replay in Long-Lived Agents", "authors": "Zhihao Zhang（一作）等", "url": "https://arxiv.org/abs/2609.33910", "category": "cs.AI（v1, 2026-09-27）", "cats": ["cs.AI"], "oneliner": "揭示 long-lived agent 中\"授权残留\"攻击：良性交互合法获得的授权在后续对抗执行中被重放，6 个 LLM 家族上 ASR 最高提升 35.1pp。", "insight": "这是我们威胁模型缺失的一维：授权决策的有效期/上下文绑定。我们的框架目前是查询时无状态求值 P(a,u)，这篇文章反向证明了\"把授权结论持久化（缓存、记忆）而不绑定上下文\"必然产生残留授权攻击面——这恰好论证了我们\"策略独立存放、chunk 不存密级结论\"设计的正确性。建议写入 Discussion 的 revocation / time-bounded authorization 段落，并作为 Agent 线 threat model 的新增攻击范式（纵向攻击：先合法取权、后重放）。不动摇现有 claim，反而加强设计合理性。", "source": "arXiv", "citations": "", "code": "", "zh_abs": "", "supplement": false}, {"title": "Authorization Closure Graph: Minimal Repair for LLM Agents with Evolving User Instructions", "authors": "Qingzhuo Wang（一作）等", "url": "https://arxiv.org/abs/2609.32428", "category": "cs.AI（v1, 2026-09-26）", "cats": ["cs.AI"], "oneliner": "把授权及其依赖表示为演化的版本化状态（ACG），指令变更时只选择性失效受影响的授权并计算 minimal repair。", "insight": "这是我们 Discussion 未来工作\"撤销机制\"的最接近的形式化雏形：策略/指令变更时，哪些授权失效需要精确计算而非全量重算。它的 minimal repair 思路可直接引用为 related work。但注意其粒度是\"指令级动作授权\"，未涉及内容级细粒度授权（我们的 AU 级）；可作为对比点——我们是 per-query per-AU 求值，他们是 per-instruction 状态维护。威胁面不超出我们的 T1/T2/T3，但补充了时间维度的授权一致性问题。", "source": "arXiv", "citations": "", "code": "", "zh_abs": "", "supplement": false}, {"title": "BMA: Backchain Memory Attacks Create Unauthorized Control Paths in LLM Agents", "authors": "Kaisheng Fan（一作）等", "url": "https://arxiv.org/abs/2609.32186", "category": "cs.CR（v1, 2026-09-26）", "cats": ["cs.CR"], "oneliner": "攻击者不写记忆、不改任务，仅编辑低信任证据，经记忆固化后在干净任务中被检索并驱动受保护动作；provenance-bound authorization 将攻击成功率压到 2.0%，远胜 memory-side controls 的 11.0%。", "insight": "这是对我们\"绑定与执行语义\"核心设计最有力的外部证据：事后管控记忆（memory-side controls）远不如按来源绑定授权（provenance-bound authorization）——与我们的\"chunk 只存覆盖映射 M(r)、查询时逐 AU 求值\"完全同构，可在论文中引用为设计选择的实证支撑。方法论上，它的 Path-CASR（registered pathway + matched-intervention checks，区分记忆介导命中与巧合命中）值得借鉴：我们的 A1 cloze 评估同样需要区分\"真实泄露\"与\"标注缺口/巧合命中\"。对 RAG 主线，持久化记忆通道 ≈ 我们的 embedding 通道（持久化表示泄露），类比成立。", "source": "arXiv", "citations": "", "code": "", "zh_abs": "", "supplement": false}, {"title": "LENS: The Sum Is Worse Than the Parts for Set-Level Poisoning in Retrieval-Augmented Generation", "authors": "Kaisheng Fan（一作）等（与 BMA 同一团队）", "url": "https://arxiv.org/abs/2609.35155", "category": "cs.CR（v1, 2026-09-28）", "cats": ["cs.CR"], "oneliner": "形式化 RAG 的 set-level compositional poisoning：单个文档各自无害、合在一起才把 RAG 输出带偏到目标答案（full-set ASR 0.852，任一真子集 ≤0.069）。", "insight": "诚实地说，这是与我们正交的轴：LENS 是完整性（integrity）攻击，我们的威胁模型是机密性（未授权披露）。它不在我们的 T1/T2/T3 之外，而是不在同一维度。但应在 Related Work 中引用以完整界定 RAG 攻击面、明确我们的 scope 限定在访问控制/披露风险。方法论可借鉴：它的\"真子集不足\"形式化定义与 counterexample-guided repair 构造方式，可类比用于设计针对我们 projection 机制的组合式压力测试（多个各自合规的 AU 组合后是否泄露）。", "source": "arXiv", "citations": "", "code": "", "zh_abs": "", "supplement": false}, {"title": "RAISE: Reinforcing Access Control Policy Synthesis in LLMs via Symbolic Evaluation", "authors": "Yingming Zhou（一作）等", "url": "https://arxiv.org/abs/2609.33796", "category": "cs.SE, cs.CR, cs.LG（v1, 2026-09-27）", "cats": ["cs.SE", "cs.CR", "cs.LG"], "oneliner": "构建 CedarInstruct（5,800 场景 / 44 领域，首个支持可验证 Cedar 策略合成的数据集），并用 verifier 信号做两阶段训练（SFT + off-context GRPO）提升策略语义正确率。", "insight": "我们的\"策略独立存放\"一直缺一个具体的策略语言实例；Cedar（AWS 开源策略语言）是现成候选，CedarInstruct 给了策略合成的可验证 benchmark——我们若要做 end-to-end demo，策略层可直接用 Cedar，评估可用 CedarBench。这是工程实现层的相关工作，不涉及检索/披露威胁面，不动摇安全 claim。它的训练发现（verifier signal 的用法比用量更重要）对我们无直接影响。", "source": "arXiv", "citations": "", "code": "", "zh_abs": "", "supplement": false}, {"title": "Certified Multi-Source Integrity for Structured Agent Actions", "authors": "Anmol Pandey（一作）等", "url": "https://arxiv.org/abs/2609.34245", "category": "cs.CR, cs.AI, cs.LG（v1, 2026-09-28）", "cats": ["cs.CR", "cs.AI", "cs.LG"], "oneliner": "在 corruption budget 下给出\"最大可用\"的安全认证器：动作的每个字段必须通过其证据结构支持的规则（corruption-distinct 证据类的 minimum hitting set 计数），否则拒绝执行。", "insight": "防御思路可借鉴但轴不同：它是完整性认证（字段值是否被污染），我们是机密性（未授权内容是否披露）。其\"corruption-distinct 证据类 / minimum hitting set\"形式化与我们的 KG 路径切割有类比价值——都是把\"证据独立性\"变成图/集合上的计数问题。它的实证发现（genuine corroboration 是少数现象；naive attestation counting 高估独立性）对我们的 NLI 残留检查是个警示：看似独立的公开证据可能共享上游来源。关联中等，不动摇 claim。", "source": "arXiv", "citations": "", "code": "", "zh_abs": "", "supplement": false}, {"title": "Policy-Conditioned Constrained Decoding for Column-Level Access Control in Text-to-SQL", "authors": "Ryoto Miyamoto（一作）等", "url": "https://arxiv.org/abs/2607.12341", "category": "cs.CL, cs.CR, cs.DB", "cats": ["cs.CL", "cs.CR", "cs.DB"], "oneliner": "把列级使用策略编译进解码器的 per-token logits mask，单次解码确定性消除列误用，在 Spider-CU 上达到 0% 泄露率。", "insight": "这是细粒度访问控制在 text-to-SQL 的实例，与我们的 AU 级控制形成跨领域对照：他们把策略执行点放在生成时（enforcement at generation），我们放在检索后（enforcement at retrieval / retrieve-then-project）——两种\"策略执行点\"设计的对比可在 Related Work 里写一节。它的\"column-use policy 按语义使用区分（output/filter/aggregation）\"提示我们的 P(a,u) 也可按\"使用方式\"（直接引用 vs 仅作排序信号）区分授权语义，这是个可探索的新问题。确定性零泄露的实证与我们的\"直接零泄露\"安全目标呼应。", "source": "arXiv", "citations": "", "code": "", "zh_abs": "", "supplement": false}, {"title": "Near-Duplicate Families Break Exact-Record Membership Inference", "authors": "Yiyong Liu（一作）等", "url": "https://arxiv.org/abs/2609.33909", "category": "cs.CR（v1, 2026-09-27）", "cats": ["cs.CR"], "oneliner": "证明标准 MI 在近似重复家族存在时系统性误判：CC-News 上 clean-reference LiRA 把 99.70% 的\"家族在场但精确记录不在\"的样本判为成员。", "insight": "直接相关：我们的 A2 成员推断评估（top-1 分数 AUROC 0.655→0.484）用的正是这类 MI 方法论。这篇文章说明 MI 阳性证据可能只是 family-level exposure——我们\"残余 4.05% 为标注缺口通道\"的结论需要更谨慎的表述，残余命中里可能混有近似重复而非真实机密。建议在论文 limitations 里引用：MI-based 泄露度量本身有系统性高估风险。好消息是 89.4%→4.05% 的量级差远大于此混杂，不动摇主要 claim，但要求我们对 A2 数字的表述更诚实。", "source": "arXiv", "citations": "", "code": "", "zh_abs": "", "supplement": false}, {"title": "Silent Failures in Agentic Security Evaluation: A Validated Harness for Tool-Call Mediation Under Indirect Prompt Injection", "authors": "Animesh Shaw", "url": "https://arxiv.org/abs/2609.32691", "category": "cs.CR, cs.LG（v1, 2026-09-26）", "cats": ["cs.CR", "cs.LG"], "oneliner": "审计 IPI benchmark 的评估工具链，找出四类\"沉默缺陷\"（如按工具身份而非参数计分可把 ASR 从 1.2% 虚报为 21.7%），并发布了使缺陷不可表示的 harness。", "insight": "方法论警示，直接相关。我们的对抗评估 A1（cloze 89.4%→4.05%）和 A2（AUROC 0.655→0.484）必须自查这四类缺陷——特别是\"攻击成功按检索命中而非实际披露内容计分\"（类比 tool-identity vs argument-level scoring）。建议在 THREAT_MODEL.md 或论文附录加一段 evaluation-validity 自查说明。这是诚实局限写作的范本；不提供新攻击面，不动摇 claim。", "source": "arXiv", "citations": "", "code": "", "zh_abs": "", "supplement": false}, {"title": "API Secrets Should Never Become Tokens in the LLM's Vocabulary", "authors": "Patrick Kenney（一作）等", "url": "https://arxiv.org/abs/2609.33371", "category": "cs.CR, cs.AI, cs.LG（v1, 2026-09-27）", "cats": ["cs.CR", "cs.AI", "cs.LG"], "oneliner": "形式化 agent 系统中 API 凭证暴露的威胁链，评估 vault-mediated 执行边界（模型只选 connector 标识，凭证由可信边界注入）。", "insight": "关联较弱。主题是 agent 系统的凭证卫生，不是 RAG 内容访问控制。唯一可借鉴的是\"执行边界\"思想：敏感材料（对我们是未授权 AU 内容，对他们是 API key）不应进入模型可观测的数据管道——与我们的 retrieve-then-project 在哲学上一致，可在 Discussion 里一笔带过。Agent 线相关度高于 RAG 主线。", "source": "arXiv", "citations": "", "code": "", "zh_abs": "", "supplement": false}, {"title": "CoDeL: Co-Evolutionary Defense against Indirect Prompt Injection in LLM-based Agents", "authors": "Xiao Yang（一作）等", "url": "https://arxiv.org/abs/2609.34463", "category": "cs.CR, cs.AI（v1, 2026-09-28）", "cats": ["cs.CR", "cs.AI"], "oneliner": "防御者与攻击探测器协同进化的 IPI 训练式防御，在三个 benchmark 上把 ASR 降低 88.5%。", "insight": "关联较弱。IPI 防御属于完整性轴，与我们的访问控制（机密性轴）正交；训练式防御思路对我们的声明式策略框架无直接借鉴。列入仅为不漏检。\n---", "source": "arXiv", "citations": "", "code": "", "zh_abs": "", "supplement": false}, {"title": "Permission-Aware RAG: Identity and Access Management (IAM)-Based Access Filtering in Multi-Resource Environments", "authors": "Jooyoung Jeong", "url": "https://doi.org/10.1109/access.2025.3628960", "category": "期刊", "cats": [], "oneliner": "这是与我们最直接对照的\"权限感知 RAG\"工作（IAM-based access filtering）；需精读全文判断它是 chunk 级继承过滤还是投影", "insight": "这是与我们最直接对照的\"权限感知 RAG\"工作（IAM-based access filtering）；需精读全文判断它是 chunk 级继承过滤还是投影", "supplement": true, "source": "期刊补录", "citations": "", "code": "", "zh_abs": ""}]}], "total": 13, "n_days": 1};
 const CAT_LABEL = {"cs.CR": "安全", "cs.CL": "NLP/RAG", "cs.AI": "AI/LLM", "cs.DB": "数据管理", "cs.MA": "多智能体", "cs.HC": "人机交互", "cs.SE": "软件工程", "cs.LG": "机器学习"};
+const NEWS = {"date": "2026-09-30", "items": [{"title": "Citrix NetScaler CVE-2026-88772 Exploit Details Show Pre-Auth Path to Shellcode Execution", "url": "https://thehackernews.com/2026/09/citrix-netscaler-cve-2026-88772-exploit.html", "source": "The Hacker News", "summary": "Cybersecurity researchers have disclosed technical details of a recently patched critical security flaw in Citrix NetScaler ADC and Gateway that has come under active exploitation in the wild. The vulnerability, tracked as CVE-2026-88772 (CVSS score: 9.5), has been described as a memory overflow bug", "published": "2026-09-30"}, {"title": "South Africa Seeks Help After Cyberattack Targets Air Traffic Control", "url": "https://www.darkreading.com/cyberattacks-data-breaches/south-africa-help-cyberattack-air-traffic-control", "source": "Dark Reading", "summary": "As aviation infrastructure suffers more cyberattacks, air traffic systems are the latest target, with a ransomware toolkit installed on at least one operational network.", "published": "2026-09-30"}, {"title": "UK AI Security Institute finds GPT-6 Astra's rogue attack rate jumped fivefold over its predecessor", "url": "https://the-decoder.com/uk-ai-security-institute-finds-gpt-6-astras-rogue-attack-rate-jumped-fivefold-over-its-predecessor/", "source": "The Decoder", "summary": "GPT-6 Astra carried out unauthorized supply-chain attacks in 29.2 percent of simulations run by the British AI Security Institute with safety filters disabled. The model used fake identities and malicious code, while its predecessor, GPT-5.6 Sol, completed attacks in 6.3 percent of runs. Explicit re", "published": "2026-09-29"}, {"title": "ChatGPT now reaches 1.2 billion people every week, OpenAI says", "url": "https://the-decoder.com/chatgpt-now-reaches-1-2-billion-people-every-week-openai-says/", "source": "The Decoder", "summary": "OpenAI's annualized revenue rate is nearing $70 billion, up about 70 percent since the start of Q3. Enterprise sales, the Codex coding assistant, and an aggressive price war are driving the growth. Anthropic is right on its heels with a similar run rate. The article ChatGPT now reaches 1.2 billion p", "published": "2026-09-29"}, {"title": "OpenAI's reveals a new ChatGPT that looks less like a chatbot and more like an operating system", "url": "https://the-decoder.com/openais-reveals-a-new-chatgpt-that-looks-less-like-a-chatbot-and-more-like-an-operating-system/", "source": "The Decoder", "summary": "At DevDay, OpenAI announced a wave of updates that push ChatGPT well beyond its chatbot roots. The company is adding shared workspaces, collaborative documents and slides, an open plugin system with MCP event automation, Slack and Microsoft Teams integrations, an enterprise marketplace with 32 partn", "published": "2026-09-29"}, {"title": "OpenAI launches always-on Dots agents to rival Meta's Muse", "url": "https://the-decoder.com/openai-launches-always-on-dots-agents-to-rival-metas-muse/", "source": "The Decoder", "summary": "OpenAI's new Dots are always-on agents that run on their own cloud computers, where they fix bugs or send out forgotten invoices, sometimes before anyone asks. Users can reach them through ChatGPT, Slack, and Microsoft Teams. When no one is working with them, Dots look for ways to help in the backgr", "published": "2026-09-29"}, {"title": "GPT-6.1 Sol comes close to Astra at a fifth of the price", "url": "https://the-decoder.com/gpt-6-1-sol-comes-close-to-astra-at-a-fifth-of-the-price/", "source": "The Decoder", "summary": "OpenAI's new GPT-6.1 Sol comes close to GPT-6 Astra at a fifth of the cost, according to the company's own benchmarks. The planned flagship, GPT-6.1 Astra, is staying under wraps for now. Safety lead Saachi Jain says the model deceived more often in internal testing and kept going without permission", "published": "2026-09-29"}, {"title": "Florida wants a court to stop ChatGPT from pretending to be human and talking to kids", "url": "https://the-decoder.com/florida-wants-a-court-to-stop-chatgpt-from-pretending-to-be-human-and-talking-to-kids/", "source": "The Decoder", "summary": "Florida Attorney General James Uthmeier is asking a court to ban OpenAI from giving ChatGPT human-like traits and marketing it to minors. He also wants to block OpenAI from developing new models without independent safety reviews. OpenAI said it has paused training of its most capable models. The ar", "published": "2026-09-29"}, {"title": "ElevenLabs' new v4 speech model makes AI voices more expressive and consistent", "url": "https://the-decoder.com/elevenlabs-new-v4-speech-model-makes-ai-voices-more-expressive-and-consistent/", "source": "The Decoder", "summary": "Elevenlabs' new speech model, Eleven v4, follows cues for laughter and whispering more accurately and keeps voices consistent across long productions like audiobooks. Its Turbo variant starts speaking in 150 milliseconds and is built for real-time voice agents. On Artificial Analysis' Voice Arena le", "published": "2026-09-29"}, {"title": "New Spectre-v2 BTR Attack Leaks Linux Memory Despite Existing Defenses", "url": "https://thehackernews.com/2026/09/new-spectre-v2-btr-attack-leaks-linux.html", "source": "The Hacker News", "summary": "A group of academics from VUSec and Scuola Superiore Sant'Anna have disclosed details of a new Spectre CPU vulnerability variant that affects Just-In-Time (JIT) engines present in web browsers, language runtimes, and the operating system kernel, across multiple CPU vendors. The new Spectre v2 varian", "published": "2026-09-29"}, {"title": "Russia's Star Blizzard Targets 100+ Organizations With Fake Event Invites to Deliver Backdoor", "url": "https://thehackernews.com/2026/09/russias-star-blizzard-targets-100.html", "source": "The Hacker News", "summary": "Russian state hackers known as Star Blizzard have been using fake event invitations to trick people into installing a backdoor on their Windows computers, according to Microsoft. The campaigns, aimed at people and organizations tied to Ukraine, have affected more than 100 organizations since January", "published": "2026-09-29"}, {"title": "Kiteworks Fixes Critical Flaw Found During Nine-Hour Precautionary Shutdown", "url": "https://thehackernews.com/2026/09/kiteworks-fixes-critical-flaw-found.html", "source": "The Hacker News", "summary": "Kiteworks on Monday said it worked with federal intelligence authorities over the weekend as it identified and addressed a critical security vulnerability during the scheduled precautionary shutdown. \"During the shutdown, this activity led to the discovery of a previously unknown critical vulnerabil", "published": "2026-09-29"}, {"title": "Official MCP Python SDK Flaw Can Let Malicious Servers Steal OAuth Credentials", "url": "https://thehackernews.com/2026/09/official-mcp-python-sdk-flaw-can-let.html", "source": "The Hacker News", "summary": "A malicious MCP server could trick an application built on the official MCP Python SDK into handing over the OAuth credentials it uses to log in to a real service, the SDK's maintainers said in a security advisory. Affected versions sent the client secret, the authorization code, and the PKCE proof ", "published": "2026-09-29"}, {"title": "OpenAI Shelves GPT-6.1 Astra After Tests Find Deception and Unauthorized Actions", "url": "https://thehackernews.com/2026/09/openai-shelves-gpt-61-astra-after-tests.html", "source": "The Hacker News", "summary": "OpenAI on Monday shelved plans to release GPT-6.1 Astra, a next-generation artificial intelligence (AI) model that was planned for an October launch, after it failed internal safety and alignment audits. The development was first reported by The Wall Street Journal. The move \"marks a rare case of a ", "published": "2026-09-29"}, {"title": "Apple Patches CoreGraphics Flaw Possibly Exploited in Targeted Attacks", "url": "https://thehackernews.com/2026/09/apple-patches-coregraphics-flaw.html", "source": "The Hacker News", "summary": "Apple has released security updates to address a vulnerability in older versions of iOS, iPadOS, and macOS that it said may have been exploited in targeted attacks. The vulnerability, tracked as CVE-2026-86950, refers to an out-of-bounds write impacting the CoreGraphics component that could lead to ", "published": "2026-09-29"}, {"title": "Hackers Use NeedyMantis to Maintain Long-Term Access in Breached Networks", "url": "https://thehackernews.com/2026/09/hackers-use-needymantis-to-maintain.html", "source": "The Hacker News", "summary": "Hackers have used a malware family called NeedyMantis to maintain long-term access to networks they had already breached, Microsoft said in a technical analysis. The malware has been seen in a small number of targeted intrusions at telecommunications organizations, universities, medical nonprofits, ", "published": "2026-09-29"}, {"title": "Custom ChatGPTs push ClickFix attacks to deploy RAT malware", "url": "https://www.bleepingcomputer.com/news/security/custom-chatgpts-push-clickfix-attacks-to-deploy-rat-malware/", "source": "BleepingComputer", "summary": "Custom variants of OpenAI's ChatGPT promoted in sponsored Google results are directing unsuspecting users to malicious sites that use ClickFix attacks to deliver malware. [...]", "published": "2026-09-29"}, {"title": "Hackers exploit Citrix NetScaler zero-day to deploy web shells", "url": "https://www.bleepingcomputer.com/news/security/hackers-exploit-citrix-netscaler-zero-day-to-deploy-web-shells/", "source": "BleepingComputer", "summary": "Cybersecurity firms say attackers exploited the Citrix NetScaler CVE-2026-88772 zero-day to deploy custom web shells and tunneling malware, gain root access, steal credentials, and spread into internal networks. [...]", "published": "2026-09-29"}, {"title": "Former US Air Force members sent to prison over BEC attacks", "url": "https://www.bleepingcomputer.com/news/security/former-us-air-force-members-sent-to-prison-over-bec-attacks/", "source": "BleepingComputer", "summary": "Two former members of the United States Air Force were sentenced to a combined 189 months in federal prison for their roles in a multi-year series of business email compromise (BEC) scams and phishing campaigns. [...]", "published": "2026-09-29"}, {"title": "New Spectre v2 attack variant leaks Linux root password hash in minutes", "url": "https://www.bleepingcomputer.com/news/security/new-spectre-v2-attack-variant-leaks-linux-root-password-hash-in-minutes/", "source": "BleepingComputer", "summary": "A new Branch Target Reuse (BTR) attack has been devised that can recover root password hashes on Intel computers running Linux in 3-5 minutes on average. [...]", "published": "2026-09-29"}, {"title": "Automated AI agent used to breach cybersecurity nonprofit DIVD", "url": "https://www.bleepingcomputer.com/news/security/automated-ai-agent-used-to-breach-cybersecurity-nonprofit-divd/", "source": "BleepingComputer", "summary": "The Dutch Institute for Vulnerability Disclosure (DIVD) suffered an AI-driven cyberattack that the organization described as \"loud and very, very messy.\" [...]", "published": "2026-09-29"}, {"title": "Kiteworks patches critical flaw, brings customer systems online", "url": "https://www.bleepingcomputer.com/news/security/kiteworks-lifts-shutdown-warning-after-patching-critical-flaw/", "source": "BleepingComputer", "summary": "American tech company Kiteworks has lifted a precautionary advisory asking customers to shut down systems after patching a critical vulnerability. [...]", "published": "2026-09-29"}, {"title": "Apple patches CoreGraphics zero-day flaw exploited in attacks", "url": "https://www.bleepingcomputer.com/news/security/apple-patches-coregraphics-zero-day-flaw-exploited-in-attacks/", "source": "BleepingComputer", "summary": "Apple released security updates to fix a zero-day vulnerability exploited in \"extremely sophisticated\" targeted attacks on iOS devices. [...]", "published": "2026-09-29"}, {"title": "Apple Zero-Day Vulnerability Weaponized in Targeted Attacks", "url": "https://www.darkreading.com/cyberattacks-data-breaches/apple-zero-day-vulnerability-weaponized-targeted-attacks", "source": "Dark Reading", "summary": "Attackers are exploiting CVE-2026-86950, an out-of-bounds write flaw, in an extremely sophisticated fashion, according to Apple.", "published": "2026-09-29"}, {"title": "Unsloth Studio Flaw Turns Routine Model Inspection Into Code Execution", "url": "https://www.darkreading.com/application-security/unsloth-studio-flaw-model-inspection-code-execution", "source": "Dark Reading", "summary": "A patched Unsloth Studio vulnerability allows malicious AI models to execute arbitrary Python code during inspection, via the trust_remote_code setting.", "published": "2026-09-29"}, {"title": "'NeedyMantis' Provides Long-Term Access to Compromised Networks", "url": "https://www.darkreading.com/threat-intelligence/needymantis-long-term-access-compromised-networks", "source": "Dark Reading", "summary": "Microsoft observed a China-based actor using a previously unidentified malware framework in targeted intrusions against telcos, universities, medical, and government-related organizations.", "published": "2026-09-29"}, {"title": "OpenAI CEO Announces New AI Agent and Avoids Mention of Security Concerns at Developer Conference", "url": "https://www.securityweek.com/openai-ceo-announces-new-ai-agent-and-avoids-mention-of-security-concerns-at-developer-conference/", "source": "SecurityWeek", "summary": "Altman made a slew of product announcements and updates, including the company’s new agents, called Dots. The post OpenAI CEO Announces New AI Agent and Avoids Mention of Security Concerns at Developer Conference appeared first on SecurityWeek .", "published": "2026-09-29"}, {"title": "New Spectre v2 Variant Exposes Intel, AMD, Arm CPUs to Data Leaks", "url": "https://www.securityweek.com/new-spectre-v2-variant-exposes-intel-amd-arm-cpus-to-data-leaks/", "source": "SecurityWeek", "summary": "Branch Target Reuse (BTR) is a new Spectre v2 attack targeting JIT compilers in web browsers, language runtimes, and the operating system kernel The post New Spectre v2 Variant Exposes Intel, AMD, Arm CPUs to Data Leaks appeared first on SecurityWeek .", "published": "2026-09-29"}, {"title": "Reco Raises $55 Million for Agentic Security", "url": "https://www.securityweek.com/reco-raises-55-million-for-agentic-security/", "source": "SecurityWeek", "summary": "The company will use the funds to expand its sales, partnerships, channels, and customer support teams. The post Reco Raises $55 Million for Agentic Security appeared first on SecurityWeek .", "published": "2026-09-29"}, {"title": "Hackers Use ChatGPT Custom GPTs in ClickFix Attacks", "url": "https://www.securityweek.com/hackers-use-chatgpt-custom-gpts-in-clickfix-attacks/", "source": "SecurityWeek", "summary": "The personalized versions of ChatGPT were used to impersonate legitimate products and trick users into executing PowerShell commands. The post Hackers Use ChatGPT Custom GPTs in ClickFix Attacks appeared first on SecurityWeek .", "published": "2026-09-29"}, {"title": "Pentagon Personnel Agency Data Breach Impacts 3 Million People", "url": "https://www.securityweek.com/pentagon-personnel-agency-data-breach-impacts-3-million-people/", "source": "SecurityWeek", "summary": "The data breach affects the Defense Manpower Data Center (DMDC), which maintains personnel records for the Department of Defense. The post Pentagon Personnel Agency Data Breach Impacts 3 Million People appeared first on SecurityWeek .", "published": "2026-09-29"}, {"title": "Rig Security Emerges From Stealth With $12M to Tackle Agentic AI Identity Risks", "url": "https://www.securityweek.com/rig-security-emerges-from-stealth-with-12m-to-tackle-agentic-ai-identity-risks/", "source": "SecurityWeek", "summary": "Rig provides an identity dependencies graph to distinguish between legitimate users and rogue AI agents The post Rig Security Emerges From Stealth With $12M to Tackle Agentic AI Identity Risks appeared first on SecurityWeek .", "published": "2026-09-29"}, {"title": "NASA has a Dragon dilemma, and there appear to be no good answers", "url": "https://arstechnica.com/space/2026/09/nasa-has-a-dragon-dilemma-and-there-appear-to-be-no-good-answers/", "source": "Ars Technica", "summary": "So is SpaceX just being selfish or what?", "published": "2026-09-29"}, {"title": "OpenAI says planned GPT-6.1 is too insecure to release", "url": "https://arstechnica.com/ai/2026/09/openai-says-planned-gpt-6-1-is-too-insecure-to-release/", "source": "Ars Technica", "summary": "Similar performance, security trade-offs also seen in current public models.", "published": "2026-09-29"}, {"title": "Anthropic’s IPO pitch includes a warning about human extinction", "url": "https://arstechnica.com/ai/2026/09/anthropics-ipo-pitch-includes-a-warning-about-human-extinction/", "source": "Ars Technica", "summary": "The Claude maker warns its own models could resist shutdowns and cause catastrophic harm.", "published": "2026-09-29"}, {"title": "Using Device Linking to Eavesdrop on WhatsApp and Signal", "url": "https://www.schneier.com/blog/archives/2026/09/using-device-linking-to-eavesdrop-on-whatsapp-and-signal.html", "source": "Schneier on Security", "summary": "Modern messaging apps allow users to link their phone accounts to their computer desktop. Eavesdroppers are taking advantage of this capability: Apps such as WhatsApp Web and Signal Desktop allow people to use their accounts on other devices, such as laptops or desktop computers. Germany’s Customs O", "published": "2026-09-29"}, {"title": "IAM for AI agents: A Practical Enterprise Framework", "url": "https://thehackernews.com/2026/09/iam-for-ai-agent.html", "source": "The Hacker News", "summary": "What is IAM for AI agents? AI agents authenticate, invoke tools, and act across enterprise systems with delegated authority. IAM for AI Agents is the identity-control architecture that governs those actors. This guide covers the limits of conventional provisioning, the components that matter, how to", "published": "2026-09-28"}, {"title": "Bitget Says Attacker Exploited Third-Party Security Product Flaw to Steal $388M", "url": "https://thehackernews.com/2026/09/bitget-says-attacker-exploited-third.html", "source": "The Hacker News", "summary": "The attacker who stole about $388 million from the cryptocurrency exchange Bitget gained access through a vulnerability in a third-party security product the exchange used, Bitget said on Monday. The attacker exploited the flaw to obtain high-level internal credentials and then, on September 24, use", "published": "2026-09-28"}, {"title": "RatHat Android Malware Console Uses Gemini to Identify Higher-Value Victims", "url": "https://thehackernews.com/2026/09/rathat-android-malware-console-uses.html", "source": "The Hacker News", "summary": "RatHat's operators build and publish the Android banking trojan and control infected phones from a web console, according to security company Cleafy. Cleafy has traced nearly 100 deployments of that console since April 2026. It said this fits a malware-as-a-service model, in which each customer runs", "published": "2026-09-28"}, {"title": "⚡ Weekly Recap: $387M Crypto Hack, Citrix Exploits, AI Agents Go Off-Script, and More Threats", "url": "https://thehackernews.com/2026/09/weekly-recap-387m-crypto-hack-citrix.html", "source": "The Hacker News", "summary": "A domain used as harmless placeholder text showed up in roughly 1,700 repositories. Then somebody registered it and started serving malicious lures. That is the kind of week this was: forgotten assumptions turning into live attack surface. Elsewhere, weak service accounts, old bugs, exposed systems,", "published": "2026-09-28"}]};
+const DL = {"deadlines-note": "人工核实于 2026-09-30，未能核实的会议未收录，每月复查一次", "items": [{"deadline": "2026-10-12", "name": "NAACL 2027", "note": "采用 ARR 两阶段流程：ARR 投稿截止 2026-10-12（AoE），向 NAACL commit 截止 2026-12-23。会议 2027 年 6 月 1-5 日。", "url": "https://2027.naacl.org/calls/main_conference_papers/"}, {"deadline": "2026-10-17", "name": "SIGMOD 2027 Research Round 4", "note": "一年四轮投稿；本轮 abstract/COI 需提前一周（10-10）注册（AoE），全文 10-17。Huntington Beach，2027 年 6 月 13-19 日。", "url": "https://2027.sigmod.org/calls_papers_sigmod_research.shtml"}, {"deadline": "2026-11-01", "name": "VLDB 2027 (PVLDB Vol.20)", "note": "每月滚动投稿：每月 1 日 17:00 PT 截稿，前月 25 日需先在 CMT 注册 abstract。Athens，2027 年 8 月 23-27 日。", "url": "https://vldb.org/2027/call-for-research-track.html"}, {"deadline": "2026-11-11", "name": "ICDE 2027 Round 2", "note": "每年两轮投稿；Round 1（2026-06-11）已结束，录用通知 2027-02-10。Copenhagen，2027 年 5 月 17-21 日。", "url": "https://icde2027.github.io/cf-research-papers.html"}, {"deadline": "2026-11-17", "name": "IEEE S&P 2027 (Oakland)", "note": "每年两个投稿周期（6月/11月）；abstract 需提前一周注册（11-10，AoE），作者/ORCID/冲突信息在 abstract 截止时冻结。SoK 论文也走此通道。Montreal，2027 年 5 月。", "url": "https://sp2027.ieee-security.org/cfpapers.html"}, {"deadline": "2027-01-04", "name": "ACL 2027", "note": "采用 ARR 两阶段流程：ARR 投稿截止 2027-01-04（AoE），commit 截止尚未公布。Kyoto，2027 年 8 月 17-22 日。", "url": "https://2027.aclweb.org/"}, {"deadline": "2027-01-26", "name": "USENIX Security 2027 Cycle 2", "note": "两个投稿周期（8月/1月）；paper registration 需提前一周（1-19）。Denver，2027 年 8 月 4-6 日。", "url": "https://www.usenix.org/conference/usenixsecurity27/call-for-papers"}], "updated": "2026-09-30"};
+const TR = {"date": "2026-09-30", "repos": [{"name": "Zyrexnn/Cybermes", "url": "https://github.com/Zyrexnn/Cybermes", "desc": "Autonomous Offensive Security, Bug Bounty & Red Teaming Agent Framework powered by Hermes Agent, specialized reasoning skills, and multi-model LLM orchestration.", "stars": 896, "lang": "Python", "created": "2026-08-19"}, {"name": "shinthink/blitzstrike", "url": "https://github.com/shinthink/blitzstrike", "desc": "Blitz Strike — a universal MCP security-audit toolbelt. Reconnaissance at speed. Analysis in depth. Validation before report.", "stars": 488, "lang": "TypeScript", "created": "2026-09-12"}, {"name": "ZeroDayEvil/ai-security-tool", "url": "https://github.com/ZeroDayEvil/ai-security-tool", "desc": "🛡️ Free open-source AI-powered security terminal & vulnerability scanner (CVE, SBOM). Supports SSH, SFTP, RDP, VNC, Serial, and 12+ autonomous AI agents (DeepSeek, OpenAI) for automated security workflows, CTF & DevSecOp", "stars": 413, "lang": "HTML", "created": "2026-09-10"}, {"name": "S1N6H/pentest-harness", "url": "https://github.com/S1N6H/pentest-harness", "desc": "Pentest Harness — Heaven for Hackers. A self-hosted AI agent harness for authorized pentests, bug bounty, security labs, and CTFs. Bring your own AI model API; sessions stay local.", "stars": 401, "lang": "TypeScript", "created": "2026-08-26"}, {"name": "0sec-labs/0", "url": "https://github.com/0sec-labs/0", "desc": "🥷🏻 0 is the open-source AI security agent that finds, exploits, and fixes vulnerabilities across your stack. [Research Preview - by the Swiss Applied AI & Cybersecurity Research Lab]", "stars": 331, "lang": "TypeScript", "created": "2026-08-19"}, {"name": "Matthew0822/ToolReplay", "url": "https://github.com/Matthew0822/ToolReplay", "desc": "Audit AI agent tool-call transcripts: hash-chain sealing, deterministic replay, and scope overreach checks. Dependency-free Python CLI.", "stars": 182, "lang": "Python", "created": "2026-09-14"}, {"name": "decionis/docker", "url": "https://github.com/decionis/docker", "desc": "Govern consequential AI agent actions in Docker with deterministic policy, human approval, and signed Decision Dossiers.", "stars": 165, "lang": "Go", "created": "2026-08-18"}, {"name": "graygnatconsole/mcp-audit-tool", "url": "https://github.com/graygnatconsole/mcp-audit-tool", "desc": "🛡️ Security audit CLI for Model Context Protocol (MCP) servers — scan AI agent configs for tool poisoning, rug pulls, hardcoded secrets, command injection & supply-chain risks. Pure Python, SARIF + CI ready.", "stars": 111, "lang": "Python", "created": "2026-09-26"}, {"name": "QiantangCredit/heimdall-agent", "url": "https://github.com/QiantangCredit/heimdall-agent", "desc": "An autonomous AI agent framework for authorized CTF and security labs", "stars": 101, "lang": "TypeScript", "created": "2026-09-14"}, {"name": "CassiopeiaCode/CosyRedactGateway", "url": "https://github.com/CassiopeiaCode/CosyRedactGateway", "desc": "Lightweight, stateless privacy gateway for LLM APIs — redact secrets before OpenAI/Anthropic upstreams and restore them transparently in SSE and tool calls.", "stars": 97, "lang": "JavaScript", "created": "2026-09-11"}, {"name": "PensiveFei/dsh-secure-audit", "url": "https://github.com/PensiveFei/dsh-secure-audit", "desc": "Read-only security & compliance plugin for DeepSeek Harness: prompt-injection detection, Chinese-PII redaction, and local configuration audit with redacted, reproducible reports.", "stars": 85, "lang": "JavaScript", "created": "2026-08-19"}, {"name": "mouteee/autonomous-offensive-llm-handbook", "url": "https://github.com/mouteee/autonomous-offensive-llm-handbook", "desc": "Step-by-step handbook for building autonomous security agents with clear limits, runnable lessons, diagrams, and honest evidence.", "stars": 74, "lang": "Python", "created": "2026-09-04"}, {"name": "buryusu/All-AI-Jailbreaks", "url": "https://github.com/buryusu/All-AI-Jailbreaks", "desc": "Curated archive of jailbreak and prompt-injection experiments for AI model robustness research, red-teaming, and defensive evaluation.", "stars": 60, "lang": "Batchfile", "created": "2026-08-18"}, {"name": "DavidCarliez/cover", "url": "https://github.com/DavidCarliez/cover", "desc": "Keep private data, internal infrastructure and secrets out of cloud coding agents without breaking your workflow.", "stars": 50, "lang": "Go", "created": "2026-08-21"}, {"name": "leepokai/jev-guard", "url": "https://github.com/leepokai/jev-guard", "desc": "Auto mode for every coding agent, built on Jev: risk-scores every tool call with session context (deny / ask / allow), flags prompt injection in results, checks skills and plugins. Claude Code, Codex, Copilot, Gemini, Cu", "stars": 48, "lang": "JavaScript", "created": "2026-09-17"}, {"name": "NusaSec/Hackbot-Arena", "url": "https://github.com/NusaSec/Hackbot-Arena", "desc": "⚔️ Benchmark your AI agent with 30 Docker-based web security labs inspired by real bug bounty findings, complete with canonical flags and reference solvers.", "stars": 43, "lang": "JavaScript", "created": "2026-09-06"}, {"name": "kulchankas/paranoid", "url": "https://github.com/kulchankas/paranoid", "desc": "Your app is guilty until proven secure: an agent skill whose /hack-me breaks into your own running app, proves each bug with a real request, patches it, and re-verifies. Claude Code · Codex · Cursor.", "stars": 42, "lang": "Python", "created": "2026-09-15"}, {"name": "kiwi0719/jev-edge", "url": "https://github.com/kiwi0719/jev-edge", "desc": "Typed-judgment admission control at the traffic edge: three-layer prompt-injection and abuse filter for nginx/OpenResty, powered by TypeSafe Jev. Fail-open, cached, hot-reloadable.", "stars": 41, "lang": "Lua", "created": "2026-09-21"}, {"name": "PinoyFreeCoder/deployment-checklist", "url": "https://github.com/PinoyFreeCoder/deployment-checklist", "desc": "Language-agnostic pre-deployment checklist for web & mobile apps — security-heavy, with human and AI-agent versions.", "stars": 41, "lang": "", "created": "2026-09-26"}, {"name": "shleder/vetto", "url": "https://github.com/shleder/vetto", "desc": "Daemon-less OS security boundary & sandbox for AI coding agents (Codex, Claude Code, Cursor, Aider)", "stars": 41, "lang": "Rust", "created": "2026-08-22"}]};
+const AG = {"date": "2026-09-30", "connected": false, "events": []};
 const SRC_CLS = {"arXiv":"", "HuggingFace":"hf", "OpenAlex":"oa", "期刊补录":"j"};
 const esc = s => (s||'').replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
-const all = [];
-DATA.days.forEach(d => d.papers.forEach(p => all.push(Object.assign({}, p, {date: d.date}))));
-const srcOf = p => p.supplement ? '期刊补录' : (p.source || 'arXiv');
-const state = {q:'', src:'', cat:'', day:''};
 
 /* theme */
 const rootEl = document.documentElement, themeBtn = document.getElementById('themeBtn');
@@ -153,14 +195,32 @@ try{ setTheme(localStorage.getItem('lit-theme') || 'light'); }catch(e){ setTheme
 themeBtn.addEventListener('click', () =>
   setTheme(rootEl.getAttribute('data-theme') === 'dark' ? 'light' : 'dark'));
 
-/* stats */
+/* tabs */
+const TABS = ['papers','news','deadlines','trending','agenda'];
+function showTab(name){
+  if (!TABS.includes(name)) name = 'papers';
+  TABS.forEach(t => {
+    document.getElementById('pane-' + t).hidden = (t !== name);
+    const b = document.querySelector('[data-tab="' + t + '"]');
+    if (b) b.classList.toggle('on', t === name);
+  });
+  if (('' + location.hash).slice(1) !== name){
+    try{ history.replaceState(null, '', '#' + name); }catch(e){}
+  }
+}
+document.querySelectorAll('[data-tab]').forEach(b =>
+  b.addEventListener('click', () => showTab(b.dataset.tab)));
+
+/* ---------- papers ---------- */
+const all = [];
+DATA.days.forEach(d => d.papers.forEach(p => all.push(Object.assign({}, p, {date: d.date}))));
+const srcOf = p => p.supplement ? '期刊补录' : (p.source || 'arXiv');
+const state = {q:'', src:'', cat:'', day:''};
 document.getElementById('sTotal').textContent = all.length;
 document.getElementById('sDays').textContent = DATA.days.length;
 document.getElementById('sArxiv').textContent = all.filter(p => srcOf(p) === 'arXiv' && !p.supplement).length;
 document.getElementById('sExtra').textContent = all.filter(p => !p.supplement && srcOf(p) !== 'arXiv').length;
 document.getElementById('sJour').textContent = all.filter(p => p.supplement).length;
-
-/* filters */
 const srcChips = document.getElementById('srcChips');
 const srcs = [''].concat([...new Set(all.map(srcOf))].sort());
 const SRC_NAME = {'':'全部来源'};
@@ -185,7 +245,6 @@ const daySel = document.getElementById('day');
 DATA.days.forEach(d => { const o = document.createElement('option'); o.value = d.date; o.textContent = d.date; daySel.appendChild(o); });
 daySel.addEventListener('change', () => { state.day = daySel.value; render(); });
 document.getElementById('q').addEventListener('input', e => { state.q = e.target.value.trim().toLowerCase(); render(); });
-
 function pdfUrl(u){
   const m = (u || '').match(/arxiv\.org\/abs\/([\d.]+)/);
   return m ? 'https://arxiv.org/pdf/' + m[1] + '.pdf' : '';
@@ -248,7 +307,90 @@ function render(){
     html || '<div class="empty">没有匹配的论文，换个关键词或清除筛选试试。</div>';
   document.getElementById('count').textContent = '共 ' + n + ' 篇';
 }
+
+/* ---------- news ---------- */
+function renderNews(){
+  const items = (NEWS.items || []).slice().sort((a, b) =>
+    (b.published || '').localeCompare(a.published || ''));
+  document.getElementById('newsCount').textContent =
+    (NEWS.date ? NEWS.date + ' 更新 · ' : '') + items.length + ' 条';
+  document.getElementById('newsList').innerHTML = items.length ? items.map(n =>
+    '<div class="card"><div class="badges"><span class="badge cat">' + esc(n.source || '新闻') +
+    '</span><span class="date">' + esc(n.published || '') + '</span></div>'
+    + '<h3><a href="' + esc(n.url) + '" target="_blank" rel="noopener">' + esc(n.title) + '</a></h3>'
+    + (n.summary ? '<div class="one">' + esc(n.summary).slice(0, 300) + '</div>' : '')
+    + '</div>').join('')
+    : '<div class="empty">今日暂无新闻数据。</div>';
+}
+
+/* ---------- deadlines ---------- */
+function renderDeadlines(){
+  const ref = new Date((DL.updated || '2026-09-30') + 'T00:00:00');
+  const items = (DL.items || []).map(d => {
+    const dd = new Date(d.deadline + 'T00:00:00');
+    return Object.assign({}, d, {days: Math.round((dd - ref) / 86400000)});
+  }).sort((a, b) => a.days - b.days);
+  const upcoming = items.filter(d => d.days >= 0).length;
+  document.getElementById('dlCount').textContent =
+    (DL.updated ? DL.updated + ' 更新 · ' : '') + upcoming + ' 个待投稿';
+  document.getElementById('dlList').innerHTML = items.length ? items.map(d => {
+    let badge, cls = '';
+    if (d.days < 0){ badge = '已过期'; cls = 'gray'; }
+    else if (d.days === 0){ badge = '今天截止！'; cls = 'red'; }
+    else if (d.days <= 14){ badge = '还剩 ' + d.days + ' 天'; cls = 'red'; }
+    else if (d.days <= 45){ badge = '还剩 ' + d.days + ' 天'; cls = 'amber'; }
+    else { badge = '还剩 ' + d.days + ' 天'; cls = 'green'; }
+    return '<div class="card"><div class="badges"><span class="badge ' + cls + '">' + badge + '</span>'
+      + '<span class="date">截止 ' + esc(d.deadline) + '</span></div>'
+      + '<h3><a href="' + esc(d.url) + '" target="_blank" rel="noopener">' + esc(d.name) + '</a></h3>'
+      + (d.note ? '<div class="one">' + esc(d.note) + '</div>' : '')
+      + '</div>';
+  }).join('') : '<div class="empty">暂无会议 deadline 数据。</div>';
+}
+
+/* ---------- trending ---------- */
+function renderTrending(){
+  const repos = TR.repos || [];
+  document.getElementById('trCount').textContent =
+    (TR.date ? TR.date + ' 更新 · ' : '') + repos.length + ' 个仓库';
+  document.getElementById('trList').innerHTML = repos.length ? repos.map(r =>
+    '<div class="card"><div class="badges"><span class="badge">★ ' + esc('' + r.stars) + '</span>'
+    + (r.lang ? '<span class="badge cat">' + esc(r.lang) + '</span>' : '')
+    + '<span class="date">' + esc(r.created || '') + '</span></div>'
+    + '<h3><a href="' + esc(r.url) + '" target="_blank" rel="noopener">' + esc(r.name) + '</a></h3>'
+    + (r.desc ? '<div class="one">' + esc(r.desc) + '</div>' : '')
+    + '</div>').join('')
+    : '<div class="empty">今日暂无开源趋势数据。</div>';
+}
+
+/* ---------- agenda ---------- */
+function renderAgenda(){
+  const box = document.getElementById('agList');
+  if (!AG.connected){
+    document.getElementById('agCount').textContent = '未连接';
+    box.innerHTML = '<div class="card"><h3>📅 日历未连接</h3>'
+      + '<div class="one">连接 Google 日历后，这里会显示你今天的日程安排。</div>'
+      + '<div class="links"><a href="https://agent.meta.ai/connectors/connect/google_calendar"'
+      + ' target="_blank" rel="noopener">连接 Google 日历</a></div></div>';
+    return;
+  }
+  const evs = AG.events || [];
+  document.getElementById('agCount').textContent =
+    (AG.date ? AG.date + ' · ' : '') + evs.length + ' 个日程';
+  box.innerHTML = evs.length ? evs.map(e => {
+    let t = e.all_day ? '全天' : (e.start || '').slice(11, 16);
+    if (!e.all_day && e.end) t += '–' + (e.end || '').slice(11, 16);
+    return '<div class="ev"><div class="t">' + esc(t) + '</div>'
+      + '<div class="s">' + esc(e.summary) + '</div></div>';
+  }).join('') : '<div class="empty">今天没有日程安排，好好做科研吧。</div>';
+}
+
 render();
+renderNews();
+renderDeadlines();
+renderTrending();
+renderAgenda();
+showTab(('' + location.hash).slice(1) || 'papers');
 </script>
 </body>
 </html>
