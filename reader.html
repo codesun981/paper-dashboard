@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>随便看看 · 独立博客聚合</title>
+<style>
+:root{
+  --bg:#f5f5f7; --card:#ffffff; --ink:#1d1d1f; --mut:#86868b;
+  --fill:rgba(120,120,128,.12); --fill-strong:rgba(120,120,128,.2);
+  --acc:#0071e3; --acc-soft:rgba(0,113,227,.07);
+  --shadow:0 2px 16px rgba(0,0,0,.06); --shadow-lg:0 12px 32px rgba(0,0,0,.12);
+  --radius:18px;
+}
+[data-theme="dark"]{
+  --bg:#000000; --card:#1c1c1e; --ink:#f5f5f7; --mut:#98989d;
+  --fill:rgba(120,120,128,.22); --fill-strong:rgba(120,120,128,.32);
+  --acc:#0a84ff; --acc-soft:rgba(10,132,255,.13);
+  --shadow:0 2px 16px rgba(0,0,0,.5); --shadow-lg:0 12px 32px rgba(0,0,0,.6);
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);
+  font:15px/1.7 -apple-system,BlinkMacSystemFont,"SF Pro Text","Segoe UI","PingFang SC","Hiragino Sans GB","Microsoft YaHei",sans-serif;
+  -webkit-font-smoothing:antialiased;transition:background .25s,color .25s}
+.wrap{max-width:860px;margin:0 auto;padding:40px 24px 80px}
+header.top{display:flex;align-items:flex-start;justify-content:space-between;gap:12px;margin-bottom:4px}
+.dateline{font-size:12.5px;font-weight:600;letter-spacing:.08em;color:var(--mut);margin-bottom:6px}
+h1{font-size:30px;font-weight:700;letter-spacing:-.02em;margin:0}
+.sub{color:var(--mut);font-size:14px;margin:6px 0 18px}
+.head-btns{display:flex;gap:8px;align-items:center;flex:none}
+.mini-btn{border:0;background:var(--fill);color:var(--ink);border-radius:999px;
+  padding:9px 14px;font-size:13px;font-weight:500;cursor:pointer;white-space:nowrap;
+  text-decoration:none;display:inline-flex;align-items:center;gap:5px}
+.mini-btn:hover{background:var(--fill-strong)}
+.theme-btn{flex:none;width:40px;height:40px;border:0;background:var(--fill);color:var(--ink);
+  border-radius:50%;font-size:17px;cursor:pointer;display:flex;align-items:center;justify-content:center}
+.stats{display:flex;gap:36px;flex-wrap:wrap;margin:4px 0 20px}
+.stat b{font-size:26px;font-weight:700;letter-spacing:-.02em;display:block;line-height:1.15}
+.stat span{color:var(--mut);font-size:13px}
+.toolbar{padding:10px 0;display:flex;gap:10px;flex-wrap:wrap;align-items:center;position:sticky;top:0;z-index:20;
+  background:color-mix(in srgb,var(--bg) 88%,transparent);backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);
+  margin:0 -24px;padding:12px 24px}
+.search{flex:1;min-width:200px;display:flex;align-items:center;background:var(--fill);border:0;border-radius:12px;padding:0 14px}
+.search input{flex:1;border:0;outline:0;background:transparent;color:var(--ink);font:inherit;padding:11px 0}
+.search input::placeholder{color:var(--mut)}
+.chips{display:flex;gap:8px;flex-wrap:wrap}
+.chip{border:0;background:var(--fill);color:var(--ink);border-radius:999px;padding:8px 15px;
+  font-size:13px;font-weight:500;cursor:pointer}
+.chip.on{background:var(--ink);color:var(--bg);font-weight:600}
+select.sel{font:inherit;font-weight:500;color:var(--ink);background:var(--fill);border:0;border-radius:12px;padding:10px 12px;cursor:pointer}
+.count{font-size:12.5px;color:var(--mut);margin:8px 2px}
+.list{display:grid;gap:12px}
+.card{background:var(--card);border:0;border-radius:var(--radius);padding:18px 22px;
+  box-shadow:var(--shadow);transition:transform .2s,box-shadow .2s}
+.card:hover{transform:translateY(-2px);box-shadow:var(--shadow-lg)}
+.card h3{font-size:16px;font-weight:600;margin:0 0 6px;line-height:1.55}
+.card h3 a{color:var(--ink);text-decoration:none}
+.card h3 a:hover{color:var(--acc)}
+.meta{display:flex;gap:8px;flex-wrap:wrap;align-items:center;font-size:12px;color:var(--mut);margin-bottom:8px}
+.badge{font-size:11px;font-weight:600;border-radius:999px;padding:3px 10px;background:var(--fill);color:var(--mut);white-space:nowrap}
+.badge.score{background:var(--acc-soft);color:var(--acc)}
+.sum{font-size:13.5px;color:var(--mut);display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden;margin:0 0 8px}
+.src{font-size:12.5px}
+.src a{color:var(--acc);text-decoration:none}
+.more{display:block;margin:26px auto 0;border:0;background:var(--fill);color:var(--ink);
+  border-radius:999px;padding:12px 34px;font-size:14px;font-weight:600;cursor:pointer}
+.more:hover{background:var(--fill-strong)}
+.empty{text-align:center;color:var(--mut);padding:60px 0}
+.foot{margin-top:40px;font-size:12px;color:var(--mut);text-align:center}
+@media(max-width:640px){.wrap{padding:24px 16px 60px}h1{font-size:24px}.toolbar{margin:0 -16px;padding:10px 16px}}
+</style>
+</head>
+<body>
+<div class="wrap">
+<header class="top">
+<div>
+<div class="dateline" id="dateline">独立博客聚合</div>
+<h1>📡 随便看看</h1>
+<div class="sub" id="subline">独立博客 · Jev 前置分类 · 每天 07:00 / 19:00 更新</div>
+</div>
+<div class="head-btns">
+<a class="mini-btn" href="index.html" title="回到每日看板">☀️ 看板</a>
+<button class="theme-btn" id="themeBtn" title="切换深浅色">🌙</button>
+</div>
+</header>
+<div class="stats">
+<div class="stat"><b id="stN">–</b><span>篇文章</span></div>
+<div class="stat"><b id="stS">–</b><span>个来源</span></div>
+<div class="stat"><b id="stT">–</b><span>更新于</span></div>
+</div>
+<div class="toolbar">
+<div class="search"><span style="color:var(--mut);margin-right:8px">🔍</span><input id="q" placeholder="搜索标题 / 来源 / 摘要…"></div>
+<div class="chips" id="chips"></div>
+<select class="sel" id="sort"><option value="score">按推荐分</option><option value="time">按时间</option></select>
+</div>
+<div class="count" id="count"></div>
+<div class="list" id="list"></div>
+<button class="more" id="moreBtn" hidden>加载更多</button>
+<div class="foot">数据来自 584 个中文独立博客 RSS · 由 Jev 做相关性/分类/质量初筛，仅供浏览参考</div>
+</div>
+<script>
+const BUCKET={"news":"📰 新闻","models":"🤖 模型","trending":"🔥 开源","interests":"🎯 深度","voices":"👀 言论"};
+let DATA=[], shown=0; const PAGE=30;
+let fBucket="all", fQ="", fSort="score";
+function score(a){return a.jev.relevance*(1+a.jev.quality/5);}
+function esc(s){return (s||"").replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));}
+function fmtTime(iso){try{const d=new Date(iso);const p=n=>String(n).padStart(2,"0");
+  return `${d.getMonth()+1}月${d.getDate()}日 ${p(d.getHours())}:${p(d.getMinutes())}`;}catch(e){return "";}}
+function filtered(){
+  let r=DATA.filter(a=>(fBucket==="all"||a.jev.bucket===fBucket));
+  if(fQ){const q=fQ.toLowerCase();r=r.filter(a=>(a.title+a.source+a.summary).toLowerCase().includes(q));}
+  r.sort((x,y)=>fSort==="time"?new Date(y.published)-new Date(x.published):score(y)-score(x));
+  return r;
+}
+function card(a){
+  const s=score(a).toFixed(2);
+  return `<div class="card"><h3><a href="${esc(a.url)}" target="_blank" rel="noopener">${esc(a.title)}</a></h3>
+  <div class="meta"><span class="badge">${BUCKET[a.jev.bucket]||a.jev.bucket}</span>
+  <span class="badge score">推荐 ${s}</span><span>${esc(a.source)}</span><span>${fmtTime(a.published)}</span></div>
+  ${a.summary?`<p class="sum">${esc(a.summary)}</p>`:""}
+  <div class="src"><a href="${esc(a.url)}" target="_blank" rel="noopener">阅读原文 →</a></div></div>`;
+}
+function render(reset){
+  const r=filtered();
+  if(reset){shown=0;document.getElementById("list").innerHTML="";}
+  const slice=r.slice(shown,shown+PAGE);
+  document.getElementById("list").insertAdjacentHTML("beforeend",slice.map(card).join(""));
+  shown+=slice.length;
+  document.getElementById("moreBtn").hidden=shown>=r.length;
+  document.getElementById("count").textContent=`共 ${r.length} 篇`+(fQ?`（“${fQ}”）`:"");
+  if(!r.length)document.getElementById("list").innerHTML='<div class="empty">没有匹配的文章，换个条件试试</div>';
+}
+function initChips(){
+  const c=[["all","全部"]].concat(Object.entries(BUCKET));
+  document.getElementById("chips").innerHTML=c.map(([k,v])=>
+    `<button class="chip${k==="all"?" on":""}" data-k="${k}">${v}</button>`).join("");
+  document.getElementById("chips").addEventListener("click",e=>{
+    const b=e.target.closest(".chip");if(!b)return;fBucket=b.dataset.k;
+    document.querySelectorAll(".chip").forEach(x=>x.classList.toggle("on",x===b));render(true);});
+}
+function theme(){
+  const t=localStorage.getItem("reader-theme")||(matchMedia("(prefers-color-scheme: dark)").matches?"dark":"light");
+  document.documentElement.dataset.theme=t;
+  document.getElementById("themeBtn").textContent=t==="dark"?"☀️":"🌙";
+}
+document.getElementById("themeBtn").onclick=()=>{
+  const t=document.documentElement.dataset.theme==="dark"?"light":"dark";
+  document.documentElement.dataset.theme=t;localStorage.setItem("reader-theme",t);
+  document.getElementById("themeBtn").textContent=t==="dark"?"☀️":"🌙";};
+document.getElementById("q").addEventListener("input",e=>{fQ=e.target.value.trim();render(true);});
+document.getElementById("sort").addEventListener("change",e=>{fSort=e.target.value;render(true);});
+document.getElementById("moreBtn").onclick=()=>render(false);
+theme();initChips();
+fetch("reader_data.json").then(r=>r.json()).then(d=>{
+  DATA=d.articles||[];
+  document.getElementById("stN").textContent=DATA.length;
+  document.getElementById("stS").textContent=d.sources||"–";
+  try{const t=new Date(d.generated_at);const p=n=>String(n).padStart(2,"0");
+    document.getElementById("stT").textContent=`${t.getMonth()+1}/${t.getDate()} ${p(t.getHours())}:${p(t.getMinutes())}`;
+    document.getElementById("dateline").textContent=`${t.getFullYear()}年${t.getMonth()+1}月${t.getDate()}日 · 独立博客聚合`;
+  }catch(e){}
+  render(true);
+}).catch(()=>{document.getElementById("list").innerHTML='<div class="empty">数据加载失败，请稍后刷新重试</div>';});
+</script>
+</body>
+</html>
