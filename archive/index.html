@@ -5,23 +5,26 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>历史归档 · 晨间看板</title>
 <style>
-:root{--bg:#f3f4f6;--card:#fff;--ink:#141926;--mut:#6b7280;--line:#e5e7eb;--acc:#4f46e5;
-  --shadow:0 1px 2px rgba(16,24,40,.05),0 2px 8px rgba(16,24,40,.06)}
-[data-theme="dark"]{--bg:#0c1017;--card:#141a27;--ink:#e8ebf3;--mut:#98a1b3;--line:#232b3d;--acc:#9a97ff;
-  --shadow:0 1px 2px rgba(0,0,0,.5)}
+:root{--bg:#f5f5f7;--card:#fff;--ink:#1d1d1f;--mut:#86868b;--acc:#0071e3;
+  --fill:rgba(120,120,128,.12);
+  --shadow:0 2px 16px rgba(0,0,0,.06)}
+[data-theme="dark"]{--bg:#000;--card:#1c1c1e;--ink:#f5f5f7;--mut:#98989d;--acc:#0a84ff;
+  --fill:rgba(120,120,128,.22);
+  --shadow:0 2px 16px rgba(0,0,0,.5)}
 *{box-sizing:border-box}
 body{margin:0;background:var(--bg);color:var(--ink);
-  font:15px/1.7 -apple-system,"PingFang SC","Microsoft YaHei",sans-serif}
-.wrap{max-width:720px;margin:0 auto;padding:32px 20px 70px}
-h1{font-size:22px;margin:0 0 4px}
+  font:15px/1.7 -apple-system,"PingFang SC","Microsoft YaHei",sans-serif;
+  -webkit-font-smoothing:antialiased}
+.wrap{max-width:720px;margin:0 auto;padding:40px 24px 70px}
+h1{font-size:26px;font-weight:700;letter-spacing:-.02em;margin:0 0 4px}
 .sub{color:var(--mut);font-size:13px;margin-bottom:8px}
 .back{font-size:13px;margin-bottom:14px}
 .back a{color:var(--acc);text-decoration:none}
 .arch-list{display:grid;gap:10px;margin-top:14px}
 .arch-list a{display:flex;justify-content:space-between;align-items:center;background:var(--card);
-  border:1px solid var(--line);border-radius:12px;padding:14px 18px;text-decoration:none;
+  border-radius:14px;padding:15px 18px;text-decoration:none;
   color:var(--ink);box-shadow:var(--shadow)}
-.arch-list a:hover{border-color:var(--acc)}
+.arch-list a:hover{box-shadow:0 8px 24px rgba(0,0,0,.1)}
 .arch-list .n{font-size:12.5px;color:var(--mut)}
 </style>
 </head>
