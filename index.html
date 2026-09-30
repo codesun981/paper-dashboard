@@ -800,13 +800,14 @@ document.addEventListener('keydown', e => {
 });
 
 /* ---------- archive run switcher (早/中/晚版次，仅归档页) ---------- */
+const NEWS_LATEST = NEWS, XW_LATEST = XW;  // 页面初始即最新合并状态
 function switchRun(label){
-  if (typeof ARCH_RUNS === 'undefined' || !ARCH_RUNS || !ARCH_RUNS[label]) return;
-  const r = ARCH_RUNS[label];
-  if (r.news) NEWS = r.news;
-  if (r.x) XW = r.x;
   document.querySelectorAll('.run-switch button').forEach(b =>
     b.classList.toggle('on', b.getAttribute('data-run') === label));
+  const r = (typeof ARCH_RUNS !== 'undefined' && ARCH_RUNS) ? ARCH_RUNS[label] : null;
+  // 该版次有差异数据则用之，否则回退到最新合并状态
+  NEWS = (r && r.news) ? r.news : NEWS_LATEST;
+  XW = (r && r.x) ? r.x : XW_LATEST;
   if (typeof renderNews === 'function') renderNews();
   if (typeof renderX === 'function') renderX();
   if (typeof renderXDots === 'function') renderXDots();
