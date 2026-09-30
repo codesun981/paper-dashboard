@@ -69,13 +69,20 @@ function badge(p){
   if (p.supplement) return '<span class="badge j">期刊/会议</span>';
   return (p.cats||[]).map(c => '<span class="badge">' + esc((CAT_LABEL[c] ? CAT_LABEL[c] + ' · ' : '') + c) + '</span>').join('');
 }
+function pdfUrl(u){
+  const m = (u||'').match(/arxiv\.org\/abs\/([\d.]+)/);
+  return m ? 'https://arxiv.org/pdf/' + m[1] + '.pdf' : '';
+}
 function card(p){
+  const pdf = pdfUrl(p.url);
+  const links = (p.url ? '<a href="' + esc(p.url) + '" target="_blank" rel="noopener">原文页面</a>' : '')
+    + (pdf ? ' · <a href="' + esc(pdf) + '" target="_blank" rel="noopener">PDF 直链</a>' : '');
   return '<div class="card"><h3><a href="' + esc(p.url) + '" target="_blank" rel="noopener">' + esc(p.title) + '</a></h3>'
     + '<div class="meta">' + badge(p) + '<span>' + esc(p.date) + '</span></div>'
     + (p.authors ? '<div class="authors">' + esc(p.authors) + '</div>' : '')
     + (p.oneliner ? '<div class="one">' + esc(p.oneliner) + '</div>' : '')
     + (p.insight ? '<div class="insight"><b>对我们论文的启迪</b><br>' + esc(p.insight).replace(/\n/g,'<br>') + '</div>' : '')
-    + (p.url ? '<div class="link"><a href="' + esc(p.url) + '" target="_blank" rel="noopener">' + esc(p.url) + '</a></div>' : '')
+    + (links ? '<div class="link">' + links + '</div>' : '')
     + '</div>';
 }
 function render(){
