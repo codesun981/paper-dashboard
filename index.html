@@ -220,17 +220,17 @@ footer a{color:var(--acc);text-decoration:none}
 .theme-btn{width:36px;height:36px}
 .mini-btn{padding:8px 11px;font-size:12px}}
 /* ---------- archive modal ---------- */
-.modal{position:fixed;inset:0;z-index:60;display:flex;align-items:flex-start;justify-content:center;
-  padding:9vh 16px 16px;background:rgba(0,0,0,.32);-webkit-backdrop-filter:blur(10px);backdrop-filter:blur(10px)}
+.modal{position:fixed;inset:0;z-index:60;overflow-y:auto;-webkit-overflow-scrolling:touch;overscroll-behavior:contain;
+  padding:9vh 16px 24px;background:rgba(0,0,0,.32);-webkit-backdrop-filter:blur(10px);backdrop-filter:blur(10px)}
 .modal[hidden]{display:none}
 .modal-card{background:var(--card);border-radius:20px;box-shadow:0 24px 64px rgba(0,0,0,.25);
-  width:100%;max-width:620px;max-height:78vh;max-height:78dvh;display:flex;flex-direction:column;overflow:hidden}
+  width:100%;max-width:620px;margin:0 auto;overflow:clip}
 .modal-head{display:flex;align-items:center;justify-content:space-between;
   padding:16px 20px 12px;border-bottom:1px solid var(--fill)}
 .modal-head h3{margin:0;font-size:17px;font-weight:700}
 .modal-x{border:0;background:var(--fill);color:var(--ink);width:30px;height:30px;border-radius:50%;
   font-size:15px;cursor:pointer;line-height:1}
-.modal-list{overflow-y:auto;-webkit-overflow-scrolling:touch;overscroll-behavior:contain;touch-action:pan-y;min-height:0;padding:12px 14px 18px;display:grid;gap:8px}
+.modal-list{padding:12px 14px 18px;display:grid;gap:8px}
 .arch-item{background:var(--bg);border-radius:14px;overflow:hidden}
 .arch-item summary{list-style:none;display:flex;align-items:center;gap:8px;
   padding:13px 16px;cursor:pointer;font-size:14px;font-weight:600}
