@@ -57,6 +57,12 @@ select.sel{font:inherit;font-weight:500;color:var(--ink);background:var(--fill);
 .chip .n{opacity:.55;font-weight:400;margin-left:4px}
 .chips-label{font-size:12px;color:var(--mut);margin:10px 2px -4px;font-weight:600;letter-spacing:.05em}
 .count{font-size:12.5px;color:var(--mut);margin:8px 2px}
+.ai-summary{background:linear-gradient(135deg,#e8f1fd,#f4ecff);border:1px solid rgba(0,113,227,.16);
+  border-radius:var(--radius);padding:18px 20px;margin:14px 0 6px;box-shadow:var(--shadow);
+  font-size:14px;line-height:1.85;color:var(--ink)}
+[data-theme="dark"] .ai-summary{background:linear-gradient(135deg,#0a2540,#221038);border-color:rgba(10,132,255,.28)}
+.ai-summary .ai-sum-head{font-weight:700;font-size:13px;color:var(--acc);margin-bottom:10px;letter-spacing:.05em}
+.ai-summary p{margin:0 0 10px}.ai-summary p:last-child{margin:0}
 .list{display:grid;gap:12px}
 .card{background:var(--card);border:0;border-radius:var(--radius);padding:18px 22px;
   box-shadow:var(--shadow);transition:transform .2s,box-shadow .2s}
@@ -168,6 +174,7 @@ select.sel{font:inherit;font-weight:500;color:var(--ink);background:var(--fill);
 <div class="chips-label">来源</div>
 <div class="chips scrollx" id="srcChips"></div>
 <div class="count" id="count"></div>
+<div id="aiSummary" style="display:none"></div>
 <div class="list" id="list">
 <div class="skel"><i style="width:65%"></i><i style="width:92%"></i><i style="width:38%"></i></div>
 <div class="skel"><i style="width:72%"></i><i style="width:88%"></i><i style="width:45%"></i></div>
@@ -186,9 +193,20 @@ select.sel{font:inherit;font-weight:500;color:var(--ink);background:var(--fill);
 </div>
 </div>
 <script>
-const BUCKET={"news":"📰 新闻","models":"🤖 模型","trending":"🔥 开源","interests":"🎯 深度","voices":"👀 言论"};
-let DATA=[], VIEW=[], shown=0, tlShown=0, tlLastDay=""; const PAGE=30;
+const BUCKET={"news":"📰 新闻","models":"🤖 模型","trending":"🔥 开源","interests":"🎯 深度","voices":"👀 言论","ai":"🏢 AI专区"};
+let DATA=[], AI_SUMMARY=null, VIEW=[], shown=0, tlShown=0, tlLastDay=""; const PAGE=30;
 let fBucket="all", fSource="all", fQ="", fSort="score", fView="list";
+function md(s){return esc(s||"").replace(/\*\*([^*]+)\*\*/g,"<b>$1</b>").replace(/
+{2,}/g,"</p><p>").replace(/
+/g,"<br>");}
+function renderAiSummary(){
+  const el=document.getElementById("aiSummary");
+  if(fBucket==="ai"&&AI_SUMMARY&&AI_SUMMARY.text){
+    let d="";try{const t=new Date(AI_SUMMARY.updated);d=`${t.getMonth()+1}月${t.getDate()}日`;}catch(e){}
+    el.innerHTML=`<div class="ai-summary"><div class="ai-sum-head">✨ AI 专区动态总结${d?" · "+d:""}</div><p>${md(AI_SUMMARY.text)}</p></div>`;
+    el.style.display="";
+  }else{el.innerHTML="";el.style.display="none";}
+}
 function score(a){return a.jev.relevance*(1+a.jev.quality/5);}
 function esc(s){return (s||"").replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));}
 function fmtTime(iso){try{const d=new Date(iso);const p=n=>String(n).padStart(2,"0");
@@ -267,6 +285,7 @@ function render(reset){
   const isList=fView==="list";
   document.getElementById("list").style.display=isList?"":"none";
   document.getElementById("tlwrap").style.display=isList?"none":"";
+  renderAiSummary();
   if(isList)renderList(reset);else renderTimeline(reset);
 }
 /* ---- 站内阅读弹窗 ---- */
@@ -346,6 +365,7 @@ fetch("reader_data.json").then(r=>r.json()).then(d=>{
   try{localStorage.setItem(RCACHE,JSON.stringify(d));}catch(e){}
   applyData(d);  // 后台拿到新数据再刷新
 }).catch(()=>{if(!DATA.length)document.getElementById("list").innerHTML='<div class="empty">数据加载失败，请稍后刷新重试</div>';});
+fetch("ai_summary.json").then(r=>r.json()).then(d=>{AI_SUMMARY=d;renderAiSummary();}).catch(()=>{});
 </script>
 </body>
 </html>
