@@ -1,1 +1,53 @@
-<p>客服 Agent 查到库存还有 1 件，认真推理后答应退款换货；就在它执行前，另一笔订单把库存扣成 0。模型没有幻觉，检索也返回了真实数据，结果仍然错。生产 Agent 最危险的故障之一，是正确地使用了已经过期的事实。</p><h2>发生了什么</h2><p>MongoDB 9 月 29 日公布 MongoDB 9.0、Atlas Infinite 和 Atlas Agent Engine。官方称 9.0 相比 8.0 在大型实例上吞吐最高提升 2 倍、读取快 35%、更新快 30%；Atlas Infinite 让计算与存储独立伸缩，公开预览先在 AWS 开始；Agent Engine 把记忆、检索、运行时和治理放到操作数据所在的平台，并保持模型、框架与云的开放选择。</p><p>这些性能数字来自厂商，部署规模和工作负载未必与你相同。更值得开发者关注的是官方提出的问题：Agent 即使推理完美，只要拿到昨天的库存、旧余额或过期订单状态，也会执行错误动作。把向量检索靠近操作库能减少复制链路，却不能自动消除“读取后状态发生变化”。</p><h2>技术原理：从新鲜读取到安全写入</h2><p>Agent 通常先检索事实，再花几秒到几分钟规划、调用工具，最后写回系统。这个间隔叫检查—使用窗口。解决方案不是让模型“更谨慎”，而是在数据层保存版本号：读取时带回版本，写入时要求版本仍一致；不一致就拒绝，重新读取和规划。这是乐观并发控制。</p><p>长期记忆也必须与实时状态分开。用户偏好“喜欢蓝色”可以长期保存；“账户余额 500 元”不该作为可执行事实长期复用。向量相似度回答“哪段历史相关”，版本与事务回答“现在还能不能做”。</p><h2>最小实践：阻断陈旧计划</h2><p>下面用内存字典模拟版本门禁，不依赖第三方库。保存为 ，运行 。<code>freshness_gate.py</code><code>python freshness_gate.py</code></p><pre><code>inventory = {"sku-42": {"stock": 1, "version": 7}} completed = set() def read_item(sku): return inventory[sku].copy() def reserve(sku, expected_version, request_id): if request_id in completed: return "ALREADY_DONE" current = inventory[sku] if current["version"] != expected_version: return "STALE_READ" if current["stock"] < 1: return "OUT_OF_STOCK" current["stock"] -= 1 current["version"] += 1 completed.add(request_id) return "RESERVED" snapshot = read_item("sku-42") # 模拟Agent思考期间，另一笔订单完成扣减 inventory["sku-42"] = {"stock": 0, "version": 8} result = reserve("sku-42", snapshot["version"], "req-1001") print(result, inventory["sku-42"]) assert result == "STALE_READ" </code></pre><p>本次在 Python 3.9.6 实际运行，返回 ，库存保持 0，没有发生二次扣减。它验证的是通用并发语义，不是 MongoDB SDK 示例；真实系统应使用条件更新或事务，把版本比较与写入放在同一个原子操作中。<code>STALE_READ</code></p><h2>对开发者与业务的影响</h2><p>具体场景不只库存。金融 Agent 转账前要重读余额和风控状态，日程 Agent 订会议室前要重读时间段，客服退款前要重读订单与退款记录。数据平台把记忆、检索和操作数据统一后，接入更简单，但错误动作的爆炸半径也可能更大，因此控制必须更硬。</p><p>我的判断是，Agent 数据层的竞争会从“能存多少记忆”转到“能否证明一次动作基于哪个版本的事实”。平台能力有价值，但架构责任不能外包给产品名。团队应该给每个高风险工具定义读取集合、版本条件、幂等键、审批规则和补偿动作，并把冲突率作为核心指标。</p><h2>边界、风险与行动清单</h2><p>乐观并发适合冲突不频繁、失败可重试的业务；高冲突或跨多个系统的一致性流程，可能需要锁、队列、事务编排或人工确认。向量检索不适合作为余额、权限和库存的最终真相源。立即检查：记忆是否带过期时间；操作数据是否有版本；工具写入是否幂等；冲突后是否重新规划；日志能否还原读取版本与实际写入。</p><p>此外，不要把 MongoDB 的“最高提升”当成容量承诺。用自己的文档大小、索引、并发、地域和峰值流量压测；Atlas Infinite 仍是公开预览，Agent Engine 的功能、区域、价格和治理细节也需在目标账号复核。</p><p>你的 Agent 执行动作前，会重新确认关键数据版本，还是默认检索结果一直有效？</p><p>关注「蜗牛聊AI」，一起看懂技术变化背后的真正机会。</p> .j4u-post { font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",PingFang SC,"Microsoft YaHei",sans-serif; color:#24292e; line-height:1.8; max-width:860px; margin:0 auto; } .j4u-post img.hero { display:block; width:100%; max-width:860px; border-radius:10px; margin:0 0 24px; } .j4u-post h1 { font-size:30px; margin:0 0 16px; } .j4u-post h2 { font-size:24px; margin:32px 0 12px; padding-bottom:8px; border-bottom:2px solid #07c160; } .j4u-post h3 { font-size:20px; margin:24px 0 10px; } .j4u-post p { font-size:16px; margin:0 0 16px; } .j4u-post a { color:#07c160; text-decoration:none; } .j4u-post blockquote { margin:18px 0; padding:12px 16px; background:#f6f8fa; border-left:4px solid #07c160; color:#555; } .j4u-post pre { background:#0d1117; color:#c9d1d9; padding:16px; border-radius:8px; overflow:auto; font-size:14px; line-height:1.6; } .j4u-post code { font-family:Consolas,Menlo,monospace; } .j4u-post pre code { background:none; padding:0; } .j4u-post :not(pre) > code { background:#f6f8fa; padding:2px 6px; border-radius:4px; color:#c7254e; font-size:14px; } .j4u-post ul, .j4u-post ol { padding-left:24px; margin:0 0 16px; } .j4u-post li { font-size:16px; margin:6px 0; } .j4u-post img { max-width:100%; }
+<div><div><div class="j4u-post">
+
+<p><img src="https://images.unsplash.com/photo-1517694712202-14dd9538aa97?w=1600&amp;q=80&amp;fm=jpg&amp;fit=crop" alt="彩色代码屏" loading="lazy"></p>
+<p>客服 Agent 查到库存还有 1 件，认真推理后答应退款换货；就在它执行前，另一笔订单把库存扣成 0。模型没有幻觉，检索也返回了真实数据，结果仍然错。生产 Agent 最危险的故障之一，是正确地使用了已经过期的事实。</p>
+<h2>发生了什么</h2>
+<p>MongoDB 9 月 29 日公布 MongoDB 9.0、Atlas Infinite 和 Atlas Agent Engine。官方称 9.0 相比 8.0 在大型实例上吞吐最高提升 2 倍、读取快 35%、更新快 30%；Atlas Infinite 让计算与存储独立伸缩，公开预览先在 AWS 开始；Agent Engine 把记忆、检索、运行时和治理放到操作数据所在的平台，并保持模型、框架与云的开放选择。</p>
+<p>这些性能数字来自厂商，部署规模和工作负载未必与你相同。更值得开发者关注的是官方提出的问题：Agent 即使推理完美，只要拿到昨天的库存、旧余额或过期订单状态，也会执行错误动作。把向量检索靠近操作库能减少复制链路，却不能自动消除“读取后状态发生变化”。</p>
+<h2>技术原理：从新鲜读取到安全写入</h2>
+<p>Agent 通常先检索事实，再花几秒到几分钟规划、调用工具，最后写回系统。这个间隔叫检查—使用窗口。解决方案不是让模型“更谨慎”，而是在数据层保存版本号：读取时带回版本，写入时要求版本仍一致；不一致就拒绝，重新读取和规划。这是乐观并发控制。</p>
+<p>长期记忆也必须与实时状态分开。用户偏好“喜欢蓝色”可以长期保存；“账户余额 500 元”不该作为可执行事实长期复用。向量相似度回答“哪段历史相关”，版本与事务回答“现在还能不能做”。</p>
+<p></p><p><img src="https://java4u.cn/wp-content/uploads/2026/09/inline_00-107.png" alt="mermaid diagram" loading="lazy"></p>
+
+<h2>最小实践：阻断陈旧计划</h2>
+<p>下面用内存字典模拟版本门禁，不依赖第三方库。保存为 <code>freshness_gate.py</code>，运行 <code>python freshness_gate.py</code>。</p>
+<pre><code class="language-python">inventory = {"sku-42": {"stock": 1, "version": 7}}
+completed = set()
+
+def read_item(sku):
+    return inventory[sku].copy()
+
+def reserve(sku, expected_version, request_id):
+    if request_id in completed:
+        return "ALREADY_DONE"
+    current = inventory[sku]
+    if current["version"] != expected_version:
+        return "STALE_READ"
+    if current["stock"] &lt; 1:
+        return "OUT_OF_STOCK"
+    current["stock"] -= 1
+    current["version"] += 1
+    completed.add(request_id)
+    return "RESERVED"
+
+snapshot = read_item("sku-42")
+
+# 模拟Agent思考期间，另一笔订单完成扣减
+inventory["sku-42"] = {"stock": 0, "version": 8}
+
+result = reserve("sku-42", snapshot["version"], "req-1001")
+print(result, inventory["sku-42"])
+assert result == "STALE_READ"
+</code></pre>
+<p>本次在 Python 3.9.6 实际运行，返回 <code>STALE_READ</code>，库存保持 0，没有发生二次扣减。它验证的是通用并发语义，不是 MongoDB SDK 示例；真实系统应使用条件更新或事务，把版本比较与写入放在同一个原子操作中。</p>
+<h2>对开发者与业务的影响</h2>
+<p>具体场景不只库存。金融 Agent 转账前要重读余额和风控状态，日程 Agent 订会议室前要重读时间段，客服退款前要重读订单与退款记录。数据平台把记忆、检索和操作数据统一后，接入更简单，但错误动作的爆炸半径也可能更大，因此控制必须更硬。</p>
+<p>我的判断是，Agent 数据层的竞争会从“能存多少记忆”转到“能否证明一次动作基于哪个版本的事实”。平台能力有价值，但架构责任不能外包给产品名。团队应该给每个高风险工具定义读取集合、版本条件、幂等键、审批规则和补偿动作，并把冲突率作为核心指标。</p>
+<h2>边界、风险与行动清单</h2>
+<p>乐观并发适合冲突不频繁、失败可重试的业务；高冲突或跨多个系统的一致性流程，可能需要锁、队列、事务编排或人工确认。向量检索不适合作为余额、权限和库存的最终真相源。立即检查：记忆是否带过期时间；操作数据是否有版本；工具写入是否幂等；冲突后是否重新规划；日志能否还原读取版本与实际写入。</p>
+<p>此外，不要把 MongoDB 的“最高提升”当成容量承诺。用自己的文档大小、索引、并发、地域和峰值流量压测；Atlas Infinite 仍是公开预览，Agent Engine 的功能、区域、价格和治理细节也需在目标账号复核。</p>
+<p>你的 Agent 执行动作前，会重新确认关键数据版本，还是默认检索结果一直有效？</p>
+<p>关注「蜗牛聊AI」，一起看懂技术变化背后的真正机会。</p>
+</div>
+</div></div>
