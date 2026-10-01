@@ -1,1 +1,38 @@
-<p>Windows 上做 AI 开发，最让人疲惫的往往不是模型，而是 Linux 依赖、容器网络、文件挂载和公司安全策略互相打架。WSL Containers 正式版提供了一个更原生的入口，但判断它能否替代现有运行时，不能只看镜像是否成功启动。</p><h2>发生了什么</h2><p>微软 9 月 29 日宣布 WSL Containers（Windows Subsystem for Linux Containers，适用于 Linux 的 Windows 子系统容器）GA。更新 WSL 后，开发者可用 ，或别名 ，直接构建、运行和部署 Linux 容器；原生 Windows 应用还能通过 API 调用容器能力。<code>wslc.exe</code><code>container.exe</code></p><p>正式版补齐了重启、文件复制、系统信息、网络连接/断开、事件流、健康检查、停止超时、挂载和自定义存储路径。VS Code Dev Containers、Aspire 与多个社区界面已经接入。企业侧，Microsoft Defender for Endpoint 可关联容器内进程、文件和网络活动，Intune 可关闭功能或限制允许拉取镜像的仓库。</p><p>最重要的边界也写在官方页面： 仍在路线图上，目标是未来兼容现有 ；网络、跨系统文件性能仍在继续优化。官方给出的“访问 Windows 文件最高 2 倍”是特定能力主张，不是所有项目都会得到两倍训练或推理速度。<code>wslc compose</code><code>compose.yaml</code></p><h2>最小实践：验收一个本地推理服务</h2><p>下面命令面向 Windows PowerShell。先执行 并重启终端，再使用团队批准的镜像；示例端口和镜像只是占位，生产环境不要拉取未固定摘要的镜像。<code>wsl --update</code></p><pre><code>wsl --update wslc system info wslc pull ghcr.io/your-org/ai-api@sha256:REPLACE_ME wslc network create ai-dev wslc run --name ai-api --network ai-dev ` --mount type=bind,src=C:\models,dst=/models,readonly ` --stop-timeout 30 -p 8000:8000 ` ghcr.io/your-org/ai-api@sha256:REPLACE_ME wslc container ls wslc events Invoke-RestMethod http://localhost:8000/health wslc container cp ai-api:/app/report.json .\report.json wslc container restart ai-api wslc container stop ai-api </code></pre><p>运行时应记录镜像摘要、首次启动时间、健康检查耗时、Windows 文件挂载吞吐、内存峰值与网络出口。当前任务运行在 macOS，没有 Windows 与 ，示例未在本次任务中实际运行；命令名称与功能已按微软 9 月 29 日正式版说明核验。<code>wslc</code></p><h2>对AI开发的实际影响</h2><p>一个具体场景是把本地嵌入模型、向量库和 API 服务交给新成员。过去文档可能要求分别安装 Python、CUDA 工具链、数据库和桌面容器运行时；现在可把单服务环境收进镜像，并让 VS Code 连接。但多服务项目暂时不要假定 Compose 已可用，仍需脚本化启动或保留原工具。</p><p>我的判断是，WSL Containers 的真正价值不在“又一个容器命令”，而在 Windows 主机治理与 Linux 开发体验开始进入同一控制面。对企业团队，镜像白名单、主机到容器的调查链比少点几次安装按钮更重要。对个人开发者，是否迁移取决于文件 IO、GPU 透传、IDE 接入和现有 Compose 工作流，而不是 GA 标签。</p><h2>适用边界与检查表</h2><p>适合 Windows 为主、需要 Linux AI 工具链、且希望统一 Intune/Defender 管理的团队。不适合立即替换依赖复杂 Compose、特定 Kubernetes 网络、成熟桌面扩展或严格 GPU 兼容矩阵的环境。迁移前应 A/B：冷启动、Windows 与 Linux 文件路径吞吐、端口可达性、代理证书、GPU 可见性、镜像签名、漏洞扫描、停止与恢复。失败时必须能回到原运行时，而不是两套状态共用同一数据目录。</p><p>立即可执行的建议是选一个无状态嵌入服务做试点，固定镜像摘要，连续运行一周；先验证健康、日志、网络和回滚，再讨论全团队迁移。能跑只是第一关，可复现、可审计、可恢复才是开发平台。</p><p>你在 Windows 本地 AI 开发中最常被哪一层卡住：文件 IO、GPU、网络，还是企业权限？</p><p>关注「蜗牛聊AI」，一起看懂技术变化背后的真正机会。</p> .j4u-post { font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",PingFang SC,"Microsoft YaHei",sans-serif; color:#24292e; line-height:1.8; max-width:860px; margin:0 auto; } .j4u-post img.hero { display:block; width:100%; max-width:860px; border-radius:10px; margin:0 0 24px; } .j4u-post h1 { font-size:30px; margin:0 0 16px; } .j4u-post h2 { font-size:24px; margin:32px 0 12px; padding-bottom:8px; border-bottom:2px solid #07c160; } .j4u-post h3 { font-size:20px; margin:24px 0 10px; } .j4u-post p { font-size:16px; margin:0 0 16px; } .j4u-post a { color:#07c160; text-decoration:none; } .j4u-post blockquote { margin:18px 0; padding:12px 16px; background:#f6f8fa; border-left:4px solid #07c160; color:#555; } .j4u-post pre { background:#0d1117; color:#c9d1d9; padding:16px; border-radius:8px; overflow:auto; font-size:14px; line-height:1.6; } .j4u-post code { font-family:Consolas,Menlo,monospace; } .j4u-post pre code { background:none; padding:0; } .j4u-post :not(pre) > code { background:#f6f8fa; padding:2px 6px; border-radius:4px; color:#c7254e; font-size:14px; } .j4u-post ul, .j4u-post ol { padding-left:24px; margin:0 0 16px; } .j4u-post li { font-size:16px; margin:6px 0; } .j4u-post img { max-width:100%; }
+<div><div><div class="j4u-post">
+
+<p><img src="https://images.unsplash.com/photo-1555255707-c07966088b7b?w=1600&amp;q=80&amp;fm=jpg&amp;fit=crop" alt="工业机器人臂" loading="lazy"></p>
+<p>Windows 上做 AI 开发，最让人疲惫的往往不是模型，而是 Linux 依赖、容器网络、文件挂载和公司安全策略互相打架。WSL Containers 正式版提供了一个更原生的入口，但判断它能否替代现有运行时，不能只看镜像是否成功启动。</p>
+<h2>发生了什么</h2>
+<p>微软 9 月 29 日宣布 WSL Containers（Windows Subsystem for Linux Containers，适用于 Linux 的 Windows 子系统容器）GA。更新 WSL 后，开发者可用 <code>wslc.exe</code>，或别名 <code>container.exe</code>，直接构建、运行和部署 Linux 容器；原生 Windows 应用还能通过 API 调用容器能力。</p>
+<p>正式版补齐了重启、文件复制、系统信息、网络连接/断开、事件流、健康检查、停止超时、挂载和自定义存储路径。VS Code Dev Containers、Aspire 与多个社区界面已经接入。企业侧，Microsoft Defender for Endpoint 可关联容器内进程、文件和网络活动，Intune 可关闭功能或限制允许拉取镜像的仓库。</p>
+<p>最重要的边界也写在官方页面：<code>wslc compose</code> 仍在路线图上，目标是未来兼容现有 <code>compose.yaml</code>；网络、跨系统文件性能仍在继续优化。官方给出的“访问 Windows 文件最高 2 倍”是特定能力主张，不是所有项目都会得到两倍训练或推理速度。</p>
+<p></p><p><img src="https://java4u.cn/wp-content/uploads/2026/09/inline_00-110.png" alt="mermaid diagram" loading="lazy"></p>
+
+<h2>最小实践：验收一个本地推理服务</h2>
+<p>下面命令面向 Windows PowerShell。先执行 <code>wsl --update</code> 并重启终端，再使用团队批准的镜像；示例端口和镜像只是占位，生产环境不要拉取未固定摘要的镜像。</p>
+<pre><code class="language-powershell">wsl --update
+wslc system info
+wslc pull ghcr.io/your-org/ai-api@sha256:REPLACE_ME
+wslc network create ai-dev
+wslc run --name ai-api --network ai-dev `
+  --mount type=bind,src=C:\models,dst=/models,readonly `
+  --stop-timeout 30 -p 8000:8000 `
+  ghcr.io/your-org/ai-api@sha256:REPLACE_ME
+wslc container ls
+wslc events
+Invoke-RestMethod http://localhost:8000/health
+wslc container cp ai-api:/app/report.json .\report.json
+wslc container restart ai-api
+wslc container stop ai-api
+</code></pre>
+<p>运行时应记录镜像摘要、首次启动时间、健康检查耗时、Windows 文件挂载吞吐、内存峰值与网络出口。当前任务运行在 macOS，没有 Windows 与 <code>wslc</code>，示例未在本次任务中实际运行；命令名称与功能已按微软 9 月 29 日正式版说明核验。</p>
+<h2>对AI开发的实际影响</h2>
+<p>一个具体场景是把本地嵌入模型、向量库和 API 服务交给新成员。过去文档可能要求分别安装 Python、CUDA 工具链、数据库和桌面容器运行时；现在可把单服务环境收进镜像，并让 VS Code 连接。但多服务项目暂时不要假定 Compose 已可用，仍需脚本化启动或保留原工具。</p>
+<p>我的判断是，WSL Containers 的真正价值不在“又一个容器命令”，而在 Windows 主机治理与 Linux 开发体验开始进入同一控制面。对企业团队，镜像白名单、主机到容器的调查链比少点几次安装按钮更重要。对个人开发者，是否迁移取决于文件 IO、GPU 透传、IDE 接入和现有 Compose 工作流，而不是 GA 标签。</p>
+<h2>适用边界与检查表</h2>
+<p>适合 Windows 为主、需要 Linux AI 工具链、且希望统一 Intune/Defender 管理的团队。不适合立即替换依赖复杂 Compose、特定 Kubernetes 网络、成熟桌面扩展或严格 GPU 兼容矩阵的环境。迁移前应 A/B：冷启动、Windows 与 Linux 文件路径吞吐、端口可达性、代理证书、GPU 可见性、镜像签名、漏洞扫描、停止与恢复。失败时必须能回到原运行时，而不是两套状态共用同一数据目录。</p>
+<p>立即可执行的建议是选一个无状态嵌入服务做试点，固定镜像摘要，连续运行一周；先验证健康、日志、网络和回滚，再讨论全团队迁移。能跑只是第一关，可复现、可审计、可恢复才是开发平台。</p>
+<p>你在 Windows 本地 AI 开发中最常被哪一层卡住：文件 IO、GPU、网络，还是企业权限？</p>
+<p>关注「蜗牛聊AI」，一起看懂技术变化背后的真正机会。</p>
+</div>
+</div></div>
