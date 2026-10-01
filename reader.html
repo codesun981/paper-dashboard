@@ -171,7 +171,7 @@ select.sel{font:inherit;font-weight:500;color:var(--ink);background:var(--fill);
 </div>
 <div class="chips-label">栏目</div>
 <div class="chips" id="chips"></div>
-<div class="chips-label">来源</div>
+<div class="chips-label" id="srcLabel">来源</div>
 <div class="chips scrollx" id="srcChips"></div>
 <div class="count" id="count"></div>
 <div id="aiSummary" style="display:none"></div>
@@ -195,7 +195,8 @@ select.sel{font:inherit;font-weight:500;color:var(--ink);background:var(--fill);
 <script>
 const BUCKET={"news":"📰 新闻","models":"🤖 模型","trending":"🔥 开源","interests":"🎯 深度","voices":"👀 言论","ai":"🏢 AI专区"};
 let DATA=[], AI_SUMMARY=null, VIEW=[], shown=0, tlShown=0, tlLastDay=""; const PAGE=30;
-let fBucket="all", fSource="all", fQ="", fSort="score", fView="list";
+let fBucket="all", fSource="all", fCompany="all", fQ="", fSort="score", fView="list";
+const COMPANIES=["腾讯混元","DeepSeek","月之暗面","智谱","Qwen","MiniMax","小米","OpenAI","Google","Anthropic","Meta","xAI"];
 function md(s){return esc(s||"").replace(/\*\*([^*]+)\*\*/g,"<b>$1</b>").replace(/\n{2,}/g,"</p><p>").replace(/\n/g,"<br>");}
 function renderAiSummary(){
   const el=document.getElementById("aiSummary");
@@ -214,12 +215,14 @@ function dayLabel(iso){try{const d=new Date(iso);
   return d.toLocaleDateString("zh-CN",{month:"long",day:"numeric",weekday:"long"});}catch(e){return "";}}
 function filtered(){
   let r=DATA.filter(a=>(fBucket==="all"||a.jev.bucket===fBucket)&&(fSource==="all"||a.source===fSource));
+  if(fBucket==="ai"&&fCompany!=="all")r=r.filter(a=>(a.company||"")===fCompany);
   if(fQ){const q=fQ.toLowerCase();r=r.filter(a=>(a.title+a.source+a.summary).toLowerCase().includes(q));}
   r.sort((x,y)=>fSort==="time"?new Date(y.published)-new Date(x.published):score(y)-score(x));
   return r;
 }
 function metaBadges(a){
-  return `<span class="badge">${BUCKET[a.jev.bucket]||a.jev.bucket}</span>`+
+  const comp=(a.jev.bucket==="ai"&&a.company)?`<span class="badge">${esc(a.company)}</span>`:"";
+  return `<span class="badge">${BUCKET[a.jev.bucket]||a.jev.bucket}</span>`+comp+
     `<span class="badge score">推荐 ${score(a).toFixed(2)}</span>`+
     `<span>${esc(a.source)}</span><span>${fmtTime(a.published)}</span>`;
 }
@@ -312,17 +315,35 @@ function initChips(){
     `<button class="chip${k==="all"?" on":""}" data-k="${k}">${v}</button>`).join("");
   document.getElementById("chips").addEventListener("click",e=>{
     const b=e.target.closest(".chip");if(!b)return;fBucket=b.dataset.k;
+    fSource="all";fCompany="all";renderSecondRow();
     document.querySelectorAll("#chips .chip").forEach(x=>x.classList.toggle("on",x===b));render(true);});
 }
+/* 第二排：AI专区显示公司 tab，其余栏目显示来源 tab */
+function renderSecondRow(){
+  const el=document.getElementById("srcChips"), label=document.getElementById("srcLabel");
+  if(fBucket==="ai"){
+    label.textContent="公司";
+    el.innerHTML=`<button class="chip on" data-k="all">全部公司</button>`+
+      COMPANIES.map(c=>{
+        const n=DATA.filter(a=>a.jev.bucket==="ai"&&(a.company||"")===c).length;
+        return `<button class="chip" data-k="${esc(c)}">${esc(c)}${n?`<span class="n">${n}</span>`:""}</button>`;
+      }).join("");
+  }else{
+    label.textContent="来源";
+    const counts={};
+    DATA.forEach(a=>{counts[a.source]=(counts[a.source]||0)+1;});
+    const srcs=Object.entries(counts).sort((x,y)=>y[1]-x[1]);
+    el.innerHTML=
+      `<button class="chip on" data-k="all">全部来源</button>`+
+      srcs.map(([s,n])=>`<button class="chip" data-k="${esc(s)}">${esc(s)}<span class="n">${n}</span></button>`).join("");
+  }
+}
 function initSrcChips(){
-  const counts={};
-  DATA.forEach(a=>{counts[a.source]=(counts[a.source]||0)+1;});
-  const srcs=Object.entries(counts).sort((x,y)=>y[1]-x[1]);
-  document.getElementById("srcChips").innerHTML=
-    `<button class="chip on" data-k="all">全部来源</button>`+
-    srcs.map(([s,n])=>`<button class="chip" data-k="${esc(s)}">${esc(s)}<span class="n">${n}</span></button>`).join("");
+  renderSecondRow();
   document.getElementById("srcChips").addEventListener("click",e=>{
-    const b=e.target.closest(".chip");if(!b)return;fSource=b.dataset.k;
+    const b=e.target.closest(".chip");if(!b)return;
+    if(fBucket==="ai"){fCompany=b.dataset.k;}
+    else{fSource=b.dataset.k;}
     document.querySelectorAll("#srcChips .chip").forEach(x=>x.classList.toggle("on",x===b));render(true);});
 }
 function theme(){
@@ -333,7 +354,8 @@ function theme(){
 }
 document.getElementById("themeBtn").onclick=()=>{
   const t=document.documentElement.dataset.theme==="dark"?"light":"dark";
-  document.documentElement.dataset.theme=t;localStorage.setItem("reader-theme",t);
+  document.documentElement.dataset.theme=t;
+  try{localStorage.setItem("reader-theme",t);}catch(e){}
   document.getElementById("themeBtn").textContent=t==="dark"?"☀️":"🌙";};
 document.getElementById("q").addEventListener("input",e=>{fQ=e.target.value.trim();render(true);});
 document.getElementById("sort").addEventListener("change",e=>{fSort=e.target.value;render(true);});
