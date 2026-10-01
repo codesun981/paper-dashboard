@@ -224,13 +224,13 @@ footer a{color:var(--acc);text-decoration:none}
   padding:9vh 16px 16px;background:rgba(0,0,0,.32);-webkit-backdrop-filter:blur(10px);backdrop-filter:blur(10px)}
 .modal[hidden]{display:none}
 .modal-card{background:var(--card);border-radius:20px;box-shadow:0 24px 64px rgba(0,0,0,.25);
-  width:100%;max-width:620px;max-height:78vh;display:flex;flex-direction:column;overflow:hidden}
+  width:100%;max-width:620px;max-height:78vh;max-height:78dvh;display:flex;flex-direction:column;overflow:hidden}
 .modal-head{display:flex;align-items:center;justify-content:space-between;
   padding:16px 20px 12px;border-bottom:1px solid var(--fill)}
 .modal-head h3{margin:0;font-size:17px;font-weight:700}
 .modal-x{border:0;background:var(--fill);color:var(--ink);width:30px;height:30px;border-radius:50%;
   font-size:15px;cursor:pointer;line-height:1}
-.modal-list{overflow-y:auto;-webkit-overflow-scrolling:touch;min-height:0;padding:12px 14px 18px;display:grid;gap:8px}
+.modal-list{overflow-y:auto;-webkit-overflow-scrolling:touch;overscroll-behavior:contain;touch-action:pan-y;min-height:0;padding:12px 14px 18px;display:grid;gap:8px}
 .arch-item{background:var(--bg);border-radius:14px;overflow:hidden}
 .arch-item summary{list-style:none;display:flex;align-items:center;gap:8px;
   padding:13px 16px;cursor:pointer;font-size:14px;font-weight:600}
@@ -748,10 +748,25 @@ function renderArchList(items, partial){
     (partial ? '<div class="empty">本地打开为精简模式，仅显示近 7 天</div>' : '') +
     items.map((it, i) => archItemHTML(it, i === 0)).join('');
 }
+let archScrollY = 0;
+function lockBodyScroll(){
+  archScrollY = window.scrollY || 0;
+  document.body.style.position = 'fixed';
+  document.body.style.top = '-' + archScrollY + 'px';
+  document.body.style.left = '0';
+  document.body.style.right = '0';
+}
+function unlockBodyScroll(){
+  document.body.style.position = '';
+  document.body.style.top = '';
+  document.body.style.left = '';
+  document.body.style.right = '';
+  window.scrollTo(0, archScrollY);
+}
 async function openArchive(){
   const m = document.getElementById('archModal');
   m.hidden = false;
-  document.body.style.overflow = 'hidden';
+  lockBodyScroll();
   if (archDigestCache){ renderArchList(archDigestCache.list, archDigestCache.partial); return; }
   const list = document.getElementById('archList');
   list.innerHTML = '<div class="empty">加载中…</div>';
@@ -767,7 +782,7 @@ async function openArchive(){
 }
 function closeArchive(){
   document.getElementById('archModal').hidden = true;
-  document.body.style.overflow = '';
+  unlockBodyScroll();
 }
 document.getElementById('archBtn').addEventListener('click', openArchive);
 document.getElementById('archClose').addEventListener('click', closeArchive);
