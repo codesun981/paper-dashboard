@@ -111,10 +111,7 @@ select.sel{font:inherit;font-weight:500;color:var(--ink);background:var(--fill);
 .m-x{flex:none;width:34px;height:34px;border:0;border-radius:50%;background:var(--fill);
   color:var(--ink);font-size:15px;cursor:pointer}
 .m-title{font-size:20px;font-weight:700;line-height:1.5;margin:0;padding:18px 24px 4px}
-.m-sum{margin:2px 24px 6px;padding:12px 16px;background:var(--acc-soft);border-radius:12px;
-  font-size:13.5px;line-height:1.8}
-.m-sum b{display:block;font-size:11.5px;letter-spacing:.06em;color:var(--acc);margin-bottom:4px}
-.m-body{overflow-y:auto;padding:6px 24px 10px;font-size:15.5px;line-height:1.9;
+.m-body{overflow-y:auto;-webkit-overflow-scrolling:touch;min-height:0;padding:6px 24px 10px;font-size:15.5px;line-height:1.9;
   overflow-wrap:break-word;text-autospace:normal}
 .m-body p{margin:0 0 1em}
 .m-body h1,.m-body h2,.m-body h3,.m-body h4{line-height:1.5;margin:1.3em 0 .55em}
@@ -142,7 +139,7 @@ select.sel{font:inherit;font-weight:500;color:var(--ink);background:var(--fill);
 .m-loading{text-align:center;color:var(--mut);padding:40px 0}
 @media(max-width:640px){.wrap{padding:24px 16px 60px}h1{font-size:24px}
   .toolbar{margin:0 -16px;padding:10px 16px}.tl-day-h{top:118px}.modal-bk{padding:10px}.m-title{font-size:17px}
-  .card-thumb{width:76px;height:76px}.m-sum{margin:2px 16px 6px}}
+  .card-thumb{width:76px;height:76px}}
 </style>
 </head>
 <body>
@@ -188,7 +185,6 @@ select.sel{font:inherit;font-weight:500;color:var(--ink);background:var(--fill);
 <div class="modal" role="dialog" aria-modal="true">
 <div class="m-head"><div class="m-meta" id="mMeta"></div><button class="m-x" id="mX">✕</button></div>
 <h2 class="m-title" id="mTitle"></h2>
-<div class="m-sum" id="mSum" hidden></div>
 <div class="m-body" id="mBody"></div>
 <div class="m-foot" id="mFoot"></div>
 </div>
@@ -284,8 +280,6 @@ function openModal(i){
   const a=VIEW[i];if(!a)return;modalIdx=i;
   document.getElementById("mTitle").textContent=a.title;
   document.getElementById("mMeta").innerHTML=metaBadges(a);
-  const mSum=document.getElementById("mSum");
-  if(a.summary){mSum.hidden=false;mSum.innerHTML=`<b>✨ JEV 摘要</b>${esc(a.summary)}`;}else{mSum.hidden=true;}
   document.getElementById("mBody").innerHTML='<div class="m-loading">正文加载中…</div>';
   document.getElementById("mFoot").innerHTML=`<a href="${esc(a.url)}" target="_blank" rel="noopener">阅读原文 →</a>`;
   document.getElementById("mBk").hidden=false;
