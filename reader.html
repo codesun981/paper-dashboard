@@ -196,9 +196,7 @@ select.sel{font:inherit;font-weight:500;color:var(--ink);background:var(--fill);
 const BUCKET={"news":"📰 新闻","models":"🤖 模型","trending":"🔥 开源","interests":"🎯 深度","voices":"👀 言论","ai":"🏢 AI专区"};
 let DATA=[], AI_SUMMARY=null, VIEW=[], shown=0, tlShown=0, tlLastDay=""; const PAGE=30;
 let fBucket="all", fSource="all", fQ="", fSort="score", fView="list";
-function md(s){return esc(s||"").replace(/\*\*([^*]+)\*\*/g,"<b>$1</b>").replace(/
-{2,}/g,"</p><p>").replace(/
-/g,"<br>");}
+function md(s){return esc(s||"").replace(/\*\*([^*]+)\*\*/g,"<b>$1</b>").replace(/\n{2,}/g,"</p><p>").replace(/\n/g,"<br>");}
 function renderAiSummary(){
   const el=document.getElementById("aiSummary");
   if(fBucket==="ai"&&AI_SUMMARY&&AI_SUMMARY.text){
@@ -328,7 +326,8 @@ function initSrcChips(){
     document.querySelectorAll("#srcChips .chip").forEach(x=>x.classList.toggle("on",x===b));render(true);});
 }
 function theme(){
-  const t=localStorage.getItem("reader-theme")||(matchMedia("(prefers-color-scheme: dark)").matches?"dark":"light");
+  let t="light";
+  try{t=localStorage.getItem("reader-theme")||(matchMedia("(prefers-color-scheme: dark)").matches?"dark":"light");}catch(e){}
   document.documentElement.dataset.theme=t;
   document.getElementById("themeBtn").textContent=t==="dark"?"☀️":"🌙";
 }
