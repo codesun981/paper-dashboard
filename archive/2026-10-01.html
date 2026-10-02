@@ -257,7 +257,7 @@ footer a{color:var(--acc);text-decoration:none}
 <div>
 <div class="dateline">2026年10月2日 星期五</div>
 <h1>☀️ 每日看板</h1>
-<div class="sub">论文 · 模型追踪 · 兴趣追踪 · 开源趋势 · 大佬动态 —— 每天 08:00 / 12:00 / 22:00 自动更新</div>
+<div class="sub">论文 · 模型追踪 · 兴趣追踪 · 开源趋势 · 大佬动态 · 苹果动态 —— 每天 08:00 / 12:00 / 22:00 自动更新</div>
 </div>
 <div class="head-btns">
 <a class="mini-btn" href="reader.html" title="随便看看：独立博客聚合">📡 随便看看</a>
@@ -569,8 +569,8 @@ function renderApple(){
     + '<h3><a href="' + esc(it.url) + '" target="_blank" rel="noopener">' + esc(it.title) + '</a></h3>'
     + (it.desc ? '<div class="one">' + esc(it.desc) + '</div>' : '')
     + '</div>';
-  if (off.length) html += '<h3 class="gs">🆕 官方发布</h3>' + off.map(it => card(it, '官方')).join('');
-  if (med.length) html += '<h3 class="gs">💬 媒体热议</h3>' + med.map(it => card(it, '媒体')).join('');
+  if (off.length) html += '<h3 class="gs">🆕 官方发布</h3><div class="list">' + off.map(it => card(it, '官方')).join('') + '</div>';
+  if (med.length) html += '<h3 class="gs">💬 媒体热议</h3><div class="list">' + med.map(it => card(it, '媒体')).join('') + '</div>';
   document.getElementById('apList').innerHTML =
     html || '<div class="empty">今日暂无苹果动态。</div>';
 }
