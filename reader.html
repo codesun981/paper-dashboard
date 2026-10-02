@@ -49,6 +49,9 @@ h1{font-size:30px;font-weight:700;letter-spacing:-.02em;margin:0}
 .seg button.on{background:var(--card);color:var(--ink);font-weight:600;box-shadow:var(--shadow)}
 select.sel{font:inherit;font-weight:500;color:var(--ink);background:var(--fill);border:0;border-radius:12px;padding:10px 12px;cursor:pointer}
 .chips{display:flex;gap:8px;flex-wrap:wrap;margin:10px 0 2px}
+.src-toggle{display:block;width:100%;text-align:left;border:0;background:transparent;color:var(--mut);
+  font-size:13px;font-weight:600;padding:10px 0 2px;cursor:pointer}
+.src-toggle:hover{color:var(--ink)}
 .chips.scrollx{flex-wrap:nowrap;overflow-x:auto;padding-bottom:6px;scrollbar-width:none}
 .chips.scrollx::-webkit-scrollbar{display:none}
 .chip{flex:none;border:0;background:var(--fill);color:var(--ink);border-radius:999px;padding:8px 15px;
@@ -165,14 +168,17 @@ select.sel{font:inherit;font-weight:500;color:var(--ink);background:var(--fill);
 <div class="toolbar">
 <div class="search"><span style="color:var(--mut);margin-right:8px">🔍</span><input id="q" placeholder="搜索标题 / 来源 / 摘要…"></div>
 <div class="seg" id="viewSeg">
-<button data-v="list" class="on">📋 列表</button><button data-v="timeline">🕐 时间线</button>
+<button data-v="list">📋 列表</button><button data-v="timeline" class="on">🕐 时间线</button>
 </div>
 <select class="sel" id="sort"><option value="score">按推荐分</option><option value="time">按时间</option></select>
 </div>
 <div class="chips-label">栏目</div>
 <div class="chips" id="chips"></div>
+<button class="src-toggle" id="srcToggle" hidden><span id="srcToggleText"></span></button>
+<div id="srcWrap" hidden>
 <div class="chips-label" id="srcLabel">来源</div>
 <div class="chips scrollx" id="srcChips"></div>
+</div>
 <div class="count" id="count"></div>
 <div id="aiSummary" style="display:none"></div>
 <div class="list" id="list">
@@ -193,9 +199,9 @@ select.sel{font:inherit;font-weight:500;color:var(--ink);background:var(--fill);
 </div>
 </div>
 <script>
-const BUCKET={"news":"📰 新闻","models":"🤖 模型","trending":"🔥 开源","interests":"🎯 深度","voices":"👀 言论","ai":"🏢 AI专区"};
+const BUCKET={"news":"📰 新闻","models":"🤖 模型","trending":"🔥 开源","interests":"🎯 深度","voices":"👀 言论","tutorial":"📖 教程","tools":"🛠️ 工具","paper":"📄 论文","ai":"🏢 AI专区"};
 let DATA=[], AI_SUMMARY=null, VIEW=[], shown=0, tlShown=0, tlLastDay=""; const PAGE=30;
-let fBucket="all", fSource="all", fCompany="all", fQ="", fSort="score", fView="list";
+let fBucket="all", fSource="all", fCompany="all", fQ="", fSort="score", fView="timeline";
 const COMPANIES=["腾讯混元","DeepSeek","月之暗面","智谱","Qwen","MiniMax","小米","OpenAI","Google","Anthropic","Meta","xAI"];
 function md(s){return esc(s||"").replace(/\*\*([^*]+)\*\*/g,"<b>$1</b>").replace(/\n{2,}/g,"</p><p>").replace(/\n/g,"<br>");}
 function renderAiSummary(){
@@ -321,9 +327,13 @@ function initChips(){
     document.querySelectorAll("#chips .chip").forEach(x=>x.classList.toggle("on",x===b));render(true);});
 }
 /* 第二排：AI专区显示公司 tab，其余栏目显示来源 tab */
+let srcOpen=false;  /* 来源默认折叠，点开展开 */
 function renderSecondRow(){
-  const el=document.getElementById("srcChips"), label=document.getElementById("srcLabel");
+  const el=document.getElementById("srcChips"), label=document.getElementById("srcLabel"),
+        toggle=document.getElementById("srcToggle"), wrap=document.getElementById("srcWrap"),
+        ttext=document.getElementById("srcToggleText");
   if(fBucket==="ai"){
+    toggle.hidden=true; wrap.hidden=false;  /* 公司只有 12 个，保持展开 */
     label.textContent="公司";
     el.innerHTML=`<button class="chip on" data-k="all">全部公司</button>`+
       COMPANIES.map(c=>{
@@ -338,10 +348,14 @@ function renderSecondRow(){
     el.innerHTML=
       `<button class="chip on" data-k="all">全部来源</button>`+
       srcs.map(([s,n])=>`<button class="chip" data-k="${esc(s)}">${esc(s)}<span class="n">${n}</span></button>`).join("");
+    toggle.hidden=false;
+    ttext.textContent=`📚 来源（${srcs.length}） ${srcOpen?"▾":"▸"}`;
+    wrap.hidden=!srcOpen;
   }
 }
 function initSrcChips(){
   renderSecondRow();
+  document.getElementById("srcToggle").addEventListener("click",()=>{srcOpen=!srcOpen;renderSecondRow();});
   document.getElementById("srcChips").addEventListener("click",e=>{
     const b=e.target.closest(".chip");if(!b)return;
     if(fBucket==="ai"){fCompany=b.dataset.k;}
