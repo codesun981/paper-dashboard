@@ -201,8 +201,10 @@ function md(s){return esc(s||"").replace(/\*\*([^*]+)\*\*/g,"<b>$1</b>").replace
 function renderAiSummary(){
   const el=document.getElementById("aiSummary");
   if(fBucket==="ai"&&AI_SUMMARY&&AI_SUMMARY.text){
-    let d="";try{const t=new Date(AI_SUMMARY.updated);d=`${t.getMonth()+1}月${t.getDate()}日`;}catch(e){}
-    el.innerHTML=`<div class="ai-summary"><div class="ai-sum-head">✨ AI 专区动态总结${d?" · "+d:""}</div><p>${md(AI_SUMMARY.text)}</p></div>`;
+    let d="",ed="";
+    try{const t=new Date(AI_SUMMARY.updated);d=`${t.getMonth()+1}月${t.getDate()}日`;
+      const h=t.getHours();ed=h<12?"🌅 早间":h<18?"☀️ 午间":"🌙 晚间";}catch(e){}
+    el.innerHTML=`<div class="ai-summary"><div class="ai-sum-head">✨ AI 专区动态总结${ed?" · "+ed:""}${d?" · "+d:""}</div><p>${md(AI_SUMMARY.text)}</p></div>`;
     el.style.display="";
   }else{el.innerHTML="";el.style.display="none";}
 }
