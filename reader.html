@@ -353,8 +353,11 @@ function renderSecondRow(){
     wrap.hidden=!srcOpen;
   }
 }
+let srcToggleBound=false;  /* applyData 会跑两次（缓存+网络），监听只绑一次 */
 function initSrcChips(){
   renderSecondRow();
+  if(srcToggleBound)return;
+  srcToggleBound=true;
   document.getElementById("srcToggle").addEventListener("click",()=>{srcOpen=!srcOpen;renderSecondRow();});
   document.getElementById("srcChips").addEventListener("click",e=>{
     const b=e.target.closest(".chip");if(!b)return;
