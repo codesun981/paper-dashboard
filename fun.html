@@ -1,6 +1,6 @@
 <!DOCTYPE html><html lang="zh-CN"><head><meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>✨ 今日份新鲜 · 极简</title><style>
+<title>✨ 今日份新鲜 · 瀑布流</title><style>
 *{box-sizing:border-box;margin:0;padding:0}
 :root{--bg:#f5f5f7;--card:#fff;--ink:#1d1d1f;--sub:#6e6e73;--line:#e5e5ea;--acc:#0071e3}
 @media(prefers-color-scheme:dark){:root{--bg:#000;--card:#1c1c1e;--ink:#f5f5f7;--sub:#98989d;--line:#2c2c2e;--acc:#0a84ff}}
@@ -11,16 +11,22 @@ a{color:var(--acc);text-decoration:none}
 .dateline{font-size:13px;color:var(--sub);letter-spacing:.1em}
 footer{max-width:960px;margin:0 auto;padding:36px 20px 60px;color:var(--sub);font-size:13px;text-align:center}
 
-.screen{min-height:88vh;display:flex;flex-direction:column;justify-content:center;max-width:820px;margin:0 auto;padding:40px 24px;border-bottom:1px solid var(--line)}
-.screen:last-of-type{border:none}
-.k{font-size:13px;letter-spacing:.3em;color:var(--acc);margin-bottom:18px}
-.big{font-size:clamp(34px,7vw,64px);font-weight:700;line-height:1.35;letter-spacing:-.01em}
-.mid{font-size:clamp(20px,4vw,30px);line-height:1.7}
-.sub{color:var(--sub);font-size:15px;margin-top:18px;line-height:1.8;max-width:640px}
-.num{font-size:clamp(60px,14vw,130px);font-weight:800;letter-spacing:-.03em;line-height:1}
-.hero h1{font-size:clamp(40px,9vw,84px);font-weight:800}
-.hero p{color:var(--sub);margin-top:14px;font-size:16px}
+.hero{max-width:1100px;margin:0 auto;padding:30px 20px 6px}
+.hero h1{font-size:32px}
+.hero p{color:var(--sub);margin-top:6px}
+.flow{max-width:1100px;margin:20px auto;padding:0 20px;columns:3;column-gap:18px}
+@media(max-width:900px){.flow{columns:2}}
+@media(max-width:600px){.flow{columns:1}}
+.card{background:var(--card);border-radius:18px;padding:20px;margin:0 0 18px;break-inside:avoid;
+box-shadow:0 2px 12px rgba(0,0,0,.06);border:1px solid var(--line)}
+.card:nth-child(3n){transform:rotate(-.6deg)}
+.card:nth-child(3n+1){transform:rotate(.5deg)}
+.tag{display:inline-block;font-size:12px;padding:3px 10px;border-radius:20px;background:var(--acc);color:#fff;margin-bottom:10px}
+.t{font-size:16px;line-height:1.65}
+.b{color:var(--sub);font-size:13.5px;line-height:1.7;margin-top:8px}
+.big{font-size:46px;font-weight:800}
+.modname{font-size:13px;color:var(--sub);margin-bottom:4px}
 </style></head><body>
 <div class="topbar"><a class="back" href="index.html">← 每日看板</a>
-<span class="dateline">2026-10-02</span></div><div class="screen hero"><div class="k">TODAY · FRESH</div><h1>今日份<br>新鲜</h1><p>🤍 极简版 · 一屏只讲一件事，慢慢往下翻</p></div><div class="screen"><div class="k">💡 每日一得 · 一句话</div><div class="mid">&quot;如果你不能解释清楚，说明你还不够懂。&quot; —— Richard Feynman</div></div><div class="screen"><div class="k">🧸 开源小玩具 · GitHub</div><div class="mid">brandynfisher/ToolReplay</div><div class="sub">Audit AI agent tool-call transcripts: hash-chain sealing, deterministic replay, and scope overreach checks.…</div><div class="sub"><a href="https://github.com/brandynfisher/ToolReplay">去看看 →</a></div></div><div class="screen"><div class="k">🧸 开源小玩具 · GitHub</div><div class="mid">ZeroDayEvil/ai-security-tool</div><div class="sub">🛡️ Free open-source AI-powered security terminal &amp; vulnerability scanner (CVE, SBOM). Supports SSH, SFTP…</div><div class="sub"><a href="https://github.com/ZeroDayEvil/ai-security-tool">去看看 →</a></div></div><div class="screen"><div class="k">🧊 冷知识 · 冷知识 1</div><div class="mid">你的胃每两周就会换一层内壁，不然会被自己的胃酸消化掉。</div></div><div class="screen"><div class="k">🧊 冷知识 · 冷知识 2</div><div class="mid">蓝鲸的心脏有一辆小汽车那么大，心跳声 3 公里外能听到。</div></div><footer>✨ 今日份新鲜 · 每天拆开都不一样<br>
+<span class="dateline">2026-10-02</span></div><div class="hero"><h1>✨ 今日份新鲜</h1><p>🧱 瀑布流版 · 随手一滑都是惊喜</p></div><div class="flow"><div class="card"><div class="modname">💡 每日一得</div><span class="tag">一句话</span><div class="t">&quot;The best way to predict the future is to invent it.&quot; —— Alan Kay</div></div><div class="card"><div class="modname">🧸 开源小玩具</div><span class="tag">GitHub</span><div class="t">brandynfisher/ToolReplay</div><div class="b">Audit AI agent tool-call transcripts: hash-chain sealing, deterministic replay, and scope overreach checks.…</div><div style="margin-top:8px;font-size:14px"><a href="https://github.com/brandynfisher/ToolReplay">去看看 →</a></div></div><div class="card"><div class="modname">🧸 开源小玩具</div><span class="tag">GitHub</span><div class="t">ZeroDayEvil/ai-security-tool</div><div class="b">🛡️ Free open-source AI-powered security terminal &amp; vulnerability scanner (CVE, SBOM). Supports SSH, SFTP…</div><div style="margin-top:8px;font-size:14px"><a href="https://github.com/ZeroDayEvil/ai-security-tool">去看看 →</a></div></div><div class="card"><div class="modname">🧊 冷知识</div><span class="tag">冷知识 1</span><div class="t">人类和长颈鹿的颈椎骨数量一样，都是 7 块。</div></div><div class="card"><div class="modname">🧊 冷知识</div><span class="tag">冷知识 2</span><div class="t">海星没有大脑和血液，靠海水在体内循环输送养分。</div></div></div><footer>✨ 今日份新鲜 · 每天拆开都不一样<br>
 <span style="font-size:12px">由 COCO 每日 08:00 自动生成</span></footer></body></html>
