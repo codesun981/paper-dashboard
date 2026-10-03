@@ -1,0 +1,413 @@
+<div><div><article class="pt-20 md:pt-32">
+    <div class="grid-container mb-20">
+  <div class="bg-brand-emerald-900 text-white rounded-blog-lg col-span-12 overflow-hidden">
+    
+    <div class="p-8 md:px-0 md:py-12 xl:py-16">
+      <div class="blog-grid gap-y-5">
+  
+        <div class="col-span-12 md:col-span-2 md:col-start-2">
+          <p class="flex flex-wrap gap-2">
+            <span class="font-saans-mono inline-flex items-center rounded-full border border-current px-4 py-3 text-sm leading-none whitespace-nowrap">
+                  Research
+                </span>
+          </p>
+          <p class="font-saans mt-5 text-lg font-medium xl:text-xl">
+                <span class="block whitespace-nowrap">Aleph Alpha</span>
+              </p>
+          <time datetime="2026-10-03" class="font-saans-mono block text-sm mt-1">
+            03/10/2026
+          </time>
+        </div>
+        <h1 class="font-saans text-brand-gray-400 leading-[1.3] font-semibold text-[28px] md:text-[36px] xl:text-[44px] 2xl:text-[48px] text-white! col-span-12 mb-0 leading-[1.2] font-medium md:col-span-8 md:col-start-4">
+  Kolibri Has Landed: A Sovereign Open-Weight Model
+</h1>
+      
+</div>
+    </div>
+  </div>
+</div>
+
+    
+<section class="grid-container relative mb-15 md:mb-20 xl:mb-24">
+  
+      <p class="col-span-12 md:col-span-6 md:col-start-4 text-brand-gray-800 font-saans text-base leading-[1.6] md:text-lg 2xl:text-xl mb-5 last:mb-0 blog-rich-text-links blog-inline-code">
+  
+        On the Day of German Reunification, we are releasing our new model: Kolibri.
+      
+</p>
+      <p class="col-span-12 md:col-span-6 md:col-start-4 text-brand-gray-800 font-saans text-base leading-[1.6] md:text-lg 2xl:text-xl mb-5 last:mb-0 blog-rich-text-links blog-inline-code">
+  
+        Kolibri is an English-German Mixture-of-Experts Transformer with 78B total parameters, 3B
+        active. It supports context lengths of up to 1M tokens. The model can be downloaded with the
+        full weights on <a href="https://huggingface.co/Aleph-Alpha/Kolibri-1" target="_blank" rel="noopener">Hugging Face</a> and used under the Apache 2.0 license terms.
+      
+</p>
+      <p class="col-span-12 md:col-span-6 md:col-start-4 text-brand-gray-800 font-saans text-base leading-[1.6] md:text-lg 2xl:text-xl mb-5 last:mb-0 blog-rich-text-links blog-inline-code">
+  
+        Kolibri is the result of continuous iteration of our model training effort. We first built <a href="https://aleph-alpha.com/en/blog/model-training-as-code/" target="_blank" rel="noopener">a model training pipeline</a> and validated it by building Kolibri Origin, a 30B total, 3B active model with a much shorter
+        65k token context window. Kolibri ran through the same pipeline: from data ingestion and curation,
+        through ablations, pre-training, and post-training, to the final evals. It enabled running hundreds
+        of ablation experiments and stable pre-training that ran without a person having to step in when
+        hardware failed or a data connection dropped. We continuously monitored training metrics and standardized
+        monitoring for custom benchmarks. The time we put into building and iterating on this pipeline
+        was a valuable investment. We see it in how much better Kolibri is than Kolibri Origin, and in
+        how little time separates their releases.
+      
+</p>
+      <p class="col-span-12 md:col-span-6 md:col-start-4 text-brand-gray-800 font-saans text-base leading-[1.6] md:text-lg 2xl:text-xl mb-5 last:mb-0 blog-rich-text-links blog-inline-code">
+  
+        Kolibri is a specialized language model built for sovereign mission-critical work in
+        regulated areas including public administration, industrials and aerospace. We specialized
+        Kolibri for German, reasoning, math, agentic behavior, and further capabilities our
+        customers need in production. The aim of this specialization was to optimize performance in
+        our customers' specific use cases. Through specialization, customers achieve contextualized
+        performance in their AI operations and they can monitor its economic impact, so that ROI
+        stays measurable and grows over time.
+      
+</p>
+      <p class="col-span-12 md:col-span-6 md:col-start-4 text-brand-gray-800 font-saans text-base leading-[1.6] md:text-lg 2xl:text-xl mb-5 last:mb-0 blog-rich-text-links blog-inline-code">
+  
+        Specialization alone is not enough. Sovereignty is just as important. Sovereignty, for us,
+        combines two dimensions: how we built the model, and how it transfers to our customers. We
+        offer full supply-chain integrity and account for every decision, from data ingestion,
+        through pre- and post-training, to the final evaluations. We provide transparency. Customers
+        have full freedom of deployment and intellectual-property safety, so compliance comes as an
+        inherited property of the model.
+      
+</p>
+      <p class="col-span-12 md:col-span-6 md:col-start-4 text-brand-gray-800 font-saans text-base leading-[1.6] md:text-lg 2xl:text-xl mb-5 last:mb-0 blog-rich-text-links blog-inline-code">
+  
+        Read our <a href="https://aleph-alpha.com/downloads/tech-report.pdf" target="_blank" rel="noopener">tech report</a> for full details.
+      
+</p>
+    
+</section>
+
+    
+<section class="grid-container relative mb-15 md:mb-20 xl:mb-24">
+  
+      <h2 class="col-span-12 md:col-span-6 md:col-start-4 font-saans text-brand-gray-400 leading-[1.3] font-semibold text-[24px] md:text-[28px] xl:text-[32px] 2xl:text-[36px] mb-6 md:mb-8">
+  What Kolibri Delivers
+</h2>
+      <p class="col-span-12 md:col-span-6 md:col-start-4 text-brand-gray-800 font-saans text-base leading-[1.6] md:text-lg 2xl:text-xl mb-5 last:mb-0 blog-rich-text-links blog-inline-code">
+  
+        We optimized Kolibri for performance across a wide range of sectors considering their
+        particular domain-specific language, regulatory, and procedural realities. Its small and
+        efficient size provides our customers with flexibility to run it efficiently on-premise,
+        without sending internal data to third-party inference services. The spotlight in this
+        section introduces the model's capabilities, before we describe them in section <a href="https://aleph-alpha.com/en/blog/kolibri-has-landed-a-sovereign-open-weight-model/#how-we-built-kolibri" target="_blank" rel="noopener">How we built Kolibri at high velocity</a>.
+      
+</p>
+
+      <h3 class="col-span-12 md:col-span-6 md:col-start-4 font-saans text-brand-gray-400 leading-[1.3] font-semibold text-[20px] md:text-[22px] xl:text-[24px] 2xl:text-[26px] mb-6 md:mb-8">
+  Foundational capabilities for enterprise and government
+</h3>
+      <p class="col-span-12 md:col-span-6 md:col-start-4 text-brand-gray-800 font-saans text-base leading-[1.6] md:text-lg 2xl:text-xl mb-5 last:mb-0 blog-rich-text-links blog-inline-code">
+  
+        With Kolibri we optimize the trade-off between model capability and deployment costs, using
+        3B active parameters out of 78B total. Kolibri sits on the Pareto frontier for quality
+        versus serving cost, for both English and German. The Pareto frontier is a concept from
+        economics, marking the best achievable combinations of two objectives, where improving on
+        one means giving up some of the other. None of the compared models delivers more quality at
+        the same serving cost, or the same quality at lower cost.
+      
+</p>
+      <figure class="col-span-12 md:col-span-10 md:col-start-2 text-brand-gray-900 rounded-blog-lg border-brand-gray-100 bg-brand-gray-50 mb-5 border px-5 pt-5 pb-2 last:mb-0">
+  
+        <astro-island uid="Z19a5lv" prefix="r5" component-url="/_astro/QualityCost.BHyP09_8.js" component-export="default" renderer-url="/_astro/client.BNUabsgt.js" props="{}" ssr client="visible" opts='{"name":"QualityCost","value":true}' await-children><div><div><p><span>Average benchmark score [%]</span></p></div><ul><li><span></span>Kolibri</li><li><span></span>Kolibri Origin</li><li><span></span>Other post-trained models</li><li><span></span>Pareto frontier</li></ul></div></astro-island>
+      
+  <figcaption class="font-saans-mono border-brand-gray-100 text-brand-gray-500 mt-[0.9rem] border-t px-[0.2rem] pt-[0.9rem] pb-[0.6rem] text-[0.78rem] leading-[1.5] blog-caption-bold blog-figure-caption-code">Performance vs. throughput for post-trained models in English (left) and German (right). Metrics show unweighted average benchmark scores against decoded text per second and GPU. Higher and further right is better.</figcaption>
+</figure>
+      <p class="col-span-12 md:col-span-6 md:col-start-4 text-brand-gray-800 font-saans text-base leading-[1.6] md:text-lg 2xl:text-xl mb-5 last:mb-0 blog-rich-text-links blog-inline-code">
+  
+        Across math, coding, grounding, and long-context tasks, Kolibri matches models with up to
+        four times its active parameter count, such as Nemotron 3 Super.
+      
+</p>
+      <figure class="col-span-12 md:col-span-10 md:col-start-2 text-brand-gray-900 rounded-blog-lg border-brand-gray-100 bg-brand-gray-50 mb-5 border px-5 pt-5 pb-2 last:mb-0">
+  
+        <astro-island uid="Z15ysnr" prefix="r6" component-url="/_astro/Radar.C3Gm_yE1.js" component-export="default" renderer-url="/_astro/client.BNUabsgt.js" props='{"chart":[0,"capabilities"]}' ssr client="visible" opts='{"name":"Radar","value":true}' await-children><div><div><svg viewbox="0 0 1000 860" role="img" aria-label="Radar chart of seventeen benchmarks across math, knowledge, grounding, agentic tasks, code and long context for Kolibri, Kolibri Origin, Qwen3.6-35B-A3B, Nemotron 3 Super 120B-A12B and Mistral Small 4 119B-A6B. Kolibri leads on all four AIME sets, GPQA and τ³-bench banking and is close to the best on most other axes."><polygon points="500,360 521.6744999712291,364.05166623573865 540.4217386187935,375.6594649667604 553.7097974813038,393.2556986534077 559.7440505777021,414.46389843220186 557.7095385903691,436.41977940432497 547.8810336368143,456.1580781827554 531.5859297726414,471.01302814377686 511.0249710689942,478.9783859810341 488.9750289310058,478.9783859810341 468.41407022735865,471.01302814377686 452.1189663631857,456.15807818275545 442.29046140963084,436.41977940432497 440.25594942229793,414.46389843220186 446.2902025186962,393.25569865340776 459.5782613812065,375.6594649667605 478.3255000287708,364.05166623573865" fill="none" stroke="var(--color-brand-gray-100)" stroke-width="1"></polygon><polygon points="500,300 543.3489999424584,308.1033324714773 580.8434772375869,331.3189299335209 607.4195949626074,366.5113973068154 619.4881011554041,408.9277968644038 615.4190771807383,452.83955880864994 595.7620672736288,492.3161563655108 563.1718595452827,522.0260562875537 522.0499421379884,537.9567719620682 477.9500578620116,537.9567719620682 436.8281404547173,522.0260562875537 404.23793272637135,492.3161563655109 384.58092281926173,452.83955880864994 380.51189884459586,408.9277968644037 392.5804050373925,366.51139730681547 419.15652276241303,331.31892993352096 456.65100005754164,308.1033324714773" fill="none" stroke="var(--color-brand-gray-100)" stroke-width="1"></polygon><polygon points="500,240 565.0234999136876,252.15499870721595 621.2652158563803,286.9783949002814 661.1293924439112,339.7670959602231 679.2321517331062,403.39169529660563 673.1286157711074,469.2593382129749 643.6431009104431,528.4742345482662 594.7577893179241,573.0390844313305 533.0749132069826,596.9351579431024 466.9250867930174,596.9351579431024 405.24221068207595,573.0390844313306 356.35689908955703,528.4742345482663 326.87138422889257,469.25933821297497 320.7678482668938,403.3916952966056 338.87060755608877,339.7670959602232 378.7347841436196,286.97839490028144 434.97650008631246,252.15499870721595" fill="none" stroke="var(--color-brand-gray-100)" stroke-width="1"></polygon><polygon points="500,180 586.6979998849167,196.2066649429546 661.6869544751737,242.6378598670418 714.8391899252149,313.0227946136308 738.9762023108083,397.85559372880755 730.8381543614765,485.6791176172999 691.5241345472575,564.6323127310216 626.3437190905654,624.0521125751073 544.0998842759768,655.9135439241364 455.9001157240232,655.9135439241364 373.6562809094346,624.0521125751073 308.47586545274265,564.6323127310218 269.16184563852346,485.67911761729994 261.0237976891917,397.8555937288074 285.160810074785,313.02279461363094 338.3130455248261,242.63785986704193 413.3020001150833,196.2066649429546" fill="none" stroke="var(--color-brand-gray-100)" stroke-width="1"></polygon><polygon points="500,120 608.3724998561459,140.25833117869325 702.1086930939672,198.29732483380226 768.5489874065187,286.2784932670385 798.7202528885105,392.3194921610094 788.5476929518456,502.0988970216249 739.4051681840718,600.790390913777 657.9296488632068,675.0651407188842 555.1248553449711,714.8919299051705 444.8751446550289,714.8919299051705 342.0703511367932,675.0651407188842 260.59483181592833,600.7903909137772 211.4523070481543,502.0988970216249 201.27974711148966,392.31949216100924 231.4510125934812,286.2784932670387 297.8913069060327,198.2973248338024 391.6275001438541,140.25833117869325" fill="none" stroke="var(--color-brand-gray-200)" stroke-width="1.5"></polygon><line x1="500" y1="420" x2="500" y2="120" stroke="var(--color-brand-gray-100)"></line><line x1="500" y1="420" x2="608.3724998561459" y2="140.25833117869325" stroke="var(--color-brand-gray-100)"></line><line x1="500" y1="420" x2="702.1086930939672" y2="198.29732483380226" stroke="var(--color-brand-gray-100)"></line><line x1="500" y1="420" x2="768.5489874065187" y2="286.2784932670385" stroke="var(--color-brand-gray-100)"></line><line x1="500" y1="420" x2="798.7202528885105" y2="392.3194921610094" stroke="var(--color-brand-gray-100)"></line><line x1="500" y1="420" x2="788.5476929518456" y2="502.0988970216249" stroke="var(--color-brand-gray-100)"></line><line x1="500" y1="420" x2="739.4051681840718" y2="600.790390913777" stroke="var(--color-brand-gray-100)"></line><line x1="500" y1="420" x2="657.9296488632068" y2="675.0651407188842" stroke="var(--color-brand-gray-100)"></line><line x1="500" y1="420" x2="555.1248553449711" y2="714.8919299051705" stroke="var(--color-brand-gray-100)"></line><line x1="500" y1="420" x2="444.8751446550289" y2="714.8919299051705" stroke="var(--color-brand-gray-100)"></line><line x1="500" y1="420" x2="342.0703511367932" y2="675.0651407188842" stroke="var(--color-brand-gray-100)"></line><line x1="500" y1="420" x2="260.59483181592833" y2="600.7903909137772" stroke="var(--color-brand-gray-100)"></line><line x1="500" y1="420" x2="211.4523070481543" y2="502.0988970216249" stroke="var(--color-brand-gray-100)"></line><line x1="500" y1="420" x2="201.27974711148966" y2="392.31949216100924" stroke="var(--color-brand-gray-100)"></line><line x1="500" y1="420" x2="231.4510125934812" y2="286.2784932670387" stroke="var(--color-brand-gray-100)"></line><line x1="500" y1="420" x2="297.8913069060327" y2="198.2973248338024" stroke="var(--color-brand-gray-100)"></line><line x1="500" y1="420" x2="391.6275001438541" y2="140.25833117869325" stroke="var(--color-brand-gray-100)"></line><g><polygon points="500,166.20000000000002 589.840802380745,188.0941565471367 683.9189107155102,218.25056559876006 726.6553453711018,307.1390483173805 749.1326909090177,396.91445646228186 732.5694405191877,486.17171099942965 601.3880887259544,496.5647305519845 542.4830755442026,488.61252285337986 505.84323466656696,451.25854456994807 460.53060357300075,631.1426218121021 388.3437382537128,600.3310544882512 262.7494783295849,599.1632773955532 306.0959503363597,475.17045879853197 253.55579136697898,397.1635810328326 250.78653968675061,295.9064417518119 356.90704528947117,263.0345059823321 424.4643676002663,225.02005683154917" fill="none" fill-opacity="0" stroke="#1F9FB0" stroke-width="2" stroke-dasharray="7 5" stroke-linejoin="round"></polygon><circle cx="500" cy="166.20000000000002" r="5.5" fill="#F7F7F7" stroke="#1F9FB0" stroke-width="2"></circle><circle cx="589.840802380745" cy="188.0941565471367" r="5.5" fill="#F7F7F7" stroke="#1F9FB0" stroke-width="2"></circle><circle cx="683.9189107155102" cy="218.25056559876006" r="5.5" fill="#F7F7F7" stroke="#1F9FB0" stroke-width="2"></circle><circle cx="726.6553453711018" cy="307.1390483173805" r="5.5" fill="#F7F7F7" stroke="#1F9FB0" stroke-width="2"></circle><circle cx="749.1326909090177" cy="396.91445646228186" r="5.5" fill="#F7F7F7" stroke="#1F9FB0" stroke-width="2"></circle><circle cx="732.5694405191877" cy="486.17171099942965" r="5.5" fill="#F7F7F7" stroke="#1F9FB0" stroke-width="2"></circle><circle cx="601.3880887259544" cy="496.5647305519845" r="5.5" fill="#F7F7F7" stroke="#1F9FB0" stroke-width="2"></circle><circle cx="542.4830755442026" cy="488.61252285337986" r="5.5" fill="#F7F7F7" stroke="#1F9FB0" stroke-width="2"></circle><circle cx="505.84323466656696" cy="451.25854456994807" r="5.5" fill="#F7F7F7" stroke="#1F9FB0" stroke-width="2"></circle><circle cx="460.53060357300075" cy="631.1426218121021" r="5.5" fill="#F7F7F7" stroke="#1F9FB0" stroke-width="2"></circle><circle cx="388.3437382537128" cy="600.3310544882512" r="5.5" fill="#F7F7F7" stroke="#1F9FB0" stroke-width="2"></circle><circle cx="262.7494783295849" cy="599.1632773955532" r="5.5" fill="#F7F7F7" stroke="#1F9FB0" stroke-width="2"></circle><circle cx="306.0959503363597" cy="475.17045879853197" r="5.5" fill="#F7F7F7" stroke="#1F9FB0" stroke-width="2"></circle><circle cx="253.55579136697898" cy="397.1635810328326" r="5.5" fill="#F7F7F7" stroke="#1F9FB0" stroke-width="2"></circle><circle cx="250.78653968675061" cy="295.9064417518119" r="5.5" fill="#F7F7F7" stroke="#1F9FB0" stroke-width="2"></circle><circle cx="356.90704528947117" cy="263.0345059823321" r="5.5" fill="#F7F7F7" stroke="#1F9FB0" stroke-width="2"></circle><circle cx="424.4643676002663" cy="225.02005683154917" r="5.5" fill="#F7F7F7" stroke="#1F9FB0" stroke-width="2"></circle></g><g><polygon points="500,144.89999999999998 592.766859876861,180.5411314889614 682.7062585569463,219.58078164975726 734.9803639807038,302.9936816086587 733.0017972530381,398.4092038855873 721.0275328011138,482.88775511856466 576.0111408984428,477.40094911512415 545.9575278191932,494.22395594919533 508.5443525784705,465.70824913530146 462.79072264214454,619.0520526859901 385.1851452764487,605.4323573026288 336.96508046664724,543.1182562122822 323.9859072993741,470.08032718319123 255.04939263142154,397.3019835720276 245.6841089260267,293.3657331238856 372.87363204389453,280.54901732046176 427.3904250963823,232.57308188972448" fill="none" fill-opacity="0" stroke="#E3489C" stroke-width="2" stroke-dasharray="7 5" stroke-linejoin="round"></polygon><circle cx="500" cy="144.89999999999998" r="5.5" fill="#F7F7F7" stroke="#E3489C" stroke-width="2"></circle><circle cx="592.766859876861" cy="180.5411314889614" r="5.5" fill="#F7F7F7" stroke="#E3489C" stroke-width="2"></circle><circle cx="682.7062585569463" cy="219.58078164975726" r="5.5" fill="#F7F7F7" stroke="#E3489C" stroke-width="2"></circle><circle cx="734.9803639807038" cy="302.9936816086587" r="5.5" fill="#F7F7F7" stroke="#E3489C" stroke-width="2"></circle><circle cx="733.0017972530381" cy="398.4092038855873" r="5.5" fill="#F7F7F7" stroke="#E3489C" stroke-width="2"></circle><circle cx="721.0275328011138" cy="482.88775511856466" r="5.5" fill="#F7F7F7" stroke="#E3489C" stroke-width="2"></circle><circle cx="576.0111408984428" cy="477.40094911512415" r="5.5" fill="#F7F7F7" stroke="#E3489C" stroke-width="2"></circle><circle cx="545.9575278191932" cy="494.22395594919533" r="5.5" fill="#F7F7F7" stroke="#E3489C" stroke-width="2"></circle><circle cx="508.5443525784705" cy="465.70824913530146" r="5.5" fill="#F7F7F7" stroke="#E3489C" stroke-width="2"></circle><circle cx="462.79072264214454" cy="619.0520526859901" r="5.5" fill="#F7F7F7" stroke="#E3489C" stroke-width="2"></circle><circle cx="385.1851452764487" cy="605.4323573026288" r="5.5" fill="#F7F7F7" stroke="#E3489C" stroke-width="2"></circle><circle cx="336.96508046664724" cy="543.1182562122822" r="5.5" fill="#F7F7F7" stroke="#E3489C" stroke-width="2"></circle><circle cx="323.9859072993741" cy="470.08032718319123" r="5.5" fill="#F7F7F7" stroke="#E3489C" stroke-width="2"></circle><circle cx="255.04939263142154" cy="397.3019835720276" r="5.5" fill="#F7F7F7" stroke="#E3489C" stroke-width="2"></circle><circle cx="245.6841089260267" cy="293.3657331238856" r="5.5" fill="#F7F7F7" stroke="#E3489C" stroke-width="2"></circle><circle cx="372.87363204389453" cy="280.54901732046176" r="5.5" fill="#F7F7F7" stroke="#E3489C" stroke-width="2"></circle><circle cx="427.3904250963823" cy="232.57308188972448" r="5.5" fill="#F7F7F7" stroke="#E3489C" stroke-width="2"></circle></g><g><polygon points="500,180.60000000000002 578.3533173959935,217.7467734421952 667.9523239610867,235.7650769368897 710.8109551141172,315.0286172146252 723.1440289077173,399.32266064427404 710.3512681618955,479.8500959287645 590.9739639099473,488.7003485472352 503.14211675466333,436.80884000459474 465.3264659880132,605.4870239103523 436.8281404547173,522.0260562875537 400.64685520361024,495.02801222921755 332.6423380879295,467.61736027254244 287.3111799433806,400.2914784186386 250.78653968675061,295.9064417518119 386.01069709500246,294.95969120626455 443.3211825752357,273.69510720645656" fill="none" fill-opacity="0" stroke="#939073" stroke-width="2" stroke-dasharray="7 5" stroke-linejoin="round"></polygon><circle cx="500" cy="180.60000000000002" r="5.5" fill="#F7F7F7" stroke="#939073" stroke-width="2"></circle><circle cx="578.3533173959935" cy="217.7467734421952" r="5.5" fill="#F7F7F7" stroke="#939073" stroke-width="2"></circle><circle cx="667.9523239610867" cy="235.7650769368897" r="5.5" fill="#F7F7F7" stroke="#939073" stroke-width="2"></circle><circle cx="710.8109551141172" cy="315.0286172146252" r="5.5" fill="#F7F7F7" stroke="#939073" stroke-width="2"></circle><circle cx="723.1440289077173" cy="399.32266064427404" r="5.5" fill="#F7F7F7" stroke="#939073" stroke-width="2"></circle><circle cx="710.3512681618955" cy="479.8500959287645" r="5.5" fill="#F7F7F7" stroke="#939073" stroke-width="2"></circle><circle cx="590.9739639099473" cy="488.7003485472352" r="5.5" fill="#F7F7F7" stroke="#939073" stroke-width="2"></circle><circle cx="503.14211675466333" cy="436.80884000459474" r="5.5" fill="#F7F7F7" stroke="#939073" stroke-width="2"></circle><circle cx="465.3264659880132" cy="605.4870239103523" r="5.5" fill="#F7F7F7" stroke="#939073" stroke-width="2"></circle><circle cx="436.8281404547173" cy="522.0260562875537" r="5.5" fill="#F7F7F7" stroke="#939073" stroke-width="2"></circle><circle cx="400.64685520361024" cy="495.02801222921755" r="5.5" fill="#F7F7F7" stroke="#939073" stroke-width="2"></circle><circle cx="332.6423380879295" cy="467.61736027254244" r="5.5" fill="#F7F7F7" stroke="#939073" stroke-width="2"></circle><circle cx="287.3111799433806" cy="400.2914784186386" r="5.5" fill="#F7F7F7" stroke="#939073" stroke-width="2"></circle><circle cx="250.78653968675061" cy="295.9064417518119" r="5.5" fill="#F7F7F7" stroke="#939073" stroke-width="2"></circle><circle cx="386.01069709500246" cy="294.95969120626455" r="5.5" fill="#F7F7F7" stroke="#939073" stroke-width="2"></circle><circle cx="443.3211825752357" cy="273.69510720645656" r="5.5" fill="#F7F7F7" stroke="#939073" stroke-width="2"></circle></g><g><polygon points="500,174.29999999999998 579.6537873942673,214.38987341633955 664.7185848715833,239.31231973954888 701.948838529702,319.44142693681295 703.4284922170756,401.1495741616474 668.8004003768298,468.0278547576506 543.0929302731329,452.54227036447986 506.9489045499811,431.2228661916309 503.14211675466333,436.80884000459474 467.7519596231919,592.5117789945248 407.2952961172976,569.723237601985 338.4015114757516,542.0335138667996 394.96863976552817,449.8839985158715 323.15761029000186,403.6131393593175 293.7543776717936,317.3018828290857" fill="none" fill-opacity="0" stroke="#E48916" stroke-width="2" stroke-dasharray="7 5" stroke-linejoin="round"></polygon><circle cx="500" cy="174.29999999999998" r="5.5" fill="#F7F7F7" stroke="#E48916" stroke-width="2"></circle><circle cx="579.6537873942673" cy="214.38987341633955" r="5.5" fill="#F7F7F7" stroke="#E48916" stroke-width="2"></circle><circle cx="664.7185848715833" cy="239.31231973954888" r="5.5" fill="#F7F7F7" stroke="#E48916" stroke-width="2"></circle><circle cx="701.948838529702" cy="319.44142693681295" r="5.5" fill="#F7F7F7" stroke="#E48916" stroke-width="2"></circle><circle cx="703.4284922170756" cy="401.1495741616474" r="5.5" fill="#F7F7F7" stroke="#E48916" stroke-width="2"></circle><circle cx="668.8004003768298" cy="468.0278547576506" r="5.5" fill="#F7F7F7" stroke="#E48916" stroke-width="2"></circle><circle cx="543.0929302731329" cy="452.54227036447986" r="5.5" fill="#F7F7F7" stroke="#E48916" stroke-width="2"></circle><circle cx="506.9489045499811" cy="431.2228661916309" r="5.5" fill="#F7F7F7" stroke="#E48916" stroke-width="2"></circle><circle cx="503.14211675466333" cy="436.80884000459474" r="5.5" fill="#F7F7F7" stroke="#E48916" stroke-width="2"></circle><circle cx="467.7519596231919" cy="592.5117789945248" r="5.5" fill="#F7F7F7" stroke="#E48916" stroke-width="2"></circle><circle cx="407.2952961172976" cy="569.723237601985" r="5.5" fill="#F7F7F7" stroke="#E48916" stroke-width="2"></circle><circle cx="338.4015114757516" cy="542.0335138667996" r="5.5" fill="#F7F7F7" stroke="#E48916" stroke-width="2"></circle><circle cx="394.96863976552817" cy="449.8839985158715" r="5.5" fill="#F7F7F7" stroke="#E48916" stroke-width="2"></circle><circle cx="323.15761029000186" cy="403.6131393593175" r="5.5" fill="#F7F7F7" stroke="#E48916" stroke-width="2"></circle><circle cx="293.7543776717936" cy="317.3018828290857" r="5.5" fill="#F7F7F7" stroke="#E48916" stroke-width="2"></circle></g><g><polygon points="500,129.29999999999995 594.8259373741276,175.2260397813566 694.0243453702085,207.1654318404502 741.6940886658668,299.6506439403347 751.8211731850142,396.66533189173094 734.5892743698505,486.74640327858106 580.4401365098481,480.74557134702906 546.4313167657828,494.98915137135197 521.002569886434,532.3538252938699 461.46772611386524,626.1294590037143 378.8679593219204,615.6349629313842 273.2833057296841,591.2085001953469 322.83171652756675,470.40872277127767 243.3993027687696,396.2224437663069 251.05508867415708,296.04016325854485 369.6398929543911,277.0017745178026 425.9815825982524,228.9364401950475" fill="#E48916" fill-opacity="0.14" stroke="#E48916" stroke-width="3" stroke-linejoin="round"></polygon><circle cx="500" cy="129.29999999999995" r="6.5" fill="#E48916" stroke="#E48916" stroke-width="2"></circle><circle cx="594.8259373741276" cy="175.2260397813566" r="6.5" fill="#E48916" stroke="#E48916" stroke-width="2"></circle><circle cx="694.0243453702085" cy="207.1654318404502" r="6.5" fill="#E48916" stroke="#E48916" stroke-width="2"></circle><circle cx="741.6940886658668" cy="299.6506439403347" r="6.5" fill="#E48916" stroke="#E48916" stroke-width="2"></circle><circle cx="751.8211731850142" cy="396.66533189173094" r="6.5" fill="#E48916" stroke="#E48916" stroke-width="2"></circle><circle cx="734.5892743698505" cy="486.74640327858106" r="6.5" fill="#E48916" stroke="#E48916" stroke-width="2"></circle><circle cx="580.4401365098481" cy="480.74557134702906" r="6.5" fill="#E48916" stroke="#E48916" stroke-width="2"></circle><circle cx="546.4313167657828" cy="494.98915137135197" r="6.5" fill="#E48916" stroke="#E48916" stroke-width="2"></circle><circle cx="521.002569886434" cy="532.3538252938699" r="6.5" fill="#E48916" stroke="#E48916" stroke-width="2"></circle><circle cx="461.46772611386524" cy="626.1294590037143" r="6.5" fill="#E48916" stroke="#E48916" stroke-width="2"></circle><circle cx="378.8679593219204" cy="615.6349629313842" r="6.5" fill="#E48916" stroke="#E48916" stroke-width="2"></circle><circle cx="273.2833057296841" cy="591.2085001953469" r="6.5" fill="#E48916" stroke="#E48916" stroke-width="2"></circle><circle cx="322.83171652756675" cy="470.40872277127767" r="6.5" fill="#E48916" stroke="#E48916" stroke-width="2"></circle><circle cx="243.3993027687696" cy="396.2224437663069" r="6.5" fill="#E48916" stroke="#E48916" stroke-width="2"></circle><circle cx="251.05508867415708" cy="296.04016325854485" r="6.5" fill="#E48916" stroke="#E48916" stroke-width="2"></circle><circle cx="369.6398929543911" cy="277.0017745178026" r="6.5" fill="#E48916" stroke="#E48916" stroke-width="2"></circle><circle cx="425.9815825982524" cy="228.9364401950475" r="6.5" fill="#E48916" stroke="#E48916" stroke-width="2"></circle></g><text x="500" y="72" text-anchor="middle"><tspan x="500">AIME 2025</tspan><tspan x="500" dy="21">Math</tspan></text><text x="618.4872665093862" y="94.14910875537129" text-anchor="start"><tspan x="618.4872665093862">AIME 2025 (DE)</tspan><tspan x="618.4872665093862" dy="21">Math</tspan></text><text x="720.9721711160707" y="157.60507515162382" text-anchor="start"><tspan x="720.9721711160707">AIME 2026</tspan><tspan x="720.9721711160707" dy="21">Math</tspan></text><text x="793.6135595644605" y="253.79781930529543" text-anchor="start"><tspan x="793.6135595644605">AIME 2026 (DE)</tspan><tspan x="793.6135595644605" dy="21">Math</tspan></text><text x="826.6008098247713" y="385.73597809603694" text-anchor="start"><tspan x="826.6008098247713">GPQA (diamond)</tspan><tspan x="826.6008098247713" dy="21">Knowledge</tspan></text><text x="815.4788109606847" y="523.7614607436433" text-anchor="start"><tspan x="815.4788109606847">GPQA (diamond, DE)</tspan><tspan x="815.4788109606847" dy="21">Knowledge</tspan></text><text x="761.7496505479186" y="631.6641607323961" text-anchor="start"><tspan x="761.7496505479186">AA-Omniscience Index</tspan><tspan x="761.7496505479186" dy="21">Grounding / hallucinations</tspan><tspan x="761.7496505479186" dy="19">public set; from −100 to 100</tspan></text><text x="672.6697494237728" y="712.8712205193134" text-anchor="start"><tspan x="672.6697494237728">BrowseComp</tspan><tspan x="672.6697494237728" dy="21">Agentic</tspan></text><text x="560.269841843835" y="756.4151766963198" text-anchor="start"><tspan x="560.269841843835">τ³-bench banking</tspan><tspan x="560.269841843835" dy="21">Agentic</tspan></text><text x="439.730158156165" y="756.4151766963198" text-anchor="end"><tspan x="439.730158156165">τ²-bench retail</tspan><tspan x="439.730158156165" dy="21">Agentic</tspan></text><text x="327.3302505762273" y="712.8712205193135" text-anchor="end"><tspan x="327.3302505762273">τ²-bench airline</tspan><tspan x="327.3302505762273" dy="21">Agentic</tspan></text><text x="238.25034945208165" y="631.6641607323963" text-anchor="end"><tspan x="238.25034945208165">τ²-bench telecom</tspan><tspan x="238.25034945208165" dy="21">Agentic</tspan></text><text x="184.52118903931535" y="523.7614607436433" text-anchor="end"><tspan x="184.52118903931535">BFCL v4 overall</tspan><tspan x="184.52118903931535" dy="21">Agentic</tspan></text><text x="173.39919017522868" y="385.7359780960368" text-anchor="end"><tspan x="173.39919017522868">LiveCodeBench v6</tspan><tspan x="173.39919017522868" dy="21">Code</tspan></text><text x="206.3864404355395" y="253.7978193052956" text-anchor="end"><tspan x="206.3864404355395">HumanEval+</tspan><tspan x="206.3864404355395" dy="21">Code</tspan></text><text x="279.02782888392903" y="157.60507515162396" text-anchor="end"><tspan x="279.02782888392903">LongBench Pro</tspan><tspan x="279.02782888392903" dy="21">Long context</tspan></text><text x="381.5127334906138" y="94.14910875537129" text-anchor="end"><tspan x="381.5127334906138">AA-LCR</tspan><tspan x="381.5127334906138" dy="21">Long context</tspan></text></svg></div><ul><li><li><li><li><li></ul><details><summary>Show the numbers</summary><div><table><thead><tr><th>Benchmark</th><th>Kolibri</th><th>Kolibri Origin</th><th>Qwen3.6-35B-A3B</th><th>Nemotron 3 Super 120B-A12B</th><th>Mistral Small 4 119B-A6B</th></tr></thead><tbody><tr><td>AIME 2025</td><td>96.9</td><td>81.9</td><td>84.6</td><td>91.7</td><td>79.8</td></tr><tr><td>AIME 2025 (DE)</td><td>87.5</td><td>73.5</td><td>82.9</td><td>85.6</td><td>72.3</td></tr><tr><td>AIME 2026</td><td>96.0</td><td>81.5</td><td>91.0</td><td>90.4</td><td>83.1</td></tr><tr><td>AIME 2026 (DE)</td><td>90.0</td><td>75.2</td><td>84.4</td><td>87.5</td><td>78.5</td></tr><tr><td>GPQA (diamond)</td><td>84.3</td><td>68.1</td><td>83.4</td><td>78.0</td><td>74.7</td></tr><tr><td>GPQA (diamond, DE)</td><td>81.3</td><td>58.5</td><td>80.6</td><td>76.6</td><td>72.9</td></tr><tr><td>AA-Omniscience Index</td><td>-32.8</td><td>-64.0</td><td>-15.3</td><td>-36.5</td><td>-24.0</td></tr><tr><td>BrowseComp</td><td>29.4</td><td>4.4</td><td>26.9</td><td>29.1</td><td>–</td></tr><tr><td>τ³-bench banking</td><td>38.1</td><td>5.7</td><td>10.6</td><td>15.5</td><td>5.7</td></tr><tr><td>τ²-bench retail</td><td>69.9</td><td>58.5</td><td>71.6</td><td>67.5</td><td>62.9</td></tr><tr><td>τ²-bench airline</td><td>76.7</td><td>58.7</td><td>70.7</td><td>72.7</td><td>40.0</td></tr><tr><td>τ²-bench telecom</td><td>94.7</td><td>67.5</td><td>99.1</td><td>68.1</td><td>41.5</td></tr><tr><td>BFCL v4 overall</td><td>61.4</td><td>36.4</td><td>67.2</td><td>61.0</td><td>58.0</td></tr><tr><td>LiveCodeBench v6</td><td>85.9</td><td>59.2</td><td>82.5</td><td>82.0</td><td>71.2</td></tr><tr><td>HumanEval+</td><td>92.7</td><td>76.8</td><td>92.8</td><td>94.7</td><td>92.8</td></tr><tr><td>LongBench Pro</td><td>64.5</td><td>–</td><td>70.8</td><td>62.9</td><td>56.4</td></tr><tr><td>AA-LCR</td><td>68.3</td><td>–</td><td>69.7</td><td>67.0</td><td>52.3</td></tr></tbody></table></div></details></div></astro-island>
+      
+  <figcaption class="font-saans-mono border-brand-gray-100 text-brand-gray-500 mt-[0.9rem] border-t px-[0.2rem] pt-[0.9rem] pb-[0.6rem] text-[0.78rem] leading-[1.5] blog-caption-bold blog-figure-caption-code"><b>Foundational capabilities of Kolibri.</b> Kolibri is a balanced generalist model with competitive performance across math, code, long context, agentic capabilities, and knowledge. Benchmark scores are shown on a shared 0–100 scale, higher is better.</figcaption>
+</figure>
+
+      <h3 class="col-span-12 md:col-span-6 md:col-start-4 font-saans text-brand-gray-400 leading-[1.3] font-semibold text-[20px] md:text-[22px] xl:text-[24px] 2xl:text-[26px] mb-6 md:mb-8">
+  Contextualized performance for real-world applications
+</h3>
+      <p class="col-span-12 md:col-span-6 md:col-start-4 text-brand-gray-800 font-saans text-base leading-[1.6] md:text-lg 2xl:text-xl mb-5 last:mb-0 blog-rich-text-links blog-inline-code">
+  
+        Public benchmarks fail to capture specialized sector needs, so we developed our own internal
+        evaluation suites for the verticals that matter to our customers, such as the German public
+        sector, aviation, manufacturing and the automotive industry. Each suite mirrors the skills,
+        workflows, and edge cases required in these sectors, and paired synthetic training
+        environments let us improve Kolibri against these evaluations without ever training on
+        customer data. Read more in section <a href="https://aleph-alpha.com/en/blog/kolibri-has-landed-a-sovereign-open-weight-model/#contextualized-performance" target="_blank" rel="noopener">Contextualized performance</a>.
+      
+</p>
+      <figure class="col-span-12 md:col-span-10 md:col-start-2 text-brand-gray-900 rounded-blog-lg border-brand-gray-100 bg-brand-gray-50 mb-5 border px-5 pt-5 pb-2 last:mb-0">
+  
+        <astro-island uid="51IgU" prefix="r7" component-url="/_astro/HillClimb.DVaROIpH.js" component-export="default" renderer-url="/_astro/client.BNUabsgt.js" props="{}" ssr client="visible" opts='{"name":"HillClimb","value":true}' await-children><div><div><p><span>Score on internal customer-proxy benchmark</span></p><p role="img" aria-label="Scores on five internal customer-proxy benchmarks across one month of post-training runs. All five rise from Kolibri Origin to Kolibri: automotive supplier 0.72 to 0.99, semiconductors 0.35 to 0.80, German public sector 0.54 to 0.75, industrial drive technology 0.31 to 0.60 and aerospace 0.14 to 0.59."></p></div><ul><li><span></span>Automotive supplier 0.72 → 0.99</li><li><span></span>Semiconductors 0.35 → 0.80</li><li><span></span>German public sector 0.54 → 0.75</li><li><span></span>Industrial drive technology 0.31 → 0.60</li><li><span></span>Aerospace 0.14 → 0.59</li><li><span></span>one checkpoint, one eval</li><li><span></span>mean of that day</li><li><span></span>Kolibri Origin</li><li><span></span>Kolibri</li></ul></div></astro-island>
+      
+  <figcaption class="font-saans-mono border-brand-gray-100 text-brand-gray-500 mt-[0.9rem] border-t px-[0.2rem] pt-[0.9rem] pb-[0.6rem] text-[0.78rem] leading-[1.5] blog-caption-bold blog-figure-caption-code">Contextualized performance across successive post-training runs on internal customer-proxy benchmarks. Dots are single evaluations of training checkpoints, lines are the mean of each day's evaluations. Performance climbs across all five verticals, higher is better.</figcaption>
+</figure>
+
+      <p class="col-span-12 md:col-span-6 md:col-start-4 text-brand-gray-800 font-saans text-base leading-[1.6] md:text-lg 2xl:text-xl mb-5 last:mb-0 blog-rich-text-links blog-inline-code">
+  
+        <strong>Answers that are grounded in your documents.</strong> We trained Kolibri with abstention
+        data and with our Merlin-Arthur protocol. As a result, it is trained to say "I don't know" when
+        the answer isn't in the context. Our customers value and request this feature, so we continuously
+        track and validate abstention accuracy. We provide more details in the <a href="https://aleph-alpha.com/en/blog/kolibri-has-landed-a-sovereign-open-weight-model/#grounding" target="_blank" rel="noopener">Grounding</a> section.
+      
+</p>
+      <p class="col-span-12 md:col-span-6 md:col-start-4 text-brand-gray-800 font-saans text-base leading-[1.6] md:text-lg 2xl:text-xl mb-5 last:mb-0 blog-rich-text-links blog-inline-code">
+  
+        <strong>Native German and English model.</strong> We developed a bilingual German/English tokenizer
+        and focused on <a href="https://aleph-alpha.com/en/blog/sauerkraut-not-burgers-why-german-llms-need-german-data/" target="_blank" rel="noopener">including organic German data</a> throughout the training process of the model, so that 21.3% of the pre-training tokens are German.
+        We used translation sparingly (6% overall), since translated text tends to carry the cultural
+        fingerprint of its source language. The result is a model that is bilingual by design, not an
+        English model that has read some German. Read more in sections <a href="https://aleph-alpha.com/en/blog/kolibri-has-landed-a-sovereign-open-weight-model/#german-pre-training-data" target="_blank" rel="noopener">German pre-training data</a> and <a href="https://aleph-alpha.com/en/blog/kolibri-has-landed-a-sovereign-open-weight-model/#specialized-tokenizers" target="_blank" rel="noopener">Specialized tokenizers</a>.
+      
+</p>
+
+      <h3 class="col-span-12 md:col-span-6 md:col-start-4 font-saans text-brand-gray-400 leading-[1.3] font-semibold text-[20px] md:text-[22px] xl:text-[24px] 2xl:text-[26px] mb-6 md:mb-8">
+  
+        Control and compliance by design: upholding our customers' sovereignty
+      
+</h3>
+      <p class="col-span-12 md:col-span-6 md:col-start-4 text-brand-gray-800 font-saans text-base leading-[1.6] md:text-lg 2xl:text-xl mb-5 last:mb-0 blog-rich-text-links blog-inline-code">
+  
+        We built Kolibri with the EU AI Act, the <a href="https://aleph-alpha.com/en/blog/a-signature-and-a-stance-why-we-signed-the-code-of-practice/" target="_blank" rel="noopener">General-Purpose AI Code of Practice</a> and the GDPR in mind from the ground up, with copyright law being a focus of our work to trustworthy
+        technology.
+      
+</p>
+      <p class="col-span-12 md:col-span-6 md:col-start-4 text-brand-gray-800 font-saans text-base leading-[1.6] md:text-lg 2xl:text-xl mb-5 last:mb-0 blog-rich-text-links blog-inline-code">
+  
+        We are <strong>transparent</strong> about our <a href="https://huggingface.co/Aleph-Alpha/Kolibri-1" target="_blank" rel="noopener">model weights</a> and about <a href="https://aleph-alpha.com/en/blog/sauerkraut-not-burgers-why-german-llms-need-german-data/" target="_blank" rel="noopener">curation of our training data</a>, so that decisions behind development are visible. Through its reasoning traces, it
+        becomes <strong>explainable</strong> how the model came to a particular answer. With our <a href="https://aleph-alpha.com/en/blog/bounding-hallucinations-merlin-arthur-protocols-for-mutual-information-bounds-in-language-models/" target="_blank" rel="noopener">Merlin-Arthur protocol</a> the model grounds <strong>trustworthiness</strong>: Kolibri refrains from answering when
+        the context doesn't support an answer.
+      
+</p>
+      <p class="col-span-12 md:col-span-6 md:col-start-4 text-brand-gray-800 font-saans text-base leading-[1.6] md:text-lg 2xl:text-xl mb-5 last:mb-0 blog-rich-text-links blog-inline-code">
+  
+        Our teams built the model in Germany, trained it on infrastructure in Germany and Finland,
+        under European and German law, with no foreign <strong>control</strong>. We own the entire
+        pipeline, from data curation, through pre- and post-training, to optimization in our Model
+        Factory. This control of our end to end pipeline underpins the model's sovereignty. Control
+        also passes on to our customers and Kolibri's small size gives them full freedom of
+        deployment and supports controllable reasoning effort to trade cost and latency against
+        answer quality.
+      
+</p>
+    
+</section>
+
+    
+<section class="grid-container relative mb-15 md:mb-20 xl:mb-24">
+  
+      <h2 id="how-we-built-kolibri" class="col-span-12 md:col-span-6 md:col-start-4 font-saans text-brand-gray-400 leading-[1.3] font-semibold text-[24px] md:text-[28px] xl:text-[32px] 2xl:text-[36px] mb-6 md:mb-8">
+  How We Built Kolibri at High Velocity
+</h2>
+      <h3 class="col-span-12 md:col-span-6 md:col-start-4 font-saans text-brand-gray-400 leading-[1.3] font-semibold text-[20px] md:text-[22px] xl:text-[24px] 2xl:text-[26px] mb-6 md:mb-8">
+  Our Model Factory: two models, three months apart
+</h3>
+      <p class="col-span-12 md:col-span-6 md:col-start-4 text-brand-gray-800 font-saans text-base leading-[1.6] md:text-lg 2xl:text-xl mb-5 last:mb-0 blog-rich-text-links blog-inline-code">
+  
+        Our Model Factory is our answer to iteration speed, minimizing the time it takes to go from
+        knowing what a model gets wrong to training one that does better. We implemented the
+        training pipeline as code, so that the learnings of our team landed in one versioned
+        training recipe instead of scattered scripts and notes. Here is what that looked like
+        between Kolibri Origin and Kolibri.
+      
+</p>
+      <p class="col-span-12 md:col-span-6 md:col-start-4 text-brand-gray-800 font-saans text-base leading-[1.6] md:text-lg 2xl:text-xl mb-5 last:mb-0 blog-rich-text-links blog-inline-code">
+  
+        Work on the pipeline began in January. Five months and hundreds of ablation runs later,
+        Kolibri Origin finished pre-training at target scale on 11 June. Kolibri finished on 11
+        September. In the three months between those two dates we went from 30B parameters to 78B,
+        from a 65k-token context window to up to 1M, and from 7.5T training tokens to 20T. To get
+        those 20T, the pipeline processed over 200T tokens of raw data, filtering, deduplicating,
+        and curating it down to what we actually trained on. We changed the attention design,
+        tripled the number of experts, increased sparsity, replaced the routing algorithm, improved
+        our post-training data, more than doubled the number of environment tasks, and taught the
+        model to reason at four different effort levels. Both models kept a similar number of
+        parameters active per token, yet Kolibri trained faster per token than Kolibri Origin thanks
+        to the work of our efficiency team.
+      
+</p>
+      <figure class="mb-5 last:mb-0 col-span-12 md:col-span-8 md:col-start-3">
+  <div class="rounded-blog-md border-brand-gray-800/10 overflow-x-auto border">
+    <table class="text-brand-gray-800 font-saans w-full text-sm md:text-base">
+      
+      <thead>
+        <tr class="border-brand-gray-800/10 bg-brand-gray-800/3 border-b">
+          <th scope="col" class="px-5 py-3 text-left align-top leading-[1.4] font-semibold">
+                
+              </th><th scope="col" class="px-5 py-3 text-left align-top leading-[1.4] font-semibold">
+                Kolibri Origin
+              </th><th scope="col" class="px-5 py-3 text-left align-top leading-[1.4] font-semibold">
+                Kolibri
+              </th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr class="border-brand-gray-800/10 border-b last:border-b-0">
+              <th scope="row" class="px-5 py-3 leading-[1.5] align-top text-left font-semibold">Finished pre-training</th><td class="px-5 py-3 leading-[1.5] align-top text-left">11 June 2026</td><td class="px-5 py-3 leading-[1.5] align-top text-left">11 September 2026</td>
+            </tr><tr class="border-brand-gray-800/10 border-b last:border-b-0">
+              <th scope="row" class="px-5 py-3 leading-[1.5] align-top text-left font-semibold">Release</th><td class="px-5 py-3 leading-[1.5] align-top text-left">no public release</td><td class="px-5 py-3 leading-[1.5] align-top text-left">3 October 2026</td>
+            </tr><tr class="border-brand-gray-800/10 border-b last:border-b-0">
+              <th scope="row" class="px-5 py-3 leading-[1.5] align-top text-left font-semibold">Reasoning mode</th><td class="px-5 py-3 leading-[1.5] align-top text-left">Yes (one mode only)</td><td class="px-5 py-3 leading-[1.5] align-top text-left">Yes (none, low, medium, high)</td>
+            </tr><tr class="border-brand-gray-800/10 border-b last:border-b-0">
+              <th scope="row" class="px-5 py-3 leading-[1.5] align-top text-left font-semibold">Total parameters</th><td class="px-5 py-3 leading-[1.5] align-top text-left">30.6B</td><td class="px-5 py-3 leading-[1.5] align-top text-left">78.1B</td>
+            </tr><tr class="border-brand-gray-800/10 border-b last:border-b-0">
+              <th scope="row" class="px-5 py-3 leading-[1.5] align-top text-left font-semibold">Active parameters / token</th><td class="px-5 py-3 leading-[1.5] align-top text-left">3.27B</td><td class="px-5 py-3 leading-[1.5] align-top text-left">3.46B</td>
+            </tr><tr class="border-brand-gray-800/10 border-b last:border-b-0">
+              <th scope="row" class="px-5 py-3 leading-[1.5] align-top text-left font-semibold">Pre-training tokens</th><td class="px-5 py-3 leading-[1.5] align-top text-left">7.51T</td><td class="px-5 py-3 leading-[1.5] align-top text-left">20T</td>
+            </tr><tr class="border-brand-gray-800/10 border-b last:border-b-0">
+              <th scope="row" class="px-5 py-3 leading-[1.5] align-top text-left font-semibold">Layers</th><td class="px-5 py-3 leading-[1.5] align-top text-left">50 (2 dense + 48 MoE, 1 shared expert)</td><td class="px-5 py-3 leading-[1.5] align-top text-left">50 (all MoE, 1 shared expert)</td>
+            </tr><tr class="border-brand-gray-800/10 border-b last:border-b-0">
+              <th scope="row" class="px-5 py-3 leading-[1.5] align-top text-left font-semibold">Pre-training context length</th><td class="px-5 py-3 leading-[1.5] align-top text-left">8,192 (8k)</td><td class="px-5 py-3 leading-[1.5] align-top text-left">16,384 (16k)</td>
+            </tr><tr class="border-brand-gray-800/10 border-b last:border-b-0">
+              <th scope="row" class="px-5 py-3 leading-[1.5] align-top text-left font-semibold">Longest trained length</th><td class="px-5 py-3 leading-[1.5] align-top text-left">65,536 (64k)</td><td class="px-5 py-3 leading-[1.5] align-top text-left">262,144 (256k)</td>
+            </tr><tr class="border-brand-gray-800/10 border-b last:border-b-0">
+              <th scope="row" class="px-5 py-3 leading-[1.5] align-top text-left font-semibold">Tokenizer vocabulary</th><td class="px-5 py-3 leading-[1.5] align-top text-left">96,000</td><td class="px-5 py-3 leading-[1.5] align-top text-left">128,000</td>
+            </tr><tr class="border-brand-gray-800/10 border-b last:border-b-0">
+              <th scope="row" class="px-5 py-3 leading-[1.5] align-top text-left font-semibold">Model dimension</th><td class="px-5 py-3 leading-[1.5] align-top text-left">2,048</td><td class="px-5 py-3 leading-[1.5] align-top text-left">2,560</td>
+            </tr><tr class="border-brand-gray-800/10 border-b last:border-b-0">
+              <th scope="row" class="px-5 py-3 leading-[1.5] align-top text-left font-semibold">Attention heads (query / KV)</th><td class="px-5 py-3 leading-[1.5] align-top text-left">32 / 4</td><td class="px-5 py-3 leading-[1.5] align-top text-left">48 / 4</td>
+            </tr><tr class="border-brand-gray-800/10 border-b last:border-b-0">
+              <th scope="row" class="px-5 py-3 leading-[1.5] align-top text-left font-semibold">Experts (total / active)</th><td class="px-5 py-3 leading-[1.5] align-top text-left">128 / 8</td><td class="px-5 py-3 leading-[1.5] align-top text-left">384 / 6</td>
+            </tr><tr class="border-brand-gray-800/10 border-b last:border-b-0">
+              <th scope="row" class="px-5 py-3 leading-[1.5] align-top text-left font-semibold">Expert hidden dim</th><td class="px-5 py-3 leading-[1.5] align-top text-left">768</td><td class="px-5 py-3 leading-[1.5] align-top text-left">512</td>
+            </tr><tr class="border-brand-gray-800/10 border-b last:border-b-0">
+              <th scope="row" class="px-5 py-3 leading-[1.5] align-top text-left font-semibold">Attention pattern</th><td class="px-5 py-3 leading-[1.5] align-top text-left">full attention, all layers</td><td class="px-5 py-3 leading-[1.5] align-top text-left">sliding window (512) + full attention every 5th layer</td>
+            </tr><tr class="border-brand-gray-800/10 border-b last:border-b-0">
+              <th scope="row" class="px-5 py-3 leading-[1.5] align-top text-left font-semibold">Knowledge cutoff</th><td class="px-5 py-3 leading-[1.5] align-top text-left">EN: 1 Sept 2024, DE: 1 Aug 2025</td><td class="px-5 py-3 leading-[1.5] align-top text-left">EN/DE: 18 Jun 2026</td>
+            </tr>
+      </tbody>
+    </table>
+  </div>
+</figure>
+      <p class="col-span-12 md:col-span-6 md:col-start-4 text-brand-gray-800 font-saans text-base leading-[1.6] md:text-lg 2xl:text-xl mb-5 last:mb-0 blog-rich-text-links blog-inline-code">
+  
+        What made this possible is our training pipeline, an effort to convert research-grade model
+        development into a fully automated production-ready infrastructure to design and train large
+        language models. <a href="https://aleph-alpha.com/en/blog/model-training-as-code/" target="_blank" rel="noopener">Our pipeline codebase was shared by all</a>. Every proposed code change triggers a small end-to-end model run; training, evaluation,
+        to find out if something broke within minutes. Our runs are GitHub Actions workflows, and
+        reproducing one means checking out a commit. We used the pipeline for the main training and
+        the hundreds of ablations that ran to make our architectures and data-mix decisions.
+      
+</p>
+      <p class="col-span-12 md:col-span-6 md:col-start-4 text-brand-gray-800 font-saans text-base leading-[1.6] md:text-lg 2xl:text-xl mb-5 last:mb-0 blog-rich-text-links blog-inline-code">
+  
+        Training checkpoints land roughly every hour and the pipeline automatically evaluates them
+        on English and German knowledge, maths, code, instruction following, tool use, long context,
+        safety, abstention to hallucination and grounding. We can watch capabilities appear every
+        day rather than finding out how the model turned out at the end. The run itself held up
+        better than we expected. Over 21 days of pre-training of Kolibri, we hit 38 unplanned
+        interruptions, roughly one per 10,000 GPU-hours, caused by hardware faults or a connection
+        timing out. Those were automatically handled by the pipeline without manual intervention.
+        The cluster automatically restarted the training job(s) on a different set of nodes, and
+        training picked up from a checkpoint at most 250 steps back.
+      
+</p>
+      <p class="col-span-12 md:col-span-6 md:col-start-4 text-brand-gray-800 font-saans text-base leading-[1.6] md:text-lg 2xl:text-xl mb-5 last:mb-0 blog-rich-text-links blog-inline-code">
+  
+        Having access to the whole pipeline, with checkpoints available to everyone, means that any
+        team can own a capability end to end rather than a stage of an assembly line. One team
+        trained and evaluated the grounding capability of Kolibri as a single piece of work,
+        seamlessly integrating into the overall model.
+      
+</p>
+      <p class="col-span-12 md:col-span-6 md:col-start-4 text-brand-gray-800 font-saans text-base leading-[1.6] md:text-lg 2xl:text-xl mb-5 last:mb-0 blog-rich-text-links blog-inline-code">
+  
+        However, getting here was not a linear walk. We stumbled. We stopped the Kolibri Origin
+        pre-training after a few trillion tokens and restarted it from scratch, as we identified a
+        data-shuffling bug that escaped our tests. We ran ablations, took decisions, only to find a
+        bug or an error in the configuration afterwards, forcing us to rerun some experiments.
+        Alongside our own experience, we tracked state-of-the-art architectures, best practices, and
+        the latest research advances in LLMs. Those accumulated learnings led to improvements in our
+        processes and guardrails in our pipeline.
+      
+</p>
+      <p class="col-span-12 md:col-span-6 md:col-start-4 text-brand-gray-800 font-saans text-base leading-[1.6] md:text-lg 2xl:text-xl mb-5 last:mb-0 blog-rich-text-links blog-inline-code">
+  
+        Looking at the delta between Kolibri Origin and Kolibri, the improvement is notable, but
+        this is also the easy direction: more parameters, more data, a well-understood architecture
+        family, and still at small scale. As we are contemplating scaling up, we are happy to face
+        challenges on our foundation. But the most durable thing we built this year is not the
+        pipeline, it is a team with the proven capability to build, post-train, and ship LLMs from
+        raw data at high velocity.
+      
+</p>
+    
+</section>
+
+    
+<section class="grid-container relative mb-15 md:mb-20 xl:mb-24">
+  
+      <h3 class="col-span-12 md:col-span-6 md:col-start-4 font-saans text-brand-gray-400 leading-[1.3] font-semibold text-[20px] md:text-[22px] xl:text-[24px] 2xl:text-[26px] mb-6 md:mb-8">
+  Architecture and pre-training
+</h3>
+      <p class="col-span-12 md:col-span-6 md:col-start-4 text-brand-gray-800 font-saans text-base leading-[1.6] md:text-lg 2xl:text-xl mb-5 last:mb-0 blog-rich-text-links blog-inline-code">
+  
+        Kolibri has 78B total parameters, which is 2.5 times more than Kolibri Origin, with ~3B
+        active parameters. In our experiments, increasing the size of our model from 32B to 123B led
+        to ever-improved performance. Yet the larger size came with larger training and serving
+        costs. The latter drove the decision: 123B can handle only 3 long-context 256k-token user
+        queries on two H100s, while 78B handles 18 concurrent requests and decodes 28% faster. We
+        used 384 smaller experts rather than fewer wide ones, as they performed better in our tests.
+        We applied the same efficiency-first reasoning to attention. Out of 50 total layers, only 10
+        process full context, while the remaining 40 use a tight 512-token focused window. This
+        keeps decode computation and memory bounded in those layers regardless of context length.
+        The efficiency gains benefit both serving the trained model and training during
+        post-training RL, which relies on huge amounts of inference.
+      
+</p>
+      <p class="col-span-12 md:col-span-6 md:col-start-4 text-brand-gray-800 font-saans text-base leading-[1.6] md:text-lg 2xl:text-xl mb-5 last:mb-0 blog-rich-text-links blog-inline-code">
+  
+        We trained Kolibri on <a href="https://aleph-alpha.com/en/blog/scaling-pre-training-in-practice-a-hierarchical-approach/" target="_blank" rel="noopener">768 B200 GPUs</a> in three stages: 20T tokens of pre-training at a 16k sequence length over 21 days, 3.44T tokens
+        of mid-training at 64k, and 200B tokens of long-context adaptation at 256k. This is nearly 24T
+        tokens in total, roughly three times what Kolibri Origin consumed. German accounts for more than
+        a fifth of the pre-training mix, about 4.3T tokens, against roughly 62% English and 14% code.
+        Compared to pre-training, mid-training data is a much more selective pool of curated datasets
+        weighted toward reasoning, problem-solving, code and agentic data. For long-context, rather than
+        train on long documents alone, which tends to erode the skills acquired earlier, we interleaved
+        long documents with the high-quality mid-training data of the previous stage. For the long-context
+        mix, we removed synthetic long documents to avoid artificially inflating benchmarks such as RULER.
+      
+</p>
+      <p class="col-span-12 md:col-span-6 md:col-start-4 text-brand-gray-800 font-saans text-base leading-[1.6] md:text-lg 2xl:text-xl mb-5 last:mb-0 blog-rich-text-links blog-inline-code">
+  
+        We optimized with Muon, as we did for Kolibri Origin. We put special focus on training
+        stability, resulting in a robust training run without any loss spikes for either model. With
+        Kolibri, for routing between experts during training, we introduce exact quantile balancing.
+        Quantile balancing was introduced in Kimi K3, where the global quantile is estimated from
+        histograms because an exact computation was considered too expensive to communicate; we show
+        that it can be computed exactly at fixed cost independent of batch size, and that the
+        exactness improves both load balance and model quality.
+      
+</p>
+    
+</section>
+
+    
+<section class="grid-container relative mb-15 md:mb-20 xl:mb-24">
+  
+      <h3 class="col-span-12 md:col-span-6 md:col-start-4 font-saans text-brand-gray-400 leading-[1.3] font-semibold text-[20px] md:text-[22px] xl:text-[24px] 2xl:text-[26px] mb-6 md:mb-8">
+  Post-training at scale
+</h3>
+      <p class="col-span-12 md:col-span-6 md:col-start-4 text-brand-gray-800 font-saans text-base leading-[1.6] md:text-lg 2xl:text-xl mb-5 last:mb-0 blog-rich-text-links blog-inline-code">
+  
+        Post-training happened in two stages; the first step is supervised fine-tuning to teach the
+        model core reasoning ability and how to interact in a chat, followed by large-scale
+        reinforcement learning to train the model to reason across a diverse suite of long-horizon
+        tasks. We built a pipeline for both of these steps, which allowed us to exercise
+        fine-grained control over the behavior of the model.
+      
+</p>
+      <p class="col-span-12 md:col-span-6 md:col-start-4 text-brand-gray-800 font-saans text-base leading-[1.6] md:text-lg 2xl:text-xl mb-5 last:mb-0 blog-rich-text-links blog-inline-code">
+  
+        For SFT we generated a total of 174B tokens worth of synthetic data, which we filtered for
+        quality and combined with filtered versions of permissively licensed open-source datasets to
+        obtain a high-quality training mix of 268B tokens. For reinforcement learning we trained on
+    
