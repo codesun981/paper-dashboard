@@ -1,6 +1,6 @@
 <!DOCTYPE html><html lang="zh-CN"><head><meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>✨ 今日份新鲜 · 瀑布流</title><style>
+<title>✨ 今日份新鲜 · 便利贴</title><style>
 *{box-sizing:border-box;margin:0;padding:0}
 :root{--bg:#f5f5f7;--card:#fff;--ink:#1d1d1f;--sub:#6e6e73;--line:#e5e5ea;--acc:#0071e3}
 @media(prefers-color-scheme:dark){:root{--bg:#000;--card:#1c1c1e;--ink:#f5f5f7;--sub:#98989d;--line:#2c2c2e;--acc:#0a84ff}}
@@ -11,22 +11,23 @@ a{color:var(--acc);text-decoration:none}
 .dateline{font-size:13px;color:var(--sub);letter-spacing:.1em}
 footer{max-width:960px;margin:0 auto;padding:36px 20px 60px;color:var(--sub);font-size:13px;text-align:center}
 
-.hero{max-width:1100px;margin:0 auto;padding:30px 20px 6px}
-.hero h1{font-size:32px}
-.hero p{color:var(--sub);margin-top:6px}
-.flow{max-width:1100px;margin:20px auto;padding:0 20px;columns:3;column-gap:18px}
-@media(max-width:900px){.flow{columns:2}}
-@media(max-width:600px){.flow{columns:1}}
-.card{background:var(--card);border-radius:18px;padding:20px;margin:0 0 18px;break-inside:avoid;
-box-shadow:0 2px 12px rgba(0,0,0,.06);border:1px solid var(--line)}
-.card:nth-child(3n){transform:rotate(-.6deg)}
-.card:nth-child(3n+1){transform:rotate(.5deg)}
-.tag{display:inline-block;font-size:12px;padding:3px 10px;border-radius:20px;background:var(--acc);color:#fff;margin-bottom:10px}
+.hero{max-width:640px;margin:0 auto;padding:30px 20px 6px;text-align:center}
+.hero h1{font-size:clamp(28px,7vw,36px)}
+.hero p{color:var(--sub);margin-top:8px;font-size:14px}
+.wall{max-width:640px;margin:10px auto;padding:10px 20px 20px;display:flex;flex-direction:column;gap:20px;align-items:center}
+.note{width:100%;max-width:440px;padding:22px 20px;border-radius:6px;box-shadow:0 4px 14px rgba(0,0,0,.10);
+background:#fff7ae;transform:rotate(-1.1deg)}
+.note:nth-child(even){background:#d8ecff;transform:rotate(1.2deg)}
+.note:nth-child(3n){background:#ffe3ec;transform:rotate(-.5deg)}
+@media(prefers-color-scheme:dark){.note{background:#3a3413;color:#f5f5f7}
+.note:nth-child(even){background:#16283d}.note:nth-child(3n){background:#3d1626}}
+.pin{width:14px;height:14px;border-radius:50%;background:#e05555;margin:0 auto 10px;box-shadow:0 2px 4px rgba(0,0,0,.25)}
+.modname{font-size:12px;letter-spacing:.2em;opacity:.65;margin-bottom:8px}
+.k{font-size:12px;font-weight:700;opacity:.6;margin-bottom:6px}
 .t{font-size:16px;line-height:1.65}
-.b{color:var(--sub);font-size:13.5px;line-height:1.7;margin-top:8px}
-.big{font-size:46px;font-weight:800}
-.modname{font-size:13px;color:var(--sub);margin-bottom:4px}
+.b{font-size:14px;line-height:1.7;margin-top:8px;opacity:.75}
+.big{font-size:clamp(40px,11vw,58px);font-weight:800}
 </style></head><body>
 <div class="topbar"><a class="back" href="index.html">← 每日看板</a>
-<span class="dateline">2026-10-02</span></div><div class="hero"><h1>✨ 今日份新鲜</h1><p>🧱 瀑布流版 · 随手一滑都是惊喜</p></div><div class="flow"><div class="card"><div class="modname">💡 每日一得</div><span class="tag">一句话</span><div class="t">&quot;The best way to predict the future is to invent it.&quot; —— Alan Kay</div></div><div class="card"><div class="modname">🧸 开源小玩具</div><span class="tag">GitHub</span><div class="t">brandynfisher/ToolReplay</div><div class="b">Audit AI agent tool-call transcripts: hash-chain sealing, deterministic replay, and scope overreach checks.…</div><div style="margin-top:8px;font-size:14px"><a href="https://github.com/brandynfisher/ToolReplay">去看看 →</a></div></div><div class="card"><div class="modname">🧸 开源小玩具</div><span class="tag">GitHub</span><div class="t">ZeroDayEvil/ai-security-tool</div><div class="b">🛡️ Free open-source AI-powered security terminal &amp; vulnerability scanner (CVE, SBOM). Supports SSH, SFTP…</div><div style="margin-top:8px;font-size:14px"><a href="https://github.com/ZeroDayEvil/ai-security-tool">去看看 →</a></div></div><div class="card"><div class="modname">🧊 冷知识</div><span class="tag">冷知识 1</span><div class="t">人类和长颈鹿的颈椎骨数量一样，都是 7 块。</div></div><div class="card"><div class="modname">🧊 冷知识</div><span class="tag">冷知识 2</span><div class="t">海星没有大脑和血液，靠海水在体内循环输送养分。</div></div></div><footer>✨ 今日份新鲜 · 每天拆开都不一样<br>
+<span class="dateline">2026-10-03</span></div><div class="hero"><h1>✨ 今日份新鲜</h1><p>📌 便利贴版 · 今天的新鲜事，都贴墙上了</p></div><div class="wall"><div class="note"><div class="pin"></div><div class="modname">📜 历史上的今天</div><div class="k">1993 年</div><div class="t">美国特种部队在索马利亚摩加迪休遭到当地民兵的阻击，摩加迪休之战爆发。</div><div style="margin-top:8px;font-size:14px"><a href="https://zh.wikipedia.org/wiki/%E6%91%A9%E5%8A%A0%E8%BF%AA%E4%BC%91">维基百科 →</a></div></div><div class="note"><div class="pin"></div><div class="modname">📜 历史上的今天</div><div class="k">1884 年</div><div class="t">英屬香港工人举行游行示威，抗议英国与法国壓制不合作運動。</div><div style="margin-top:8px;font-size:14px"><a href="https://zh.wikipedia.org/wiki/1884%E5%B9%B4">维基百科 →</a></div></div><div class="note"><div class="pin"></div><div class="modname">📜 历史上的今天</div><div class="k">1953 年</div><div class="t">加拿大溫哥華的聖母玫瑰主教座堂由威廉·馬克·杜克總主教主持祝聖儀式，此時距該教堂首次啟用已歷五十三載。</div><div style="margin-top:8px;font-size:14px"><a href="https://zh.wikipedia.org/wiki/1953%E5%B9%B4">维基百科 →</a></div></div><div class="note"><div class="pin"></div><div class="modname">🧸 开源小玩具</div><div class="k">GitHub</div><div class="t">0sec-labs/0</div><div class="b">Full-stack AI security OS for your browser, terminal, and agents. Find, verify, and fix vulnerabilities.…</div><div style="margin-top:8px;font-size:14px"><a href="https://github.com/0sec-labs/0">去看看 →</a></div></div><div class="note"><div class="pin"></div><div class="modname">🧸 开源小玩具</div><div class="k">GitHub</div><div class="t">brandynfisher/ToolReplay</div><div class="b">Audit AI agent tool-call transcripts: hash-chain sealing, deterministic replay, and scope overreach checks.…</div><div style="margin-top:8px;font-size:14px"><a href="https://github.com/brandynfisher/ToolReplay">去看看 →</a></div></div><div class="note"><div class="pin"></div><div class="modname">💡 每日一得</div><div class="k">一句话</div><div class="t">&quot;任何足够先进的技术，都与魔法无异。&quot; —— Arthur C. Clarke</div></div></div><footer>✨ 今日份新鲜 · 每天拆开都不一样<br>
 <span style="font-size:12px">由 COCO 每日 08:00 自动生成</span></footer></body></html>
