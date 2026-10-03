@@ -61,6 +61,12 @@ h1{font-size:34px;font-weight:700;letter-spacing:-.02em;margin:0}
   transition:all .2s}
 .tab:hover{color:var(--ink)}
 .tab.on{background:var(--ink);color:var(--bg);font-weight:600}
+/* 新鲜度标识：数据非当日时在 tab 上挂小徽标 */
+.fresh{display:inline-block;font-size:10px;font-weight:700;line-height:1;padding:3px 7px;border-radius:999px;margin-left:6px;vertical-align:1px}
+.fresh-yday{background:rgba(154,91,0,.14);color:#9a5b00}
+.fresh-old{background:rgba(215,0,21,.1);color:#d70015}
+.tab.on .fresh-yday{background:rgba(255,255,255,.22);color:#fff}
+.tab.on .fresh-old{background:rgba(255,255,255,.22);color:#fff}
 .tabpane[hidden]{display:none}
 .stats{display:flex;gap:36px;flex-wrap:wrap;margin:4px 0 26px}
 .stat b{font-size:30px;font-weight:700;letter-spacing:-.02em;display:block;line-height:1.15}
@@ -153,6 +159,7 @@ details.zh{background:var(--acc-soft)}
 .fin-list{list-style:none;margin:4px 0 14px;padding:0}
 .fin-item{font-size:14.5px;line-height:1.8;padding:9px 0 9px 20px;position:relative;border-bottom:1px solid var(--fill)}
 .fin-item:before{content:"▪";position:absolute;left:2px;color:var(--acc)}
+.fin-item.fin-num:before{content:none}
 .fin-item:last-child{border-bottom:none}
 .fin-hr{border:none;border-top:1px solid var(--fill);margin:24px 0}
 .fin-table{width:100%;border-collapse:collapse;font-size:13.5px;margin:10px 0 16px}
@@ -287,7 +294,7 @@ footer a{color:var(--acc);text-decoration:none}
 <button class="theme-btn" id="themeBtn" title="切换深浅色">🌙</button>
 </div>
 </header>
-<nav class="tabs" id="tabbar"><button class="tab" data-tab="papers">📚 论文 10</button><button class="tab" data-tab="models">🤖 模型追踪 23</button><button class="tab" data-tab="interests">🎯 兴趣追踪 10</button><button class="tab" data-tab="trending">🔥 开源趋势 20</button><button class="tab" data-tab="x">👀 大佬动态 80 <span class="tab-dot" id="xTabDot" hidden></span></button><button class="tab" data-tab="apple">🍎 苹果动态 50</button><button class="tab" data-tab="deals">🐑 今日羊毛 46</button><button class="tab" data-tab="finance">💰 财经大事 31</button><button class="tab" data-tab="ainews">📰 AI情报 62</button></nav>
+<nav class="tabs" id="tabbar"><button class="tab" data-tab="papers">📚 论文 10<span class="fresh fresh-yday" title="数据为昨日，未更新到今日">昨日</span></button><button class="tab" data-tab="models">🤖 模型追踪 23<span class="fresh fresh-old" title="数据为 2026-10-01，已 2 天未更新">2天前</span></button><button class="tab" data-tab="interests">🎯 兴趣追踪 10<span class="fresh fresh-yday" title="数据为昨日，未更新到今日">昨日</span></button><button class="tab" data-tab="trending">🔥 开源趋势 20<span class="fresh fresh-old" title="数据为 2026-10-01，已 2 天未更新">2天前</span></button><button class="tab" data-tab="x">👀 大佬动态 80<span class="fresh fresh-yday" title="数据为昨日，未更新到今日">昨日</span> <span class="tab-dot" id="xTabDot" hidden></span></button><button class="tab" data-tab="apple">🍎 苹果动态 50<span class="fresh fresh-yday" title="数据为昨日，未更新到今日">昨日</span></button><button class="tab" data-tab="deals">🐑 今日羊毛 46<span class="fresh fresh-yday" title="数据为昨日，未更新到今日">昨日</span></button><button class="tab" data-tab="finance">💰 财经大事 31<span class="fresh fresh-yday" title="数据为昨日，未更新到今日">昨日</span></button><button class="tab" data-tab="ainews">📰 AI情报 62<span class="fresh fresh-yday" title="数据为昨日，未更新到今日">昨日</span></button></nav>
 <section class="tabpane" id="pane-papers">
 <div class="stats">
 <div class="stat"><b id="sTotal">–</b><span>收录论文</span></div>
@@ -643,7 +650,7 @@ function mdInline(s){
 }
 function renderFinance(){
   const M = FIN || {}, src = M.md || '';
-  const n = (src.match(/^▪ /gm) || []).length;
+  const n = (src.match(/^(\*\*\d+\.\s*\[|▪\s?)/gm) || []).length;
   document.getElementById('finCount').textContent =
     (M.date ? M.date + ' 更新 · ' : '') + n + ' 条';
   const box = document.getElementById('finList');
@@ -665,6 +672,12 @@ function renderFinance(){
       const cells = line.split('|').slice(1, -1).map(c => mdInline(c.trim()));
       if (!inTable){ html += '<table class="fin-table"><tbody>'; inTable = true; }
       html += '<tr>' + cells.map(c => '<td>' + c + '</td>').join('') + '</tr>';
+      return;
+    }
+    if (/^\*\*\d+\.\s*\[/.test(line)){
+      closeTable();
+      if (!inList){ html += '<ul class="fin-list">'; inList = true; }
+      html += '<li class="fin-item fin-num">' + mdInline(line) + '</li>';
       return;
     }
     if (/^▪\s?/.test(line)){
