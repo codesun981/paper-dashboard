@@ -653,7 +653,7 @@ function mdInline(s){
 }
 function renderFinance(){
   const M = FIN || {}, src = M.md || '';
-  const n = (src.match(/^(\*\*\d+\.\s*\[|▪\s?)/gm) || []).length;
+  const n = (src.match(/^(\*\*|[-•▪]\s)/gm) || []).length;
   document.getElementById('finCount').textContent =
     dline(M.date) + n + ' 条';
   const box = document.getElementById('finList');
@@ -677,16 +677,16 @@ function renderFinance(){
       html += '<tr>' + cells.map(c => '<td>' + c + '</td>').join('') + '</tr>';
       return;
     }
-    if (/^\*\*\d+\.\s*\[/.test(line)){
+    if (/^\*\*\d+\.\s/.test(line)){
       closeTable();
       if (!inList){ html += '<ul class="fin-list">'; inList = true; }
       html += '<li class="fin-item fin-num">' + mdInline(line) + '</li>';
       return;
     }
-    if (/^▪\s?/.test(line)){
+    if (/^(\*\*|[-•▪]\s)/.test(line)){
       closeTable();
       if (!inList){ html += '<ul class="fin-list">'; inList = true; }
-      html += '<li class="fin-item">' + mdInline(line.replace(/^▪\s?/, '')) + '</li>';
+      html += '<li class="fin-item">' + mdInline(line.replace(/^[-•▪]\s/, '')) + '</li>';
       return;
     }
     closeList(); closeTable();
