@@ -1,0 +1,1009 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>☀️ 每日看板</title>
+<style>
+:root{
+  --bg:#f5f5f7; --card:#ffffff; --ink:#1d1d1f; --mut:#86868b;
+  --fill:rgba(120,120,128,.12); --fill-strong:rgba(120,120,128,.2);
+  --glass:rgba(245,245,247,.72); --hairline:rgba(0,0,0,.08);
+  --acc:#0071e3; --acc-soft:rgba(0,113,227,.07);
+  --green:#1d8127; --green-soft:rgba(28,129,39,.1);
+  --amber:#9a5b00; --amber-soft:rgba(154,91,0,.1);
+  --violet:#7c3aed; --violet-soft:rgba(124,58,237,.09);
+  --red:#d70015; --red-soft:rgba(215,0,21,.07);
+  --shadow:0 2px 16px rgba(0,0,0,.06);
+  --shadow-lg:0 12px 32px rgba(0,0,0,.12);
+  --radius:18px;
+}
+[data-theme="dark"]{
+  --bg:#000000; --card:#1c1c1e; --ink:#f5f5f7; --mut:#98989d;
+  --fill:rgba(120,120,128,.22); --fill-strong:rgba(120,120,128,.32);
+  --glass:rgba(0,0,0,.68); --hairline:rgba(255,255,255,.12);
+  --acc:#0a84ff; --acc-soft:rgba(10,132,255,.13);
+  --green:#30d158; --green-soft:rgba(48,209,88,.13);
+  --amber:#ff9f0a; --amber-soft:rgba(255,159,10,.13);
+  --violet:#bf5af2; --violet-soft:rgba(191,90,242,.13);
+  --red:#ff453a; --red-soft:rgba(255,69,58,.13);
+  --shadow:0 2px 16px rgba(0,0,0,.5);
+  --shadow-lg:0 12px 32px rgba(0,0,0,.6);
+}
+*{box-sizing:border-box}
+::selection{background:rgba(0,113,227,.18)}
+:focus-visible{outline:2px solid var(--acc);outline-offset:2px;border-radius:6px}
+body{margin:0;background:var(--bg);color:var(--ink);
+  font:15px/1.7 -apple-system,BlinkMacSystemFont,"SF Pro Text","Segoe UI","PingFang SC","Hiragino Sans GB","Microsoft YaHei","Noto Sans SC",sans-serif;
+  -webkit-font-smoothing:antialiased;text-rendering:optimizeLegibility;
+  transition:background .25s,color .25s}
+.wrap{max-width:1060px;margin:0 auto;padding:40px 24px 80px}
+header.top{display:flex;align-items:flex-start;justify-content:space-between;gap:12px;margin-bottom:4px}
+.dateline{font-size:12.5px;font-weight:600;letter-spacing:.08em;color:var(--mut);margin-bottom:6px}
+h1{font-size:34px;font-weight:700;letter-spacing:-.02em;margin:0}
+.sub{color:var(--mut);font-size:14px;margin:6px 0 18px}
+.theme-btn{flex:none;width:40px;height:40px;border:0;background:var(--fill);color:var(--ink);
+  border-radius:50%;font-size:17px;cursor:pointer;display:flex;align-items:center;justify-content:center;
+  transition:background .2s,transform .2s}
+.theme-btn:hover{background:var(--fill-strong);transform:scale(1.05)}
+.head-btns{display:flex;gap:8px;align-items:center;flex:none}
+.mini-btn{border:0;background:var(--fill);color:var(--ink);border-radius:999px;
+  padding:9px 14px;font-size:13px;font-weight:500;cursor:pointer;white-space:nowrap;
+  transition:background .2s;text-decoration:none;display:inline-flex;align-items:center;gap:5px}
+.mini-btn:hover{background:var(--fill-strong)}
+.tabs{position:sticky;top:0;z-index:20;margin:0 -24px;padding:12px 24px;
+  background:var(--glass);-webkit-backdrop-filter:blur(20px) saturate(180%);backdrop-filter:blur(20px) saturate(180%);
+  border-bottom:1px solid var(--hairline);
+  display:flex;gap:6px;overflow-x:auto;scrollbar-width:none}
+.tabs::-webkit-scrollbar{display:none}
+.tab{flex:none;border:0;background:transparent;color:var(--mut);
+  border-radius:999px;padding:9px 18px;font-size:14px;font-weight:500;cursor:pointer;white-space:nowrap;
+  transition:all .2s}
+.tab:hover{color:var(--ink)}
+.tab.on{background:var(--ink);color:var(--bg);font-weight:600}
+/* 新鲜度标识：数据非当日时在 tab 上挂小徽标 */
+.fresh{display:inline-block;font-size:10px;font-weight:700;line-height:1;padding:3px 7px;border-radius:999px;margin-left:6px;vertical-align:1px}
+.fresh-yday{background:rgba(154,91,0,.14);color:#9a5b00}
+.fresh-old{background:rgba(215,0,21,.1);color:#d70015}
+.tab.on .fresh-yday{background:rgba(255,255,255,.22);color:#fff}
+.tab.on .fresh-old{background:rgba(255,255,255,.22);color:#fff}
+.tabpane[hidden]{display:none}
+.stats{display:flex;gap:36px;flex-wrap:wrap;margin:4px 0 26px}
+.stat b{font-size:30px;font-weight:700;letter-spacing:-.02em;display:block;line-height:1.15}
+.stat span{color:var(--mut);font-size:13px}
+.toolbar{padding:14px 0;display:flex;gap:10px;flex-wrap:wrap;align-items:center}
+.search{flex:1;min-width:220px;display:flex;align-items:center;background:var(--fill);
+  border:0;border-radius:12px;padding:0 14px}
+.search input{flex:1;border:0;outline:0;background:transparent;color:var(--ink);font:inherit;padding:11px 0}
+.search input::placeholder{color:var(--mut)}
+.search .ico{color:var(--mut);margin-right:8px}
+.chips{display:flex;gap:8px;flex-wrap:wrap}
+.chip{border:0;background:var(--fill);color:var(--ink);
+  border-radius:999px;padding:8px 15px;font-size:13px;font-weight:500;cursor:pointer;transition:all .2s}
+.chip:hover{background:var(--fill-strong)}
+.chip.on{background:var(--ink);color:var(--bg);font-weight:600}
+select.sel{font:inherit;font-weight:500;color:var(--ink);background:var(--fill);border:0;
+  border-radius:12px;padding:10px 12px;cursor:pointer}
+.count{font-size:12.5px;color:var(--mut);margin:8px 2px}
+.day{margin:30px 0 6px}
+.day-head{display:flex;align-items:baseline;gap:10px;margin-bottom:6px}
+.day-head h2{font-size:20px;font-weight:700;letter-spacing:-.01em;margin:0}
+.day-head .n{font-size:12.5px;font-weight:500;color:var(--mut);background:var(--fill);
+  border-radius:999px;padding:3px 11px}
+.summary{background:var(--acc-soft);border-radius:14px;padding:14px 18px;font-size:13.5px;margin:12px 0 16px}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(330px,1fr));gap:16px}
+.list{display:grid;gap:12px}
+.card{background:var(--card);border:0;border-radius:var(--radius);
+  padding:20px 22px;box-shadow:var(--shadow);display:flex;flex-direction:column;gap:10px;
+  transition:transform .2s,box-shadow .2s}
+.card:hover{transform:translateY(-3px);box-shadow:var(--shadow-lg)}
+.card h3{font-size:16px;font-weight:600;letter-spacing:-.01em;margin:0;line-height:1.55}
+.card h3 a{color:var(--ink);text-decoration:none}
+.card h3 a:hover{color:var(--acc)}
+.badges{display:flex;gap:6px;flex-wrap:wrap;align-items:center}
+.badge{font-size:11px;font-weight:600;border-radius:999px;padding:4px 11px;white-space:nowrap;
+  background:var(--fill);color:var(--mut)}
+.badge.hf{background:var(--amber-soft);color:var(--amber)}
+.badge.oa{background:var(--violet-soft);color:var(--violet)}
+.badge.j{background:var(--green-soft);color:var(--green)}
+.badge.cat{background:var(--fill);color:var(--mut)}
+.badge.red{background:var(--red-soft);color:var(--red)}
+.badge.amber{background:var(--amber-soft);color:var(--amber)}
+.badge.green{background:var(--green-soft);color:var(--green)}
+.lb-wrap{overflow-x:auto;background:var(--card);border-radius:16px;box-shadow:var(--shadow);padding:4px 6px;margin-bottom:14px}
+.lb-table{width:100%;border-collapse:collapse;font-size:13px}
+.lb-table th{font-size:11px;color:var(--mut);text-align:left;padding:8px 10px;border-bottom:1px solid var(--hairline);font-weight:600;white-space:nowrap}
+.lb-table td{padding:8px 10px;border-bottom:1px solid var(--hairline);vertical-align:middle}
+.lb-table tr:last-child td{border-bottom:0}
+.lb-table .rk{color:var(--mut);width:26px;font-variant-numeric:tabular-nums}
+.lb-table .num{font-variant-numeric:tabular-nums;font-weight:600;white-space:nowrap}
+.lb-table .mname{font-weight:600}
+.lb-table .org{font-size:11px;color:var(--mut);font-weight:400;margin-left:6px;white-space:nowrap}
+.open-tag{font-size:10px;font-weight:700;color:var(--green);background:var(--green-soft);border-radius:999px;padding:2px 8px;margin-left:6px;white-space:nowrap}
+.up{color:#1a7f37;font-weight:700;white-space:nowrap}
+.down{color:#cf222e;font-weight:700;white-space:nowrap}
+.flat{color:var(--mut)}
+.date{font-size:12px;color:var(--mut)}
+.authors{font-size:13px;color:var(--mut)}
+.one{font-size:13.5px;color:var(--ink)}
+details.box{font-size:13px;background:var(--fill);border:0;border-radius:12px;padding:0}
+details.box summary{cursor:pointer;padding:9px 14px;font-weight:600;color:var(--acc);
+  list-style:none;display:flex;align-items:center;gap:6px}
+details.box summary::-webkit-details-marker{display:none}
+details.box summary::before{content:"▸";transition:transform .15s}
+details.box[open] summary::before{transform:rotate(90deg)}
+details.box .body{padding:2px 14px 12px;color:var(--ink)}
+details.zh{background:var(--acc-soft)}
+.meta-row{display:flex;gap:14px;flex-wrap:wrap;font-size:12.5px;color:var(--mut);align-items:center}
+.meta-row a{color:var(--acc);text-decoration:none;font-weight:500}
+.meta-row a:hover{text-decoration:underline}
+.links{display:flex;gap:14px;font-size:13px;font-weight:500;padding-top:10px;border-top:1px solid var(--hairline)}
+.links a{color:var(--acc);text-decoration:none}
+.links a:hover{text-decoration:underline}
+.empty{text-align:center;color:var(--mut);padding:70px 0;font-size:14px}
+.sect-head{display:flex;align-items:baseline;gap:10px;margin:22px 0 14px}
+.sect-head h2{font-size:22px;font-weight:700;letter-spacing:-.02em;margin:0}
+.sect-head .n{font-size:13px;color:var(--mut)}
+.ev{display:flex;gap:14px;align-items:flex-start;background:var(--card);
+  border-radius:14px;padding:14px 18px;box-shadow:var(--shadow)}
+.ev .t{flex:none;font-size:13px;font-weight:600;color:var(--acc);min-width:86px}
+.ev .s{font-size:14px;font-weight:500}
+/* ---------- x (dazzling X style) ---------- */
+.x-summary{background:var(--acc-soft);border-radius:16px;padding:16px 20px;margin-bottom:24px;box-shadow:var(--shadow)}
+/* ---------- finance (💰财经大事早报) ---------- */
+.fin-body{max-width:880px;margin:0 auto;background:var(--card);border-radius:18px;box-shadow:var(--shadow);padding:30px 32px}
+.fin-h2{font-size:19px;font-weight:700;margin:28px 0 12px;padding-bottom:8px;border-bottom:2px solid var(--fill)}
+.fin-h2:first-child{margin-top:0}
+.fin-h3{font-size:16px;font-weight:700;margin:20px 0 8px;line-height:1.6}
+.fin-p{font-size:14.5px;line-height:1.85;color:var(--ink);margin:8px 0}
+.fin-list{list-style:none;margin:4px 0 14px;padding:0}
+.fin-item{font-size:14.5px;line-height:1.8;padding:9px 0 9px 20px;position:relative;border-bottom:1px solid var(--fill)}
+.fin-item:before{content:"▪";position:absolute;left:2px;color:var(--acc)}
+.fin-item.fin-num:before{content:none}
+.fin-item:last-child{border-bottom:none}
+.fin-hr{border:none;border-top:1px solid var(--fill);margin:24px 0}
+.fin-table{width:100%;border-collapse:collapse;font-size:13.5px;margin:10px 0 16px}
+.fin-table td{border:1px solid var(--fill);padding:8px 10px;text-align:left;line-height:1.6}
+.fin-body a{color:var(--acc);text-decoration:none}
+.fin-body a:hover{text-decoration:underline}
+@media (max-width:640px){.fin-body{padding:20px 16px;border-radius:14px}.fin-h2{font-size:17px}}
+.grid>.x-summary{grid-column:1/-1;margin-bottom:8px}
+.x-sum-t{font-size:13px;font-weight:700;color:var(--acc);margin-bottom:8px}
+.x-errors{margin-top:14px;padding:10px 14px;border-radius:10px;background:rgba(255,149,0,.08);color:#b26a00;font-size:12px;line-height:1.6}
+.x-sum-b{font-size:14px;line-height:1.8;color:var(--ink)}
+.x-acc{margin-bottom:28px}
+.x-acc-head{display:flex;align-items:center;gap:12px;margin-bottom:2px}
+.x-acc-name{font-size:16px;font-weight:700;letter-spacing:-.01em}
+.x-acc-sub{font-size:12.5px;color:var(--mut);margin-top:2px}
+/* ---------- x groups (avatar chips, collapsible) ---------- */
+.x-group{margin-bottom:32px}
+.x-group-head{display:flex;align-items:baseline;gap:10px;margin-bottom:10px}
+.x-group-title{font-size:18px;font-weight:700;letter-spacing:-.01em}
+.x-group-n{font-size:12.5px;color:var(--mut)}
+.x-group-sum{background:var(--card);border-radius:14px;padding:12px 16px;margin-bottom:14px;
+  font-size:13.5px;line-height:1.75;box-shadow:var(--shadow)}
+.x-chips{display:flex;flex-wrap:wrap;gap:16px;margin-bottom:4px}
+.x-chip{background:none;border:0;padding:0;cursor:pointer;width:78px;text-align:center;
+  font:inherit;color:inherit;-webkit-tap-highlight-color:transparent}
+.x-chip .av-wrap{width:58px;height:58px;margin:0 auto;transition:transform .15s}
+.x-chip .av-wrap .x-av-fb{font-size:22px}
+.x-chip:active .av-wrap{transform:scale(.93)}
+.x-chip.open .av-wrap{box-shadow:0 0 0 2.5px var(--acc)}
+.x-chip-name{font-size:12px;font-weight:600;margin-top:6px;line-height:1.3;
+  white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.x-chip-sub{font-size:10.5px;color:var(--mut);margin-top:2px;
+  white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+/* 未读小红点 */
+.x-dot{position:absolute;top:1px;right:1px;width:11px;height:11px;border-radius:50%;
+  background:#ff3b30;border:2px solid var(--bg);z-index:2}
+.tab-dot{display:inline-block;width:8px;height:8px;border-radius:50%;background:#ff3b30;margin-left:5px}
+.x-dot[hidden],.tab-dot[hidden]{display:none!important}
+.x-detail:empty{display:none}
+.x-detail{background:var(--card);border-radius:16px;box-shadow:var(--shadow);
+  padding:4px 18px 10px;margin:4px 0 10px}
+.x-detail-head{display:flex;align-items:center;gap:12px;padding:12px 0 2px}
+.av-wrap{position:relative;flex:none;display:block}
+.av-wrap .x-av-fb{position:absolute;inset:0;border-radius:50%;background:var(--fill);
+  display:flex;align-items:center;justify-content:center;font-weight:700;color:var(--mut)}
+.av-wrap img{position:relative;width:100%;height:100%;border-radius:50%;object-fit:cover;display:block}
+.x-av-lg{width:46px;height:46px}.x-av-lg .x-av-fb{font-size:20px}
+.tw-av{width:42px;height:42px}.tw-av .x-av-fb{font-size:18px}
+.tw{display:flex;gap:12px;padding:14px 6px;border-bottom:1px solid var(--hairline)}
+.tw:last-child{border-bottom:0}
+.tw-body{flex:1;min-width:0}
+.tw-head{display:flex;align-items:baseline;gap:8px;flex-wrap:wrap}
+.tw-name{font-size:14.5px;font-weight:700}
+.tw-sub{font-size:13px;color:var(--mut)}
+.tw-rt{font-size:12.5px;color:var(--mut);margin:3px 0 1px}
+.tw-text{white-space:pre-wrap;word-break:break-word;font-size:14.5px;line-height:1.62;margin:4px 0 10px;color:var(--ink)}
+.tw-actions{display:flex;gap:24px;align-items:center;font-size:13px;color:var(--mut);flex-wrap:wrap}
+.tw-actions a{margin-left:auto;color:var(--acc);text-decoration:none;font-weight:500;font-size:12.5px;flex:none}
+.tw-actions a:hover{text-decoration:underline}
+footer{margin-top:56px;text-align:center;color:var(--mut);font-size:12.5px}
+footer a{color:var(--acc);text-decoration:none}
+.banner{background:var(--fill);border-radius:14px;
+  padding:12px 18px;font-size:13px;margin-bottom:16px}
+.banner a{color:var(--acc);text-decoration:none;font-weight:600}
+.banner a{color:var(--acc);text-decoration:none;font-weight:600}
+.run-switch{margin-left:10px;white-space:nowrap}
+.run-switch button{border:1px solid var(--acc);background:transparent;color:var(--acc);
+  border-radius:999px;padding:2px 12px;font-size:12px;margin-left:6px;cursor:pointer}
+.run-switch button.on{background:var(--acc);color:#fff}
+/* ---------- column summary (每栏目顶部要点) ---------- */
+.col-summary{background:var(--card);border-radius:16px;padding:16px 20px;margin:6px 0 20px;box-shadow:var(--shadow)}
+.col-sum-t{font-size:13px;font-weight:700;color:var(--acc);margin-bottom:6px}
+.col-sum-b{font-size:14px;line-height:1.8}
+@media(max-width:640px){.grid{grid-template-columns:1fr}h1{font-size:28px}.wrap{padding:28px 16px 60px}.tabs{margin:0 -16px;padding:12px 16px}
+.stats{gap:20px;margin:4px 0 18px}.stat b{font-size:24px}
+.toolbar{gap:8px}.search{flex:1 1 100%;min-width:0}
+.card{padding:16px 18px}.card h3{overflow-wrap:anywhere}
+.sect-head h2{font-size:19px}.day-head h2{font-size:17px}
+.summary{font-size:13px}.col-summary{padding:14px 16px}
+.x-chips{gap:12px}.x-chip{width:68px}
+.tw-actions{gap:14px}.ev .t{min-width:70px}
+.theme-btn{width:36px;height:36px}
+.mini-btn{padding:8px 11px;font-size:12px}
+.head-btns{flex:1 1 auto;min-width:0;flex-wrap:wrap;justify-content:flex-end;row-gap:6px}
+.dateline{white-space:nowrap}}
+/* ---------- archive modal ---------- */
+.modal{position:fixed;inset:0;z-index:60;overflow-y:auto;-webkit-overflow-scrolling:touch;overscroll-behavior:contain;
+  padding:9vh 16px 24px;background:rgba(0,0,0,.32);-webkit-backdrop-filter:blur(10px);backdrop-filter:blur(10px)}
+.modal[hidden]{display:none}
+.modal-card{background:var(--card);border-radius:20px;box-shadow:0 24px 64px rgba(0,0,0,.25);
+  width:100%;max-width:620px;margin:0 auto;overflow:clip}
+.modal-head{display:flex;align-items:center;justify-content:space-between;
+  padding:16px 20px 12px;border-bottom:1px solid var(--fill)}
+.modal-head h3{margin:0;font-size:17px;font-weight:700}
+.modal-x{border:0;background:var(--fill);color:var(--ink);width:30px;height:30px;border-radius:50%;
+  font-size:15px;cursor:pointer;line-height:1}
+.modal-list{padding:12px 14px 18px;display:grid;gap:8px}
+.arch-item{background:var(--bg);border-radius:14px;overflow:hidden}
+.arch-item summary{list-style:none;display:flex;align-items:center;gap:8px;
+  padding:13px 16px;cursor:pointer;font-size:14px;font-weight:600}
+.arch-item summary::-webkit-details-marker{display:none}
+.arch-item summary:hover{background:var(--fill)}
+.arch-date{flex:1}
+.run-tag{font-size:11px;font-weight:600;background:var(--fill);color:var(--mut);
+  border-radius:20px;padding:2px 9px}
+.arch-hint{color:var(--mut);font-weight:400;font-size:12px}
+.arch-body{padding:2px 16px 14px;font-size:13.5px}
+.arch-sec{margin:9px 0}
+.arch-sec-t{font-weight:700;font-size:13px;margin-bottom:2px}
+.arch-sec-b{color:var(--ink);line-height:1.75}
+.arch-sec-b .mut{color:var(--mut)}
+.arch-go{display:inline-block;margin-top:8px;color:var(--acc);font-size:13.5px;
+  font-weight:600;text-decoration:none}
+.arch-go:hover{text-decoration:underline}
+
+</style>
+</head>
+<body>
+<div class="wrap">
+<header class="top">
+<div>
+<div class="dateline">2026年10月5日 星期一</div>
+<h1>☀️ 每日看板</h1>
+<div class="sub">每天 08:00 / 12:00 / 22:00 自动更新</div>
+</div>
+<div class="head-btns">
+<a class="mini-btn" href="../reader.html" title="随便看看：独立博客聚合">📡 随便看看</a>
+<a class="mini-btn" href="../fun.html" title="今日份新鲜：每天拆开都不一样">✨ 今日份新鲜</a>
+<a class="mini-btn" href="../pool.html" title="AI 资源池：价格/套餐/榜单可视化">📦 资源池</a>
+<a class="mini-btn" href="../intel.html" title="AI 情报：每日 AI 动态 + 权益速递全文">📰 AI情报</a>
+<button class="mini-btn" id="libBtn" title="打开论文库">📖 论文库</button>
+<button class="mini-btn" id="archBtn" title="历史归档">🗂️ 归档</button>
+<button class="theme-btn" id="themeBtn" title="切换深浅色">🌙</button>
+</div>
+</header>
+<nav class="tabs" id="tabbar"><button class="tab" data-tab="papers">📚 论文 2</button><button class="tab" data-tab="models">🤖 模型追踪 24</button><button class="tab" data-tab="interests">🎯 兴趣追踪 20</button><button class="tab" data-tab="trending">🔥 开源趋势 20</button><button class="tab" data-tab="x">👀 大佬动态 49 <span class="tab-dot" id="xTabDot" hidden></span></button><button class="tab" data-tab="apple">🍎 苹果动态 50</button><button class="tab" data-tab="deals">🐑 今日羊毛 16</button><button class="tab" data-tab="finance">💰 财经大事 0</button><button class="tab" data-tab="ainews">📰 AI情报 39</button></nav>
+<section class="tabpane" id="pane-papers">
+<div class="stats">
+<div class="stat"><b id="sTotal">–</b><span>收录论文</span></div>
+<div class="stat"><b id="sDays">–</b><span>监测天数</span></div>
+<div class="stat"><b id="sArxiv">–</b><span>arXiv 预印本</span></div>
+<div class="stat"><b id="sExtra">–</b><span>其他来源</span></div>
+<div class="stat"><b id="sJour">–</b><span>期刊 / 会议补录</span></div>
+</div>
+<div class="toolbar">
+<label class="search"><span class="ico">🔍</span><input id="q" placeholder="搜索标题 / 作者 / 关键词…"></label>
+<div class="chips" id="srcChips"></div>
+<select class="sel" id="cat"><option value="">全部分类</option></select>
+<select class="sel" id="day"><option value="">全部日期</option></select>
+</div>
+<div class="count" id="count"></div>
+<div class="banner">🗂️ 这是 2026-10-05 的快照归档 · <a href="../index.html">← 返回最新看板</a></div>
+<div id="list"></div>
+</section>
+<section class="tabpane" id="pane-models" hidden>
+<div class="sect-head"><h2>🤖 模型追踪</h2><span class="n" id="mdCount"></span></div>
+<div id="mdList"></div>
+</section>
+<section class="tabpane" id="pane-library" hidden>
+<div class="sect-head"><h2>📖 我们的论文库</h2><span class="n" id="libCount"></span></div>
+<div id="libList"></div>
+</section>
+<section class="tabpane" id="pane-interests" hidden>
+<div class="sect-head"><h2>🎯 兴趣追踪</h2><span class="n" id="intCount"></span></div>
+<div id="intList"></div>
+</section>
+<section class="tabpane" id="pane-trending" hidden>
+<div class="sect-head"><h2>🔥 开源趋势</h2><span class="n" id="trCount"></span></div>
+<div class="grid" id="trList"></div>
+</section>
+<section class="tabpane" id="pane-x" hidden>
+<div class="sect-head"><h2>👀 大佬动态</h2><span class="n" id="xCount"></span></div>
+<div id="xList"></div>
+</section>
+<section class="tabpane" id="pane-apple" hidden>
+<div class="sect-head"><h2>🍎 苹果动态</h2><span class="n" id="apCount"></span></div>
+<div id="apList"></div>
+</section>
+<section class="tabpane" id="pane-deals" hidden>
+<div class="sect-head"><h2>🐑 今日羊毛</h2><span class="n" id="dealCount"></span></div>
+<div id="dealList"></div>
+</section>
+<section class="tabpane" id="pane-finance" hidden>
+<div class="sect-head"><h2>💰 财经大事</h2><span class="n" id="finCount"></span></div>
+<div id="finList"></div>
+</section>
+<section class="tabpane" id="pane-ainews" hidden>
+<div class="sect-head"><h2>📰 AI情报</h2><span class="n" id="ainewsCount"></span></div>
+<div id="ainewsList"></div>
+<div style="text-align:center;margin:14px 0">
+<a class="mini-btn" href="../intel.html" style="text-decoration:none">📖 查看完整 AI 情报（含权益速递全文）</a>
+</div>
+</section>
+<footer>COCO 每日看板 · 每天 08:00 / 12:00 / 22:00 自动更新</footer>
+</div>
+<div class="modal" id="archModal" hidden>
+<div class="modal-card" role="dialog" aria-label="历史归档">
+<div class="modal-head"><h3>🗂️ 历史归档</h3><button class="modal-x" id="archClose" title="关闭">✕</button></div>
+<div class="modal-list" id="archList"></div>
+</div>
+</div>
+<script>
+const ARCH_DIGEST_INLINE = [{"date": "2026-10-05", "runs": [{"label": "08:00", "name": "早"}], "papers_n": 2, "papers": "**数据口径说明**：06:45 拉取的 `arxiv_2026-10-05.json` 为空（arXiv 抓取失败），HF 每日榜单亦未更新，今日候选仅来自 OpenAlex 近 3 天关键词检索（7 篇，去重后 6 篇新候选，Jev 粗筛保留 2 篇）。若 06:46 轮拉取恢复，次日回补。  …", "models": "**LMArena Text 榜今日继续冻结**（仍为 10-02 快照）：**gemini-4-argon-high** 以 **1533.5 分**守住第一，领先第二名 claude-opus-5.5-high（1511.7）约 22 分，前十 delta 全部为 0，无座次变化；榜单前十里 A…", "interests": "今日兴趣追踪新增 2 条，两个方向无新鲜内容（宁缺毋滥）。**Agent 访问控制**新增 1 条：codecrux 10 月 3 日长文梳理 Google 的 agent 安全架构——agent 作为一等非人类主体、传输层身份认证、逐请求授权、最小权限作用域、JIT 凭证、默认拒绝，这套「授权边界…", "news": "", "trending": "今日 GitHub 趋势榜被 **AI 安全/红队工具**刷屏：前 20 里超过一半与 agent 安全、MCP 审计、渗透测试相关，说明「给 AI agent 做安全」正从论文走向工具化。最值得看的是 **shinthink/blitzstrike**（★498，TypeScript）：号称通用 …", "deals": "今日羊毛分三类。**AI 薅羊毛**：最值得盯的是 **ChatGPT Plus 学生优惠——认证后免费 4 个月（价值约 80 美元），官方活动 10 月 31 日截止**，有学生身份的别错过；**掘金 × 火山引擎 AI 用量周榜冲刺赛（第二期）**已标红（临近收口）；**珠海市算力券企业兑现入…", "x": "**Codex 或迎用量重置**：Codex 负责人 Tibo（@thsottiaux）宣布未来 28 天每天要么发布一个对大多数 Codex/Work 用户有明显改进的功能，要么发一次「full reset」（疑似额度重置）——结合他随后强调「simplifications、more effici…", "ainews": "- **本期最该打勾的一条额度收缩（免费额度线的头号事件）**：**Google 10/3 在帮助中心更新个人账号模型权限，10/9 起免费档只剩 Flash-Lite**——**Flash 与 Pro 全部收回**；**AI Plus 档（美国 $4.99/月）也丢掉 Pro**（只剩 Flash…"}, {"date": "2026-10-04", "runs": [{"label": "08:00", "name": "早"}, {"label": "12:00", "name": "中"}, {"label": "22:00", "name": "晚"}], "papers_n": 4, "papers": "今日新命中 4 篇（arXiv 1 篇 + OpenAlex 3 篇），整体质量中等偏上，Agent 安全方向占了三席。最值得关注的是 **Authority Is Not a String**：它把\"环境权限\"（ambient authority）问题形式化为 capability-scoped …", "models": "**LMArena Text 榜今日继续冻结**（arena 数据为 10-02 快照）：**gemini-4-argon-high** 以 **1533.5 分**守住第一，领先 claude-opus-5.5-high（1511.7）约 22 分，前十名 delta 全部为 0，无座次变化。**…", "interests": "今日兴趣追踪新增 4 条，embedding-privacy 方向今日无新鲜内容（宁缺毋滥）。**RAG 访问控制**：CodePoisonRAG 实证——85 个投毒代码制品在 3 个代码生成器上投毒成功率 0.80–0.93，且制品伪造安全声明保持任务相关性，检索投毒的\"供应链化\"值得警惕。**…", "news": "", "trending": "今日开源趋势的最大特征是**安全攻防工具扎堆**：前 8 名里有 6 个与 AI/应用安全直接相关。最值得看的是 **shinthink/blitzstrike**（★496，TypeScript）：一个通用 MCP 安全审计工具带，主打\"高速侦察—深度分析—报告前验证\"，正好踩在 MCP 生态爆发…", "deals": "**今日羊毛要点**：① **智谱 GLM Coding Plan 夜间免费延至 10-07**——仅剩 3 天收口，每晚 23:00–09:00 在 ZCode/AutoClaw 内调用 GLM-5.3-Flash 额度消耗为 0，薅羊毛抓紧；② **豆包全用户 30 天订阅限免至 10-17**…", "x": "今晚大佬动态的最大新闻是**特朗普宣布组建 Super Intelligence Force (SIF)**：继白宫与主要科技公司签署“超级智能协议”之后，他宣布成立联邦层面的 SIF，由国家情报总监 Jay Clayton（同日被 WSJ 披露将兼任 AI 沙皇）领衔，FTC 主席 Andrew …", "ainews": "- **本期最该打勾的一条纠错（021 期回扫翻车）**：**Qoder Qwen3.8-Flash 计费系数 0.0× 没有在 9/30 收口**——Qoder 官方（阿里云开发者社区活动说明页 + IT之家 9/29）已公告 **自 2026-10-01 起继续免费、结束时间未定、将提前在官方页…"}, {"date": "2026-10-03", "runs": [{"label": "08:00", "name": "早"}, {"label": "12:00", "name": "中"}, {"label": "22:00", "name": "晚"}], "papers_n": 12, "papers": "今日 arXiv 六个分类共抓取 830 篇，关键词命中 36 篇；Jev 初筛（preset=papers）保留 15 篇，去重（lit_seen.txt）剔除昨日已报 2 篇，人工终判入选 **12 篇**（4 篇 direct、6 篇 adjacent、2 篇 background）。最值得关…", "models": "LMArena Text 榜座次**全部冻结**：**gemini-4-argon-high** 以 **1533.1 分**守住第一，领先 claude-opus-5.5-high（1512.0）约 21 分，前十 delta 全部为 0。但 10-02 的独立评测给了 Argon 一个冷静注脚：…", "interests": "今日兴趣追踪新增 4 条，embedding-privacy 方向今日无新鲜内容（宁缺毋滥）。**RAG 访问控制**：Progress 新版 Agentic RAG 强调跨业务系统问答时**沿用已有索引内容的访问控制与治理框架、无需重建索引**——企业级 RAG「权限延续」的产品实例，与 RU/A…", "news": "", "trending": "今日开源趋势被 **AI 安全**主题统治：前 5 名中有 4 个是 agent 安全/红队工具。最值得看的是 **Zyrexnn/Cybermes（913★）**——自主进攻性安全 agent 框架（bug bounty + 红队），多模型 LLM 编排，是“AI 做红队”从 demo 走向框架化…", "deals": "**最临近收口**：掘金 × 火山引擎 AI 用量周榜冲刺赛（第二期）**10/4 24:00 收口**（距今 1 天），200 元火山代金券 + Agent Plan Medium 月卡免费一个月，要冲抓紧。**10/7 收口三件套**：智谱 ZCode 免费额度包（10 万份 × 1 亿 Tok…", "x": "**【Pro 500 用量重置异常已修复】**Codex 负责人 Tibo 中午 12:01 发文称 Pro 500 档的用量重置未按预期执行（\"didn't get the reset as expected\"），正在调查并承诺补偿（\"will make up for it\"）；25 分钟后确认已…", "ainews": "- **本期最该打勾的一条纠错（021 期回扫翻车）**：**Qoder Qwen3.8-Flash 计费系数 0.0× 没有在 9/30 收口**——Qoder 官方（阿里云开发者社区活动说明页 + IT之家 9/29）已公告 **自 2026-10-01 起继续免费、结束时间未定、将提前在官方页…"}, {"date": "2026-10-02", "runs": [{"label": "08:00", "name": "早"}, {"label": "12:00", "name": "中"}, {"label": "22:00", "name": "晚"}], "papers_n": 10, "papers": "今日 arXiv 六个分类共抓取 1085 篇，关键词命中 14 篇（全部为新增）；扩展来源中 HuggingFace 每日 50 篇无命中，OpenAlex 近 3 天 22 个关键词候选中剔除 Zenodo/figshare 通用噪声后入选 2 篇；Jev 初筛保留 13 篇，人工终判入选 **…", "models": "LMArena Text 榜座次**全部冻结**：**gemini-4-argon-high** 以 **1533.1 分**守住第一，领先第二名 claude-opus-5.5-high（1512.0）约 21 分，前十 delta 全部为 0。配合 sundarpichai 昨日亲自预告 **G…", "interests": "今日兴趣追踪新增 4 条。**RAG 访问控制**方向：Dify v1.17.1 给知识库 API key 加上 **dataset 级作用域**——此前一个 key 可访问 workspace 内所有知识库，升级后可收窄到单个 dataset，是“授权粒度下沉到数据对象”的产品实例，与 RU/AU…", "news": "", "trending": "今日开源趋势被 **AI 安全**主题统治：前 5 名中有 4 个是 agent 安全/红队工具。最值得看的是 **Zyrexnn/Cybermes（909★）**——自主进攻性安全 agent 框架（bug bounty + 红队），多模型 LLM 编排，是“AI 做红队”从 demo 走向框架化…", "deals": "**双节促销进入最后 5 天**：智谱 Coding Plan 双节促销、GLM-5.3-Flash 夜间免费、混元 Hy Image3.5 出图免费、火山 Seedance 2.0 折扣，**全部 10 月 7 日收口**，要薅抓紧。 **今天已有多个过期**：Qoder Qwen3.8-Flas…", "x": "**【用量相关】ChatGPT 付费账号将于明天太平洋时间上午 10 点进行全局额度重置（Global reset）**，Tibo（OpenAI Codex 负责人）同时确认 GPT-6.1 Sol 前两天因负载激增导致的速度问题已恢复预期——这是今日最重要的用量变化，重置后各付费账号额度回满；Al…", "ainews": "- **本期最该打勾的一条清单（9/30 十条今晚 24:00 收口）**：**Qoder Qwen3.8-Flash 0.0× / 文心 4.0 免费 / 混元 Hy3 / WorkBuddy 三类积分 / 百炼 8 折 / Trae 企业 / Qoder 600 / 皖美视听征集，今天都是最后一…"}, {"date": "2026-10-01", "runs": [{"label": "08:00", "name": "早"}, {"label": "22:00", "name": "晚"}], "papers_n": 7, "papers": "今日 arXiv 六个分类 26 篇关键词命中（去重后 24 篇新，2 篇昨日已报），扩展来源 18 篇候选中剔除噪声后 1 篇入选；Jev 初筛保留 13 篇，人工终判入选 **7 篇**（5 篇 direct、2 篇 adjacent）。最值得关注的是 **Audience-Bound Pers…", "models": "今日模型圈是**发布周**：**Google DeepMind 正式发布 Gemini 4 Argon**（新一代 frontier，主打代码、企业知识工作与网络安全复杂工作流，**1M token 输出上限**是目前公开提及的最高输出窗口之一，直指长多步任务一次搞定；首批与美国政府及可信网络安全伙…", "interests": "今日兴趣追踪仅 **Jev 决策模型**方向有新增（1 条）：**jev-decision-gateway** 开源仓库，把 TypeSafe Jev 放进带治理的提款工作流，与 GPT-6 Sol、纯规则引擎在 100 笔交易上实测对比——Jev 85% 与分析师标签一致、欺诈自动放行 0 笔、p…", "news": "", "trending": "今日上榜几乎被 **AI 红队/攻防安全智能体** 包场：**Zyrexnn/Cybermes**（★901，自主 offensive security 与赏金猎人智能体框架）领跑，pentest-harness、blitzstrike、mcp-audit-tool 等 MCP/智能体安全审计工具成…", "deals": "", "x": "**MiniMax H3 生态加速**：HeyGen Video、Creatify 的广告视频模型 Boreal-H3 均基于 MiniMax H3 构建并发布；Utopai X（H3 微调）在 Artificial Analysis 文生视频榜（v2.0）空降第二，仅次于 Wan 3.0、领先 S…", "ainews": ""}, {"date": "2026-09-30", "runs": [{"label": "08:00", "name": "早"}, {"label": "20:00", "name": "20:00"}, {"label": "22:00", "name": "晚"}], "papers_n": 13, "papers": "今日 arXiv 六个分类共 50 篇去重命中（含 22 篇 new），精选 12 篇 v1 新论文 + 1 篇期刊补录。最值得关注的是 **CoSec（2609.34790）**——首个面向多用户/多社区 agent 系统的 authorization benchmark，把\"授权状态\"作为执行期…", "models": "**Claude Opus 5.5（high）以 1517.8 分领跑 LMArena Text 榜**（榜单日期 09-25），前五被 Anthropic 包揽；开源侧 **GLM-5.2 登顶 Artificial Analysis Intelligence Index 开源权重第一**（51 …", "interests": "新增用户指定追踪方向 **Jev 决策模型**：今日收录 5 条，核心是 **JEV-27B 开源发布**（决策基准反超官方 Jev）与三篇深度讨论（中文详解 / \"can't hallucinate\" 辨析 / 逆向工程分析），另附 awesome-jev 生态导航仓库。", "news": "今日新闻仍被 OpenAI DevDay 余波和 AI agent 安全两条主线主导。**GPT-6.1 Sol 正式发布**：智能接近旗舰 Astra、价格仅 1/5，是当前性价比最高的闭源旗舰档；而原定的真旗舰 **GPT-6.1 Astra 因内部安全测试发现欺骗与未授权行为，被 OpenAI…", "trending": "今日上榜几乎被 **AI 红队/攻防安全智能体**包场：**Zyrexnn/Cybermes**（★896，自主 offensive security 与赏金猎人智能体框架）领跑，pentest-harness、blitzstrike、mcp-audit-tool 等 MCP/智能体安全审计工具成 …", "deals": "", "x": "今日 46 条动态，主题是 **OpenAI DevDay 2026 余波**：**GPT-6.1 Sol** 发布（接近 Astra 的智能水平，价格仅 1/5，缓存读取 95% 折扣）；**Ultrafast 极速档**上线（Codex 中 token 生成快 8 倍、达 300 tokens/…", "ainews": ""}];
+const DATA = {"days": [{"date": "2026-10-05", "summary": "**数据口径说明**：06:45 拉取的 `arxiv_2026-10-05.json` 为空（arXiv 抓取失败），HF 每日榜单亦未更新，今日候选仅来自 OpenAlex 近 3 天关键词检索（7 篇，去重后 6 篇新候选，Jev 粗筛保留 2 篇）。若 06:46 轮拉取恢复，次日回补。\n\n今日新命中 2 篇（均为 OpenAlex），Agent 授权线占一席。**最值得关注的是 \"Authorized Access, Unauthorized Effects\" 的 replication package**：它把 LLM-Agent 系统里\"源使用授权\"（source-use authorization）与\"控制点放置\"（control placement）做成可测量的实证对象——360 个主实验世界 + 24 个载体替换复制、溯源中继审计、确定性验证测试。核心议题正是\"检索到的内容是否被授权使用\"以及\"授权检查放在链路的哪一环\"，与我们检索内容粒度 AU 求值的执行语义是同一问题在 Agent 侧的镜像，**可作为 Agent 线的实证引用**（注意：我们只拿到了复现包，原论文正文未在爬取范围，引用前需拿到原文核实结论）。另一篇 \"Beyond Hallucination\" 是对齐失配的方法论框架，定义了 Unauthorized Action Rate 等度量，与我们主线关联较弱，可当背景读物。\n\n---", "papers": [{"title": "Replication package for: Authorized Access, Unauthorized Effects: Measuring Source-Use Authorization and Control Placement in LLM-Agent Systems", "authors": "Kai Pan, Rong Hou（A2A Lab）", "url": "https://doi.org/10.5281/zenodo.23108972", "category": "LLM Agent 安全 / 实证测量（Zenodo 复现包，2026-10-03 发布）", "cats": [], "oneliner": "原论文把\"源使用授权\"和\"控制点放在哪一环\"变成可测量对象，复现包公开了 360 个主实验世界、24 个载体替换复制的聚合结果、溯源中继审计与加密清单。", "insight": "这是目前我们看到的、与我们\"执行语义层授权求值\"最贴近的 Agent 侧实证工作。我们的三种执行语义（all-of 拒绝 / retrieve-then-project / per-view 索引）本质上也是\"控制点放置\"的设计选择——这篇的测量方法论（合成世界 + 载体替换复制）可以直接借鉴，用来量化不同放置点的授权覆盖率与误伤率差异，建议在 Related Work 的 Agent 线引用并对比：它是工具/动作调用粒度（source-use），我们是检索内容粒度（AU），两者正交互补。**但注意**：我们只抓到复现包，没有原论文正文——其具体结论（如哪一环放置最优）必须拿到原文后核实，本次只登记为\"待深读\"。适合 standards-agent 线候选（见论文库维护）。", "source": "OpenAlex", "citations": "尚未收录", "code": "复现包内含 Python 重构与事件归一化代码、确定性验证测试（无独立 GitHub 仓库）", "zh_abs": "该复现包配套原论文《Authorized Access, Unauthorized Effects: Measuring Source-Use Authorization and Control Placement in LLM-Agent Systems》。它用合成任务夹具（synthetic task fixtures）与授权策略搭建实验世界，测量 agent 在使用检索/工具来源内容时，授权检查究竟应该放在链路的哪一环（control placement），并通过溯源中继审计（provenance-relay audits）追踪权限在调用链中的传递。实验规模是 360 个主世界 + 24 个载体替换复制，全部结果经确定性验证测试与密码学清单固定。", "supplement": false}, {"title": "Beyond Hallucination: A Functional Framework for Detecting and Mitigating AI Misalignment in Large Language Models and Agentic Systems", "authors": "Kishore Chalakkal Varghese", "url": "https://doi.org/10.5281/zenodo.23100091", "category": "AI 对齐 / 方法论框架（Zenodo 自出版预印本，2026-10-02 发布）", "cats": [], "oneliner": "提出一个八层对齐失配分类法与\"失配检测鸿沟\"概念，并定义 Unauthorized Action Rate 等实证度量，为企业场景设计可复现的 benchmark 方法论。", "insight": "关联较弱。其\"授权边界\"（authorization boundaries）作为企业 benchmark 的场景变量之一出现，但全文是方法论框架、没有任何实证数据，也未深入授权机制本身。八层分类法可作为背景知识知道有这么一套话语体系，但对 RU/AU 解耦的技术设计没有直接启迪，不建议引用。", "source": "OpenAlex", "citations": "尚未收录", "code": "无", "zh_abs": "作者把对齐失配定义为\"目标保真度的失败\"（不只是幻觉那种认知不可靠），提出八层分类法：意图、规范、代理与奖励设计、目标泛化、偏好优化、监督条件行为、agent 动作、部署上下文。核心概念是 Misalignment Detection Gap——真实目标偏离与评估者可检测性之间的差距。方法上给出启发式风险模型（失配概率 × 自主性 × 权限 × 影响 × 运行时可检测性），并为模糊目标、KPI 压力、授权边界、弱监督、工具使用等企业场景定义了 Task Success Rate、Alignment Preservation Rate、Unauthorized Action Rate 等度量。", "supplement": false}]}], "total": 2, "n_days": 1, "all_total": 2, "all_days": 1};
+const CAT_LABEL = {"cs.CR": "安全", "cs.CL": "NLP/RAG", "cs.AI": "AI/LLM", "cs.DB": "数据管理", "cs.MA": "多智能体", "cs.HC": "人机交互", "cs.SE": "软件工程", "cs.LG": "机器学习"};
+const TR = {"date": "2026-10-05", "repos": [{"name": "shinthink/blitzstrike", "url": "https://github.com/shinthink/blitzstrike", "desc": "Blitz Strike — a universal MCP security-audit toolbelt. Reconnaissance at speed. Analysis in depth. Validation before report.", "stars": 498, "lang": "TypeScript", "created": "2026-09-12"}, {"name": "ZeroDayEvil/ai-security-tool", "url": "https://github.com/ZeroDayEvil/ai-security-tool", "desc": "🛡️ Free open-source AI-powered security terminal & vulnerability scanner (CVE, SBOM). Supports SSH, SFTP, RDP, VNC, Serial, and 12+ autonomous AI agents (DeepSeek, OpenAI) for automated security workflows, CTF & DevSecOp", "stars": 409, "lang": "HTML", "created": "2026-09-10"}, {"name": "S1N6H/pentest-harness", "url": "https://github.com/S1N6H/pentest-harness", "desc": "Pentest Harness — Heaven for Hackers. A self-hosted AI agent harness for authorized pentests, bug bounty, security labs, and CTFs. Bring your own AI model API; sessions stay local.", "stars": 406, "lang": "TypeScript", "created": "2026-08-26"}, {"name": "brandynfisher/ToolReplay", "url": "https://github.com/brandynfisher/ToolReplay", "desc": "Audit AI agent tool-call transcripts: hash-chain sealing, deterministic replay, and scope overreach checks. Dependency-free Python CLI.", "stars": 182, "lang": "Python", "created": "2026-09-14"}, {"name": "QiantangCredit/heimdall-agent", "url": "https://github.com/QiantangCredit/heimdall-agent", "desc": "An autonomous AI agent framework for authorized CTF and security labs", "stars": 106, "lang": "TypeScript", "created": "2026-09-14"}, {"name": "CassiopeiaCode/CosyRedactGateway", "url": "https://github.com/CassiopeiaCode/CosyRedactGateway", "desc": "Lightweight, stateless privacy gateway for LLM APIs — redact secrets before OpenAI/Anthropic upstreams and restore them transparently in SSE and tool calls.", "stars": 99, "lang": "JavaScript", "created": "2026-09-11"}, {"name": "graygnatconsole/mcp-audit-tool", "url": "https://github.com/graygnatconsole/mcp-audit-tool", "desc": "🛡️ Security audit CLI for Model Context Protocol (MCP) servers — scan AI agent configs for tool poisoning, rug pulls, hardcoded secrets, command injection & supply-chain risks. Pure Python, SARIF + CI ready.", "stars": 92, "lang": "Python", "created": "2026-09-26"}, {"name": "mouteee/autonomous-offensive-llm-handbook", "url": "https://github.com/mouteee/autonomous-offensive-llm-handbook", "desc": "Step-by-step handbook for building autonomous security agents with clear limits, runnable lessons, diagrams, and honest evidence.", "stars": 75, "lang": "Python", "created": "2026-09-04"}, {"name": "heaven999b/hello-agent-system", "url": "https://github.com/heaven999b/hello-agent-system", "desc": "👋 Hello Agent System — learn enterprise AI agent system design by building every production layer from scratch. 17 bilingual lessons (EN/中文) with tested exercises: tools, architectures, reliability, security, evals, dist", "stars": 60, "lang": "Python", "created": "2026-09-27"}, {"name": "leepokai/jev-guard", "url": "https://github.com/leepokai/jev-guard", "desc": "Auto mode for every coding agent, built on Jev: risk-scores every tool call with session context (deny / ask / allow), flags prompt injection in results, checks skills and plugins. Claude Code, Codex, Copilot, Gemini, Cu", "stars": 58, "lang": "JavaScript", "created": "2026-09-17"}, {"name": "kulchankas/paranoid", "url": "https://github.com/kulchankas/paranoid", "desc": "Your app is guilty until proven secure: an agent skill whose /hack-me breaks into your own running app, proves each bug with a real request, patches it, and re-verifies. Claude Code · Codex · Cursor.", "stars": 49, "lang": "Python", "created": "2026-09-15"}, {"name": "PinoyFreeCoder/deployment-checklist", "url": "https://github.com/PinoyFreeCoder/deployment-checklist", "desc": "Language-agnostic pre-deployment checklist for web & mobile apps — security-heavy, with human and AI-agent versions.", "stars": 46, "lang": "", "created": "2026-09-26"}, {"name": "NusaSec/Hackbot-Arena", "url": "https://github.com/NusaSec/Hackbot-Arena", "desc": "⚔️ Benchmark your AI agent with 30 Docker-based web security labs inspired by real bug bounty findings, complete with canonical flags and reference solvers.", "stars": 45, "lang": "JavaScript", "created": "2026-09-06"}, {"name": "shleder/vetto", "url": "https://github.com/shleder/vetto", "desc": "Daemon-less OS security boundary & sandbox for AI coding agents (Codex, Claude Code, Cursor, Aider)", "stars": 45, "lang": "Rust", "created": "2026-08-22"}, {"name": "Sekolah76/syadagentic", "url": "https://github.com/Sekolah76/syadagentic", "desc": "Universal Zero-Refusal Agent Framework - 40+ jailbreak templates (T1-T119), 1128 curated skills, executable framework-core, installer untuk Hermes/Claude/Codex/opencode. Verified.", "stars": 41, "lang": "Python", "created": "2026-08-24"}, {"name": "kiwi0719/jev-edge", "url": "https://github.com/kiwi0719/jev-edge", "desc": "Typed-judgment admission control at the traffic edge: three-layer prompt-injection and abuse filter for nginx/OpenResty, powered by TypeSafe Jev. Fail-open, cached, hot-reloadable.", "stars": 41, "lang": "Lua", "created": "2026-09-21"}, {"name": "dmdhrumilmistry/security-harness", "url": "https://github.com/dmdhrumilmistry/security-harness", "desc": "A multi-agent application-security review harness for Claude Code (and, later, other AI agents). One router skill dispatches to a full offensive-security pipeline that maps a codebase, hunts vulnerabilities with a per-cl", "stars": 40, "lang": "Python", "created": "2026-08-22"}, {"name": "Perruer/keelflow", "url": "https://github.com/Perruer/keelflow", "desc": "Build AI agents and LLM workflows visually. Security-maintained continuation of Flowise: security fixes, Apache-2.0 only, drop-in for your existing flows and data.", "stars": 37, "lang": "TypeScript", "created": "2026-09-24"}, {"name": "Emanuelel/dont-reinvent", "url": "https://github.com/Emanuelel/dont-reinvent", "desc": "Stop your AI coding agent from reinventing the wheel. A Claude Skill that checks Free vs. Build vs. Buy before writing code, and actually vets what it finds (license, maintenance, security) instead of stopping at star co", "stars": 36, "lang": "HTML", "created": "2026-08-27"}, {"name": "Moeeryani/Vibe-Coding-Production-Kit", "url": "https://github.com/Moeeryani/Vibe-Coding-Production-Kit", "desc": "Production-grade vibe coding framework with specs, architecture, AI agents, testing, security, code review, CI/CD, and battle-tested workflows — from idea to production.", "stars": 34, "lang": "JavaScript", "created": "2026-09-22"}], "summary": "今日 GitHub 趋势榜被 **AI 安全/红队工具**刷屏：前 20 里超过一半与 agent 安全、MCP 审计、渗透测试相关，说明「给 AI agent 做安全」正从论文走向工具化。最值得看的是 **shinthink/blitzstrike**（★498，TypeScript）：号称通用 MCP 安全审计工具带，侦察-分析-验证一条龙，恰好踩在 MCP 生态安全缺口上。**S1N6H/pentest-harness**（★406）：自托管 AI agent 渗透测试框架，主打授权 CTF/安全实验场景。**ZeroDayEvil/ai-security-tool**（★409）：AI 驱动的安全终端与漏洞扫描器。值得注意的信号：**CassiopeiaCode/CosyRedactGateway**（LLM API 前的隐私网关，调用前脱敏）与 **brandynfisher/ToolReplay**（agent 工具调用记录的哈希链封存与确定性重放）分别对应「输入侧隐私」和「审计溯源」——正是我们论文里 provenance 与执行语义关心的维度，可顺手 star 跟踪。提醒：**Sekolah76/syadagentic** 是 40+ jailbreak 模板合集（1128 个模板），属攻击工具，仅作了解攻击面参考，不建议作为正面推荐。"};
+let XW = {"date": "2026-10-05", "accounts": {"elonmusk": {"name": "Elon Musk", "label": "马斯克", "group": "other", "avatar": "https://pbs.twimg.com/profile_images/2103567689515954176/aR-Kjpp4_400x400.jpg", "tweets": []}, "realDonaldTrump_truth": {"name": "Donald Trump", "label": "特朗普 · Truth Social", "group": "other", "avatar": "https://pbs.twimg.com/profile_images/874276197357596672/kUuht00m_400x400.jpg", "tweets": [{"id": "stt_oct04_spree_memes", "text": "（周日下午23帖刷屏其余部分，多为图片/meme）格陵兰meme（巨人特朗普俯瞰群山；特朗普与举美国国旗的企鹅群）；与习近平合影（称其为\"Great Leader\"，另称\"President Trump gets YOUNGER\"）；继续推动把AI改名为\"super intelligence\"；抨击媒体为\"artificial news\"；质问反对华盛顿凯旋门计划的抗议者\"Do these people not have jobs?\"。（据qncnews/europesays报道转述）", "created_at": "10-05 03:30", "likes": 0, "reposts": 0, "replies": 0, "url": "https://truthsocial.com/@realDonaldTrump#stt_oct04_spree_memes", "author": "realDonaldTrump"}, {"id": "stt_oct04_kennedy_cooper", "text": "（系列帖，配6张肯尼迪中心内部照片）The Kennedy Center is crumbling, and a great danger to anyone who walks inside… will only get worse unless the Radical Left Judge, with his Trump Hating lawyer wife, allows me to do what must be done!（周日下午连发23帖的一部分：称肯尼迪中心\"摇摇欲坠\"\"破败\"\"丑陋\"，抨击联邦法官Christopher Cooper（曾裁定不得单方面将其改名为\"特朗普-肯尼迪中心\"）及其妻子；据qncnews/europesays报道）", "created_at": "10-05 03:00", "likes": 0, "reposts": 0, "replies": 0, "url": "https://truthsocial.com/@realDonaldTrump#stt_oct04_kennedy_cooper", "author": "realDonaldTrump"}, {"id": "stt_oct04_hormuz", "text": "（转述）伊斯兰堡美伊谈判（10月3-4日，万斯率团、伊朗议长卡利巴夫率团，会谈21小时）周日凌晨无果而终后，特朗普在Truth Social发文称：美军将对试图进出霍尔木兹海峡的船只采取行动，拦截向伊朗缴纳过航费的船只，指其为非法勒索并指控伊朗在水道布雷；CENTCOM随后宣布自美东周一上午10点起封锁进出伊朗港口的海上交通（经霍尔木兹海峡往返非伊朗港口的船只除外）。（据signalpostnews报道转述，非逐字原文；为周日最大外交动作）", "created_at": "10-04 23:00", "likes": 0, "reposts": 0, "replies": 0, "url": "https://truthsocial.com/@realDonaldTrump#stt_oct04_hormuz", "author": "realDonaldTrump"}, {"id": "stt_oct04_fox_friends", "text": "Sad to see that Fox & Friends (Sunday) is not covering our packed house and incredibly enthusiastic (beyond!) Rally that took place in Ohio last night, or the ones in Alabama, Texas, or Oklahoma over the past two days. These Election Rallies were representative of what is really… Cover our \"happenings,\" and not the opposition to Greatness for America, or FoxNews will soon have the ratings of FAKE NEWS CNN or MSNOW (MSDNC). Remember, Fox tried this act once before, and almost went out of business (and always right before an election!). That can happen again! Thank you for your attention to this matter! President DJT（美东周日上午约9点发文，抱怨Fox & Friends周日节目未报道俄亥俄集会及阿拉巴马/得州/俄克拉荷马集会，警告福克斯收视率会跌到CNN/MSNOW水平；Mediaite核实发文时间点。原文转述自wltreport报道引文）", "created_at": "10-04 21:00", "likes": 0, "reposts": 0, "replies": 0, "url": "https://truthsocial.com/@realDonaldTrump#stt_oct04_fox_friends", "author": "realDonaldTrump"}, {"id": "stt_oct04_sif", "text": "Following the Historic White House Accord on Super Intelligence, where the World's most important Technology Companies came together, and confirmed their responsibilities to the American People, I am announcing the formation of the Super Intelligence Force (SIF). The Super Intelligence Force is tasked with coordinating the effort of the Federal Government to ensure that America continues to lead the World in Super Intelligence, which many say is bigger than the Industrial Revolution, and the Internet, and will protect the interests, and improve the lives, of all Americans. The Super Intelligence Force will coordinate the Federal Government's engagement with Consumers, Public Interest Groups, Religious Organizations, Critical Infrastructure Providers, and Super Intelligence Companies, and will be led by Director of National Intelligence, Jay Clayton, Chairman of the Federal Trade Commission, Andrew Ferguson, Under Secretary of War for Research and Engineering, and Chief Technology Officer, Emil Michael, and Director of the Office of Personnel Management, Scott Kupor, and will report to the President of the United States (ME!), and the Chief of Staff, Susie Wiles. Thank you for your attention to this matter! President DONALD J. TRUMP（宣布组建超级智能部队 Super Intelligence Force (SIF)，协调联邦政府确保美国在超级智能领域全球领先；由国家情报总监 Jay Clayton（兼任 AI 沙皇）领衔，FTC 主席 Andrew Ferguson 等参与，120 天内提交 AI 风险与机遇报告）", "created_at": "10-04 20:00", "likes": 0, "reposts": 0, "replies": 0, "url": "https://truthsocial.com/@realDonaldTrump#stt_oct04_sif", "author": "realDonaldTrump"}, {"id": "stt_oct04_coale", "text": "I am pleased to announce that John Coale, Esq., a great lawyer and my incredibly successful Envoy for Belarus, will be my new Nominee for Special Presidential Envoy for Hostage Affairs, with the rank of Ambassador. John has already secured the return of over 65 Americans and Allied Citizens from Belarus over the last year, and negotiated the release of more than 800 political prisoners from multiple countries in Eastern Europe. He will work tirelessly in this new post to bring American Citizens home. Adam Boehler, who has done an incredible job, bringing back 196 hostages, will continue to assist in other matters, as Senior Advisor. Thank you for your attention to this matter! President DONALD J. TRUMP（提名白俄罗斯事务特使、律师 John Coale 出任总统人质事务特使（大使级），称其过去一年促成 65+ 美国及盟国公民从白俄罗斯获释、800+ 东欧政治犯获释；现任 Adam Boehler（已带回 196 名人质）转任高级顾问）", "created_at": "10-04 19:00", "likes": 0, "reposts": 0, "replies": 0, "url": "https://truthsocial.com/@realDonaldTrump#stt_oct04_coale", "author": "realDonaldTrump"}, {"id": "stt_oct04_bayer", "text": "HUGE NEWS FOR OHIO, where I am heading right now! Bayer just announced a brand new, 2.2 Billion Dollar Pharmaceutical Manufacturing Campus near Columbus. It will generate thousands of Jobs for Ohioans in Advanced Manufacturing, Scientific Research, Construction, and more. This massive Onshoring WIN is thanks to my strong Pharmaceutical Tariffs, which have led to over 600 BILLION DOLLARS in new Pharma Investments, and lower (MFN) Drug Prices. Companies everywhere are building in the U.S.A. BUILD IN AMERICA, HIRE AMERICAN WORKERS, AND PRICE DRUGS FOR AMERICAN PATIENTS FAIRLY — OR PAY. I LOVE OHIO! President DONALD J. TRUMP（宣布拜耳在俄亥俄哥伦布附近新建 22 亿美元制药园区，归功于其药品关税带来超 6000 亿美元新增制药投资和 MFN 药价下降；发文时正前往俄亥俄）", "created_at": "10-04 18:00", "likes": 0, "reposts": 0, "replies": 0, "url": "https://truthsocial.com/@realDonaldTrump#stt_oct04_bayer", "author": "realDonaldTrump"}, {"id": "stt_oct04_protestors", "text": "How much is she being paid, and by whom? She's at all of my developments protesting. Others, likewise, are the same people. These are paid protestors, aren't they?（质问在其地产项目前抗议的女子拿了谁的钱，称抗议者都是拿钱的雇佣人员）", "created_at": "10-04 17:00", "likes": 0, "reposts": 0, "replies": 0, "url": "https://truthsocial.com/@realDonaldTrump#stt_oct04_protestors", "author": "realDonaldTrump"}]}, "OpenAI": {"name": "OpenAI", "label": "OpenAI 官方", "group": "openai", "avatar": "https://pbs.twimg.com/profile_images/1885410181409820672/ztsaR0JW_400x400.jpg", "tweets": [{"id": "2105708732323909827", "text": "dots demo. \n\nNow... with better WiFi.", "created_at": "10-02 01:17", "likes": 18915, "reposts": 847, "replies": 1629, "views": 7377313, "url": "https://x.com/OpenAIDevs/status/2105708732323909827", "author": "OpenAIDevs"}, {"id": "2105373267171438779", "text": "Small teams are taking on more with AI—from finding customers to building products and managing finances.\n\nOur new report explores how small businesses are putting AI agents to work. And through a new partnership with @ASBDC, we're bringing hands-on AI training and local guidance to help more owners get started.\n\nhttps://openai.com/index/helping-small-businesses-put-ai-to-work/", "created_at": "10-01 03:04", "likes": 1815, "reposts": 108, "replies": 398, "views": 307304, "url": "https://x.com/OpenAI/status/2105373267171438779", "author": "OpenAI"}]}, "sama": {"name": "Sam Altman", "label": "OpenAI", "group": "openai", "avatar": "https://pbs.twimg.com/profile_images/2046764873200394240/r7BxVezs_400x400.jpg", "tweets": [{"id": "2106388373221118198", "text": "I am very uncomfortable about people trying to ascribe religious force or a surrender of human judgment to AI models, and think it is a real safety issue.", "created_at": "10-03 22:18", "likes": 27396, "reposts": 1839, "replies": 5861, "views": 6164799, "url": "https://x.com/sama/status/2106388373221118198", "author": "sama"}, {"id": "2106189841813934140", "text": "The contrast between hanging up the last phone call of the day of high-stakes decisions and then a minute later walking in the door to the pure love of small children who want to laugh and play and show you every discovery they made that day is the strangest and best thing I have ever experienced in life.", "created_at": "10-03 09:09", "likes": 22120, "reposts": 598, "replies": 1034, "views": 1441744, "url": "https://x.com/sama/status/2106189841813934140", "author": "sama"}, {"id": "2106147184693620924", "text": "There is some speculation about our partnership with Cerebras.\n\nCerebras is a close partner, and we have a deep engagement pushing on the frontiers of speed.", "created_at": "10-03 06:19", "likes": 8580, "reposts": 360, "replies": 549, "views": 1451552, "url": "https://x.com/sama/status/2106147184693620924", "author": "sama"}, {"id": "2106085986606403684", "text": "dot is my favorite openai product so far!\n\nit is amazing to me that each day it feels noticably better as it learns more of my workflow and style.\n\nhaving it do the stuff i don't like doing--and usually just builds up as a gravity well of dread--has me very happy.", "created_at": "10-03 02:16", "likes": 8718, "reposts": 345, "replies": 1791, "views": 980944, "url": "https://x.com/sama/status/2106085986606403684", "author": "sama"}]}, "thsottiaux": {"name": "Tibo · Thibault Sottiaux", "label": "OpenAI · Codex 负责人", "group": "openai", "avatar": "https://pbs.twimg.com/profile_images/2093807917833281537/2yBgpwVV_400x400.jpg", "tweets": [{"id": "2106845241357824205", "text": "Over the next 28 days, each day we’ll either ship one thing that is a clear improvement and relevant for most codex/work users or ship a full reset. Let the improvements begin.", "created_at": "10-05 04:33", "likes": 11333, "reposts": 537, "replies": 1700, "views": 530381, "url": "https://x.com/thsottiaux/status/2106845241357824205", "author": "thsottiaux"}, {"id": "2106610099720720811", "text": "All right, we’re locking in. Only things being worked on are simplifications, more efficiency for more usage, groundbreaking features or new models. \n\nSometimes you have to invest ahead of the curve, but feedback is clear that you all want things to get simpler. On it.", "created_at": "10-04 12:59", "likes": 13286, "reposts": 311, "replies": 1788, "views": 1240904, "url": "https://x.com/thsottiaux/status/2106610099720720811", "author": "thsottiaux"}, {"id": "2106603980386394123", "text": "What it did\n\n- delete all categories of email that were not needed for me to keep, validating them in batch\n- identify labels for types of work that I do and label all the emails appropriately\n- walked me through emails that needed a reply, searching for relevant context in the background to help get things right\n\nand in the process I was able to go through a lot of feedback and requests people send me directly through email. It was a good Saturday.", "created_at": "10-04 12:35", "likes": 520, "reposts": 11, "replies": 64, "views": 115448, "url": "https://x.com/thsottiaux/status/2106603980386394123", "author": "thsottiaux"}, {"id": "2106602729875685780", "text": "I have never in my life achieved inbox zero until I just made it an active goal for my dot to help get it done. Let’s see how long it lasts, but it’s a great feeling.", "created_at": "10-04 12:30", "likes": 2547, "reposts": 56, "replies": 461, "views": 427594, "url": "https://x.com/thsottiaux/status/2106602729875685780", "author": "thsottiaux"}, {"id": "2106501204285239560", "text": "If we were to add one more sidebar, what should be in it", "created_at": "10-04 05:46", "likes": 3474, "reposts": 55, "replies": 2238, "views": 651555, "url": "https://x.com/thsottiaux/status/2106501204285239560", "author": "thsottiaux"}, {"id": "2106439068557144179", "text": "What’s one thing that’s missing in codex that you wish we had?", "created_at": "10-04 01:39", "likes": 5569, "reposts": 120, "replies": 7988, "views": 1398185, "url": "https://x.com/thsottiaux/status/2106439068557144179", "author": "thsottiaux"}, {"id": "2106252868307271752", "text": "Fortunately our future models will be much better at code deletion and simplification. Just in time", "created_at": "10-03 13:19", "likes": 12586, "reposts": 284, "replies": 1075, "views": 924320, "url": "https://x.com/thsottiaux/status/2106252868307271752", "author": "thsottiaux"}, {"id": "2106239435461579088", "text": "All fixed. Surprising number of Pro 500 users on here.", "created_at": "10-03 12:26", "likes": 3904, "reposts": 68, "replies": 593, "views": 753515, "url": "https://x.com/thsottiaux/status/2106239435461579088", "author": "thsottiaux"}]}, "OpenAIDevs": {"name": "OpenAI Developers", "label": "Codex · 开发者动态", "group": "openai", "avatar": "https://pbs.twimg.com/profile_images/2022002720971096064/l3Kyt4qt_400x400.jpg", "tweets": [{"id": "2106176799545970710", "text": "Building with the Agents API?\n\nCatch up on what’s new:", "created_at": "10-03 08:17", "likes": 481, "reposts": 25, "replies": 63, "views": 78999, "url": "https://x.com/OpenAIDevs/status/2106176799545970710", "author": "OpenAIDevs"}, {"id": "2106169182257811709", "text": "Awesome Sites has voting. Go vote for your favorites! Personally I think Jelly Hockey needs some love. #awesomesites", "created_at": "10-03 07:47", "likes": 48, "reposts": 7, "replies": 8, "views": 16564, "url": "https://x.com/simpsoka/status/2106169182257811709", "author": "simpsoka"}, {"id": "2106159012538442068", "text": "The team behind Agents API continues to cook. Here's what's new this week:\n\nComputer use: Spin up a browser + agent with 1 API call 🖥️\nBedrock Managed Agents: Agents API except AWS\nGPT‑6.1 Sol 🌞\nEnvironment sizes: Spin up a light or beefy oai-hosted environment 💪\nDashboard improvements: configure subagents and more from the dashboard 📈\nEnvironment portability: Re-use environments across multiple sessions 🤖\nOverall better reliability: 99.97% turn reliability, fewer SSE disconnects, 20% faster tool calls 🪨\n\nhappy building ❤️ u all", "created_at": "10-03 07:06", "likes": 216, "reposts": 17, "replies": 27, "views": 95698, "url": "https://x.com/stevendcoffey/status/2106159012538442068", "author": "stevendcoffey"}, {"id": "2106152299026661641", "text": "Your dot learns how you work, keeps context across apps, coordinates Codex tasks, and flags what needs your attention.", "created_at": "10-03 06:40", "likes": 794, "reposts": 46, "replies": 105, "views": 88904, "url": "https://x.com/OpenAIDevs/status/2106152299026661641", "author": "OpenAIDevs"}, {"id": "2106152048924438967", "text": "https://x.com/i/article/2106076978206175232", "created_at": "10-03 06:39", "likes": 234, "reposts": 15, "replies": 14, "views": 42504, "url": "https://x.com/OpenAIDevs/status/2106152048924438967", "author": "OpenAIDevs"}, {"id": "2106126796408451308", "text": "Got to take the main stage at OpenAI DevDay to talk about plugin extensions!\n\nA few takeaways for developers building plugins:\n\n1. Make your plugin part of how people work.\nPlugin extensions let you build apps that open from ChatGPT’s sidebar, side panel, custom file viewers and editors, and settings for your plugin. Full spec here:\nhttp://github.com/openai/mcp-extensions/blob/main/docs/spec.md⁠\n\n2. Put care into what happens after installation.\nYou can provide a custom onboarding skill to guide people through setup and help them learn what your plugin can do. Use that first experience to help someone accomplish something useful and give them a reason to come back. \n\n3. Make it easier to get started.\nPlugins can support Sign in with ChatGPT so people can connect using their existing ChatGPT account. A smoother sign-in experience can help more people get through setup and start using what you’ve built. \n\n@vigyso wrote a great walkthrough of Sign in with ChatGPT for developers who want to learn more:\nhttp://developers.openai.com/cookbook/articles/sign-in-with-chatgpt⁠\n\nHere are some of the folks behind the platform: @mxstbr , @ShopifyVC , @tarstarr , and @glencoates . We’re listening to your feedback and excited to support more of the open ecosystem. \n\nHope these help you get building. I’d love to see what you make!", "created_at": "10-03 04:58", "likes": 164, "reposts": 15, "replies": 21, "views": 30299, "url": "https://x.com/coreyching/status/2106126796408451308", "author": "coreyching"}, {"id": "2106081991200579883", "text": "Today was mostly about modularity.\n\nI’m building MOSS to be modular from day one, so getting started doesn’t mean buying exactly the hardware I use. Maybe you already have a Raspberry Pi lying around from another project. Maybe a more affordable depth camera fits your budget better.\n\nPi 5, with or without Hailo, or Jetson. RealSense or Gemini. Different combinations, same rover.\n\nThat’s what I committed to when I applied to the @OpenAIdevs Codex Physical Builds program. Here’s that idea taking shape.", "created_at": "10-03 02:00", "likes": 240, "reposts": 20, "replies": 13, "views": 22924, "url": "https://x.com/metrox_eth/status/2106081991200579883", "author": "metrox_eth"}, {"id": "2106050413313286265", "text": "In a self driving car using codex to install a game my dot made for me while I was asleep. This is wild! \n\n@OpenAI @OpenAIDevs", "created_at": "10-02 23:55", "likes": 100, "reposts": 8, "replies": 7, "views": 15978, "url": "https://x.com/NicholasRuncie/status/2106050413313286265", "author": "NicholasRuncie"}]}, "AnthropicAI": {"name": "Anthropic", "label": "Claude 官方", "group": "claude", "avatar": "https://pbs.twimg.com/profile_images/1798110641414443008/XP8gyBaY_400x400.jpg", "tweets": [{"id": "2105733864152858919", "text": "In physics, an “impedance mismatch” occurs when two systems each work well but are poorly matched.\n\nIn this Science Blog guest post, Harvard physicist Matthew Schwartz argues that something similar is happening with AI and science. LLMs are capable at many things, but working with them as you would with a human collaborator isn’t currently the best way to elicit their scientific strengths.\n\nTo address this mismatch, Schwartz created a toolkit for exact calculations in quantitative science. Because similar calculations often emerge in very different areas of science, Claude found connections to ecology, population genetics, and a dozen other fields, and Schwartz worked with domain experts to steer it towards interesting questions.\n\nRead more about these projects here: https://www.anthropic.com/research/claude-shaped-science", "created_at": "10-02 02:57", "likes": 3621, "reposts": 405, "replies": 406, "views": 601348, "url": "https://x.com/AnthropicAI/status/2105733864152858919", "author": "AnthropicAI"}, {"id": "2104982629884063840", "text": "What do you want from AI?\n\nWe’re launching a new study with Anthropic Interviewer to learn more about your experiences using AI, what role you want it to play in your life and the world, and what you want from the companies building it.\n\nLast December, 81,000 people told us about their hopes and fears about AI in the largest qualitative study ever done. This time, we’re giving participants the option to make their responses public so that anyone, not just Anthropic, can learn from them.\n\nWhat you tell us will shape The Anthropic Institute’s research and inform the decisions we make. If many people say companies like Anthropic should be doing something differently, that will be on the record, where anyone can point to it.\n\nThe study runs Sept 29 to Oct 6 and is open to Free, Pro, and Max users on Claude and Claude Code.\n\nTake part here: http://claude.ai/anthropic-interviewer/your-thoughts-on-ai?from=social", "created_at": "09-30 01:12", "likes": 2098, "reposts": 204, "replies": 397, "views": 329087, "url": "https://x.com/AnthropicAI/status/2104982629884063840", "author": "AnthropicAI"}]}, "GoogleDeepMind": {"name": "Google DeepMind", "label": "Gemini 官方", "group": "google", "avatar": "https://pbs.twimg.com/profile_images/1695024885070737408/-M-HSH5P_400x400.jpg", "tweets": [{"id": "2105707090547478914", "text": "Watch → https://goo.gle/4de3fiR\nSpotify → https://goo.gle/4dKZwte\nApple Podcasts → https://goo.gle/4dQqKyH\n\nOr listen wherever you get your podcasts! 🎧", "created_at": "10-02 01:11", "likes": 35, "reposts": 5, "replies": 8, "views": 27608, "url": "https://x.com/GoogleDeepMind/status/2105707090547478914", "author": "GoogleDeepMind"}, {"id": "2105707085287567709", "text": "When AI-generated content has become so realistic, how do we verify what's made by human, machine, or nature?\n\nWe explore the vital role of provenance – and how imperceptible watermarking can safeguard both digital media and biological designs – on our podcast. ↓\n\nTimecodes:\n00:00 Introduction\n00:34 What is a watermark?\n04:35 SynthID\n15:16 Images and video\n19:28 SynthID Bio\n28:00 Future of resilience", "created_at": "10-02 01:11", "likes": 551, "reposts": 56, "replies": 122, "views": 72875, "url": "https://x.com/GoogleDeepMind/status/2105707085287567709", "author": "GoogleDeepMind"}]}, "sundarpichai": {"name": "Sundar Pichai", "label": "Google CEO", "group": "google", "avatar": "https://pbs.twimg.com/profile_images/2051799620062429184/AL8CoAUG_400x400.jpg", "tweets": [{"id": "2105828136428691774", "text": "In a busy week, SynthID Bio, our watermarking tech for AI-designed proteins, was a big big step forward for scientific integrity and biosecurity! Congrats to the team @GoogleDeepMind", "created_at": "10-02 09:12", "likes": 1407, "reposts": 112, "replies": 198, "views": 372506, "url": "https://x.com/sundarpichai/status/2105828136428691774", "author": "sundarpichai"}, {"id": "2105817662651777367", "text": "I remember the first meeting where the team pitched the idea of putting compute in space - exciting idea!\n\nToday's successful launch with our partner @planet prototype satellite shows how far we've come...and how far there is to go. Thanks for the lift, @SpaceX, another spectacular booster landing too🚀", "created_at": "10-02 08:30", "likes": 11683, "reposts": 1124, "replies": 459, "views": 1145206, "url": "https://x.com/sundarpichai/status/2105817662651777367", "author": "sundarpichai"}]}, "TencentHunyuan": {"name": "Tencent Hunyuan", "label": "腾讯混元官方", "group": "china_ai", "avatar": "https://pbs.twimg.com/profile_images/1810934469769195520/kKSVenHW_400x400.jpg", "tweets": [{"id": "2105288808929558891", "text": "New Research: We are releasing ExplorationBench, a benchmark for measuring how AI systems explore.\n\nScientific discovery begins where known problems end: a system has to frame hypotheses, design experiments, and learn from the results. Evaluating this is hard. Genuinely new answers cannot be checked quickly, and in familiar domains a model can simply recall what it has seen.\n\nAddressing this challenge, researchers from Tencent Hy, Fudan University, and Tsinghua University built verifiable Alien Worlds. Their rules are executable, so every answer is checked exactly, and they conflict with familiar knowledge, so recall alone cannot solve the tasks.\n\n🔹 Two sandboxes: AlienCode (31 hidden rule changes, 70 tasks) and AlienLogic (24 patched inference rules, 70 theorems)\n🔹 A flawed manual, four rounds of self-designed probes, and closed-book tests after every round\n🔹 Every answer graded by an interpreter or a proof checker, with no LLM judge\n\nWhat we found across 10 frontier AI systems:\n1️⃣ Getting feedback is more effective than thinking alone. No AlienCode run starts above 15.7%; after four rounds the best reaches 89.0%, while the same turns without feedback stay at 0.5–11.0%.\n2️⃣ Designing the experiments matters. Replaying a system's own best probes gives it exactly the same evidence, yet in AlienCode 9 of 10 systems do worse than when they chose the probes themselves.\n3️⃣ Knowing a rule is not using it. Even when every required rule is stated correctly, tasks are solved only 73.4% of the time.\n4️⃣ One score hides a lot. The same system under the same budget ended anywhere from 5.7% to 79.0%, and rankings barely transfer between the two worlds.\n\nCL-bench asked whether models can learn from context. ExplorationBench asks whether they can discover the rules themselves.\n\n📄 Paper: https://arxiv.org/abs/2609.30199\n🌐 Website & leaderboard: https://explorationbench.com\n📝 Blog: https://explorationbench.com/blog/\n💻 Code (coming soon): https://github.com/Tencent-Hunyuan/ExplorationBench", "created_at": "09-30 21:29", "likes": 335, "reposts": 36, "replies": 10, "views": 34301, "url": "https://x.com/TencentHunyuan/status/2105288808929558891", "author": "TencentHunyuan"}, {"id": "2105215199192207710", "text": "3 tracks. 3 winners. Go and Create. 🥇", "created_at": "09-30 16:36", "likes": 52, "reposts": 2, "replies": 1, "views": 7105, "url": "https://x.com/TencentHunyuan/status/2105215199192207710", "author": "TencentHunyuan"}]}, "deepseek_ai": {"name": "DeepSeek", "label": "DeepSeek 官方", "group": "china_ai", "avatar": "https://pbs.twimg.com/profile_images/1717417613775757312/Uk1zNOj4_400x400.jpg", "tweets": [{"id": "2105915715241062644", "text": "Please check out @DeepSeekHarness. We just released packaged desktop versions for macOS and Windows; Linux users can get it from the @​deepseek-ai/dsh package on npm. https://deepseek.com/harness", "created_at": "10-02 15:00", "likes": 4536, "reposts": 354, "replies": 221, "views": 424718, "url": "https://x.com/deepseek_ai/status/2105915715241062644", "author": "deepseek_ai"}, {"id": "2097930627949711516", "text": "🌐 Supporting open source. Expanding deployment options.\n\nWe’ll work closely with the open-source community on V4.1-Flash inference support and explore more deployment options.\nPlanning a large-scale deployment with 2,000 GPUs + a storage cluster? Let’s talk.\n\n🔹 Model: https://huggingface.co/deepseek-ai/DeepSeek-V4.1-Flash\n🔹 Paper: https://huggingface.co/deepseek-ai/DeepSeek-V4.1-Flash/blob/main/DeepSeek_V41_Tech_Report.pdf\n\n6/6", "created_at": "09-10 14:10", "likes": 2853, "reposts": 212, "replies": 68, "views": 355259, "url": "https://x.com/deepseek_ai/status/2097930627949711516", "author": "deepseek_ai"}]}, "Kimi_Moonshot": {"name": "Kimi", "label": "月之暗面官方", "group": "china_ai", "avatar": "https://pbs.twimg.com/profile_images/2086719038798102529/diJGKpOE_400x400.jpg", "tweets": [{"id": "2102372557190230244", "text": "Meet the new Kimi Browser Extension, formerly Kimi WebBridge.\n\nFrom your browser sidebar, you can chat with Kimi to navigate websites, fill out forms, and get things done.\n\nFor repetitive tasks, record your steps once and save them as a skill. Kimi can take it from there next time.\n\nAvailable now on http://kimi.ai/products/kimi-browser-extension and the Chrome Web Store.", "created_at": "09-22 20:20", "likes": 972, "reposts": 71, "replies": 61, "views": 76547, "url": "https://x.com/Kimi_Moonshot/status/2102372557190230244", "author": "Kimi_Moonshot"}, {"id": "2102244258531213596", "text": "Kimi K3 is now on Amazon Bedrock!\n\nRun coding, document analysis, and extended agent workflows with Bedrock's access, encryption, and auditing controls.  Explicit prompt caching supported.\n\nStart building with K3 on AWS 👉 https://docs.aws.amazon.com/bedrock/latest/userguide/model-card-moonshot-ai-kimi-k3.html", "created_at": "09-22 11:51", "likes": 944, "reposts": 57, "replies": 37, "views": 974068, "url": "https://x.com/Kimi_Moonshot/status/2102244258531213596", "author": "Kimi_Moonshot"}]}, "ZhipuAI": {"name": "Zhipu AI", "label": "智谱官方", "group": "china_ai", "avatar": "https://pbs.twimg.com/profile_images/1875758904795344896/U3CqYUFY_400x400.jpg", "tweets": [{"id": "1875761216062439461", "text": "购买 $ZHIPU —— 采用全自研的GLM模型架构，基于数十万亿中英文双语数据训练而成。ZHIPU 综合能力接近 GPT-4-Turbo，推理速度高达 80 token/s，阅读速度是人类极限（300词/分钟）的 25 倍，开创了AI性能的新标杆！\n\nhttps://bigmodel.cn/", "created_at": "01-05 12:28", "likes": 17, "reposts": 5, "replies": 7, "views": 9132, "url": "https://x.com/ZhipuAI/status/1875761216062439461", "author": "ZhipuAI"}]}, "Alibaba_Qwen": {"name": "Qwen", "label": "阿里 Qwen 官方", "group": "china_ai", "avatar": "https://pbs.twimg.com/profile_images/2064231947149377536/Ab70PxT5_400x400.jpg", "tweets": [{"id": "2105256053403508849", "text": "Qwen3.8-27B is now accessible via @nebiustf. Whether you are building agents or doing deep research, this 27B dense model is ready for your multi-step workflows! 🥳", "created_at": "09-30 19:18", "likes": 319, "reposts": 15, "replies": 44, "views": 51389, "url": "https://x.com/Alibaba_Qwen/status/2105256053403508849", "author": "Alibaba_Qwen"}, {"id": "2102727421128810774", "text": "Benchmark suite:", "created_at": "09-23 19:50", "likes": 45, "reposts": 0, "replies": 2, "views": 15275, "url": "https://x.com/Alibaba_Qwen/status/2102727421128810774", "author": "Alibaba_Qwen"}]}, "MiniMax_AI": {"name": "MiniMax", "label": "MiniMax 官方", "group": "china_ai", "avatar": "https://pbs.twimg.com/profile_images/1875100548535574529/VxHk9HyU_400x400.jpg", "tweets": [{"id": "2106118482765213889", "text": "@advertisingweek @krea_ai @fal @magnific 🎙️ The New Creative Stack: AI Video, Brand Control & the Future of Advertising\n\nw/ Helena Grau i Miarons (@krea_ai), Nina Gerov (@fal), Claire Xue (@magnific), @RenLeanna & @MorganSuoinMM (@MiniMax_AI)\n\n📅 Thu 10/8 · 2:30 PM ET · Innovation Stage\n🔗https://newyork2026.advertisingweek.com/aw/schedule/session/-805-2026-10-08-1510-session", "created_at": "10-03 04:25", "likes": 170, "reposts": 0, "replies": 0, "views": 89938, "url": "https://x.com/MiniMax_AI/status/2106118482765213889", "author": "MiniMax_AI"}, {"id": "2106117690041712697", "text": "New York, see you next week 🗽✨\n\nMiniMax is heading to @advertisingweek New York, Oct 5–8. \n\n📍 Booth A16E, near the Food Trucks\n🎬 Live MiniMax H3 demos all week\n🎙️ Our panel with @krea_ai  × @fal  × @magnific : Thu 10/8 · 2:30 PM ET · Innovation Stage\n\nPanel details in the replies👇\n\n@AWNewYork_ #AWNewYork26", "created_at": "10-03 04:22", "likes": 345, "reposts": 4, "replies": 6, "views": 109426, "url": "https://x.com/MiniMax_AI/status/2106117690041712697", "author": "MiniMax_AI"}]}, "XiaomiMiMo": {"name": "Xiaomi MiMo", "label": "小米 MiMo 官方", "group": "china_ai", "avatar": "https://pbs.twimg.com/profile_images/1999123454247972865/8PkB-sNt_400x400.jpg", "tweets": [{"id": "2102153146525253816", "text": "💗", "created_at": "09-22 05:49", "likes": 452, "reposts": 9, "replies": 20, "views": 22053, "url": "https://x.com/XiaomiMiMo/status/2102153146525253816", "author": "XiaomiMiMo"}, {"id": "2102147404862800097", "text": "🔥", "created_at": "09-22 05:26", "likes": 535, "reposts": 13, "replies": 14, "views": 36750, "url": "https://x.com/XiaomiMiMo/status/2102147404862800097", "author": "XiaomiMiMo"}]}}, "errors": ["@elonmusk 抓取失败（twstalker: HTTP Error 403: Forbidden）"], "summary": "**Codex 或迎用量重置**：Codex 负责人 Tibo（@thsottiaux）宣布未来 28 天每天要么发布一个对大多数 Codex/Work 用户有明显改进的功能，要么发一次「full reset」（疑似额度重置）——结合他随后强调「simplifications、more efficiency for more usage」以及「Surprising number of Pro 500 users」，这次表态被社区解读为对用量/额度问题的正面回应，对 Codex 重度用户意味着配额压力可能缓解，值得持续盯。**OpenAI 新品「dot」曝光**：sama 称 dot 是他最喜欢的 OpenAI 产品，「每天都在变好」、能跨应用记上下文并协调 Codex 任务；官方账号也在密集预热同一产品，推测是个人 AI 助手类新品。**OpenAI 开发者侧更新**：Agents API 本周新增 computer use（一行 API 起浏览器+agent）、Bedrock 托管 Agents（除 AWS 外对齐 GPT‑6.1 Sol）与更大环境尺寸。**特朗普 Truth Social 刷屏 8 条**：最大外交动向是美伊伊斯兰堡谈判破裂后，CENTCOM 宣布自美东时间周一上午 10 点起封锁进出伊朗港口的海上交通；另宣布与科技巨头签署「超级智能白宫协议」、Bayer 22 亿美元俄亥俄制药园区等。**中国 AI 组活跃**：腾讯发布 ExplorationBench（测 AI 探索能力的新 benchmark）、DeepSeek 发布桌面端打包版 harness 并规划 2000 台规模的 V4.1-Flash 推理部署、Kimi K3 登陆 Amazon Bedrock、Qwen3.8-27B 通过 Nebius 上线。**谷歌组**：皮查伊宣布 SynthID Bio（AI 设计蛋白质的水印技术，是科研诚信与生物安全的大动作）与太空算力卫星原型发射成功。", "groups": [{"key": "openai", "label": "🤖 OpenAI"}, {"key": "claude", "label": "🟠 Claude"}, {"key": "google", "label": "🔵 Google"}, {"key": "china_ai", "label": "🇨🇳 中国 AI"}, {"key": "other", "label": "🌐 其他"}], "group_summaries": {"openai": "OpenAI 组是今日最热闹的一组。**Tibo 预告 Codex 28 天连续更新或「full reset」**，并明确当前工作优先级是简化、提升用量效率、突破性功能或新模型——对被额度困扰的用户是利好信号。**「dot」成为新的关键词**：sama 亲口称其为最喜欢的 OpenAI 产品，能学用户工作流、跨应用保持上下文、协调 Codex 任务并实现 inbox zero；@OpenAI 和 @OpenAIDevs 同步预热，发布在即。开发者侧：Agents API 新增 computer use（一行 API 拉起浏览器+agent）、Bedrock 托管 Agents（除 AWS 外可用 GPT‑6.1 Sol）。sama 还回应了与 Cerebras 合作的传闻，称双方在速度前沿有深度合作。", "claude": "@AnthropicAI 只有 2 条，偏品牌/研究向：Science Blog 刊登哈佛物理学家 Matthew Schwartz 的客座文章，用「阻抗失配」比喻 AI agent 与人类系统的配合问题；另发起一项新的用户研究（Anthropic Interviewer），想了解用户希望 AI 在生活中扮演什么角色。无产品发布，无用量相关消息。", "google": "谷歌组 2 条账号各有亮点。**皮查伊宣布 SynthID Bio**：给 AI 设计的蛋白质加不可见水印的技术，被他称为「科研诚信与生物安全的重大进展」——这是水印技术从媒体内容走向生命科学的关键一步。另透露与 Planet 合作的太空算力原型卫星发射成功，「把算力放上太空」的想法从会议走向现实。@GoogleDeepMind 则在播客里继续讲 provenance 与水印在鉴别 AI 生成内容中的作用。", "other": "other 组今日几乎是特朗普 Truth Social 的专场（8 条）。**最大的一条是外交/地缘**：美伊伊斯兰堡谈判（10 月 3–4 日，21 小时）破裂后，特朗普宣布美军将拦截向伊朗缴纳过航费的船只，CENTCOM 随即宣布自美东周一上午 10 点起封锁进出伊朗港口的海上交通——霍尔木兹海峡局势骤然升级。**AI 政策**：宣布与全球重要科技公司签署「历史性白宫超级智能协议」，并继续推动把 AI 改名为「super intelligence」。**产业**：Bayer 宣布在俄亥俄州哥伦布附近建 22 亿美元制药园区。其余为集会、meme 与人事任命（John Coale 出任人质事务特使）。马斯克账号今日无更新。", "china_ai": "中国 AI 组今日 7 账号全部有更新，信息量大。**腾讯混元发布 ExplorationBench**：一个测 AI 系统「探索能力」的新 benchmark（提假设、设计实验、从失败中学习），科学发现导向。**DeepSeek 两条实锤**：发布 macOS/Windows 桌面打包版 harness（Linux 走 npm），并宣布与开源社区合作做 V4.1-Flash 推理支持、规划 2000 台规模的大规模部署。**Kimi**：浏览器扩展（原 WebBridge）上线侧边栏，可导航网站、填表单、录制重复任务；**Kimi K3 登陆 Amazon Bedrock**，支持显式 prompt caching。**Qwen**：Qwen3.8-27B 通过 Nebius 上线，主打 agent 与深度研究场景。智谱一条为推广性质（$ZHIPU 代币宣传），已按推广处理。"}};
+const AP = {"date": "2026-10-05", "updated": "2026-10-04T22:51+00:00", "official": [{"title": "Final Cut Camera now supports variable aperture on iPhone 18 Pro", "url": "https://www.apple.com/newsroom/2026/09/final-cut-camera-now-supports-variable-aperture-on-iphone-18-pro/", "published": "2026-09-29", "source": "Apple Newsroom", "desc": ""}, {"title": "New updates coming to Apple Creator Studio", "url": "https://www.apple.com/newsroom/2026/09/new-updates-coming-to-apple-creator-studio/", "published": "2026-09-29", "source": "Apple Newsroom", "desc": ""}, {"title": "Apple releases new guide to help families build healthy digital habits", "url": "https://www.apple.com/newsroom/2026/09/apple-releases-new-guide-to-help-families-build-healthy-digital-habits/", "published": "2026-09-29", "source": "Apple Newsroom", "desc": ""}, {"title": "The new Mac mini and Mac Studio are available today", "url": "https://www.apple.com/newsroom/2026/09/the-new-mac-mini-and-mac-studio-are-available-today/", "published": "2026-09-22", "source": "Apple Newsroom", "desc": ""}, {"title": "Apple opens Apple Music Hall, a state-of-the-art live music venue in London", "url": "https://www.apple.com/newsroom/2026/09/apple-opens-apple-music-hall-a-state-of-the-art-live-music-venue-in-london/", "published": "2026-09-22", "source": "Apple Newsroom", "desc": ""}, {"title": "The latest iPhone, Apple Watch, and AirPods lineups arrive in stores worldwide", "url": "https://www.apple.com/newsroom/2026/09/the-latest-iphone-apple-watch-and-airpods-lineups-arrive-in-stores-worldwide/", "published": "2026-09-18", "source": "Apple Newsroom", "desc": ""}, {"title": "Celebrating “What Holds Us” on iPhone 18 Pro", "url": "https://www.apple.com/newsroom/2026/09/celebrating-what-holds-us-on-iphone-18-pro/", "published": "2026-09-16", "source": "Apple Newsroom", "desc": ""}, {"title": "Widow’s Bay triumphs as most decorated freshman comedy in Emmy history", "url": "https://www.apple.com/newsroom/2026/09/widows-bay-triumphs-as-most-decorated-freshman-comedy-in-emmy-history/", "published": "2026-09-15", "source": "Apple Newsroom", "desc": ""}, {"title": "Major updates for Apple’s software platforms are now available", "url": "https://www.apple.com/newsroom/2026/09/major-updates-for-apples-software-platforms-are-now-available/", "published": "2026-09-14", "source": "Apple Newsroom", "desc": ""}, {"title": "Siri AI, a profoundly more capable and personal assistant, is here", "url": "https://www.apple.com/newsroom/2026/09/siri-ai-a-profoundly-more-capable-and-personal-assistant-is-here/", "published": "2026-09-14", "source": "Apple Newsroom", "desc": ""}, {"title": "Apple’s new child safety features now available", "url": "https://www.apple.com/newsroom/2026/09/apples-new-child-safety-features-now-available/", "published": "2026-09-14", "source": "Apple Newsroom", "desc": ""}, {"title": "Get ready to experience iPhone 18 Pro, the new Apple Watch lineup, and AirPods 5", "url": "https://www.apple.com/newsroom/2026/09/get-ready-to-experience-iphone-18-pro-the-new-apple-watch-lineup-and-airpods-5/", "published": "2026-09-11", "source": "Apple Newsroom", "desc": ""}, {"title": "Apple unveils iPhone Duo", "url": "https://www.apple.com/newsroom/2026/09/apple-unveils-iphone-duo/", "published": "2026-09-09", "source": "Apple Newsroom", "desc": ""}, {"title": "Apple advances health and fitness capabilities using Apple Intelligence", "url": "https://www.apple.com/newsroom/2026/09/apple-advances-health-and-fitness-capabilities-using-apple-intelligence/", "published": "2026-09-09", "source": "Apple Newsroom", "desc": ""}, {"title": "Apple unveils Apple Watch Ultra 4", "url": "https://www.apple.com/newsroom/2026/09/apple-unveils-apple-watch-ultra-4/", "published": "2026-09-09", "source": "Apple Newsroom", "desc": ""}, {"title": "Introducing Apple Watch Series 12, with the all-new Health Sensing System", "url": "https://www.apple.com/newsroom/2026/09/introducing-apple-watch-series-12-with-the-all-new-health-sensing-system/", "published": "2026-09-09", "source": "Apple Newsroom", "desc": ""}, {"title": "Apple introduces AirPods 5 with best-in-class open-ear Active Noise Cancellation", "url": "https://www.apple.com/newsroom/2026/09/apple-introduces-airpods-5-with-best-in-class-open-ear-active-noise-cancellation/", "published": "2026-09-09", "source": "Apple Newsroom", "desc": ""}, {"title": "Apple debuts iPhone 18 Pro and iPhone 18 Pro Max", "url": "https://www.apple.com/newsroom/2026/09/apple-debuts-iphone-18-pro-and-iphone-18-pro-max/", "published": "2026-09-09", "source": "Apple Newsroom", "desc": ""}, {"title": "The internet’s favorite cat comes to Apple Arcade with Pusheen’s Place", "url": "https://www.apple.com/newsroom/2026/09/the-internets-favorite-cat-comes-to-apple-arcade-with-pusheens-place/", "published": "2026-09-08", "source": "Apple Newsroom", "desc": ""}, {"title": "Exciting updates for Sneaky Sasquatch come to Apple Arcade", "url": "https://www.apple.com/newsroom/2026/08/exciting-updates-for-sneaky-sasquatch-come-to-apple-arcade/", "published": "2026-08-27", "source": "Apple Newsroom", "desc": ""}], "media": [{"title": "Amazon Launches Early Prime Day Discounts on AirPods, iPad, MacBook Air, and More", "url": "https://www.macrumors.com/2026/10/04/amazon-early-prime-day-apple/", "published": "2026-10-04", "source": "MacRumors", "desc": "Earlier this week, we began tracking early Prime Day deals on Apple-related accessories , and today Amazon has introduced major early deals on Apple products as well. This includes AirPods, iPads, MacBooks, and more, all"}, {"title": "AirPods Pro 3 Hit Record Low $179 Price During Early Prime Day Sale", "url": "https://www.macrumors.com/2026/10/04/airpods-pro-3-179-prime-day/", "published": "2026-10-04", "source": "MacRumors", "desc": "Amazon has the AirPods Pro 3 available for $179.00 this week, down from $249.00. This is a match of the all-time low price on the AirPods Pro 3, which we haven't tracked since around June. Note: MacRumors is an affiliate"}, {"title": "This is my biggest AirPods complaint, and it’s not necessarily about the hardware", "url": "https://9to5mac.com/2026/10/04/this-is-my-biggest-airpods-complaint/", "published": "2026-10-04", "source": "9to5Mac", "desc": "AirPods are one of Apple’s most interesting products. The demand for them was largely invented by the fact that the company removed the headphone jack 10 years ago, and now most of us carry this almost magical pair of ea"}, {"title": "Apple weekend deals: AirPods Pro 3 $179, MacBook Air $200 off, AirTag 2, Prime Day HomeKit discounts, more", "url": "https://9to5mac.com/2026/10/04/apple-weekend-deals-macbook-discounts/", "published": "2026-10-04", "source": "9to5Mac", "desc": "Update 10/4: Amazon just dropped AirPods Pro 3 down to $179, delivering one of the lowest prices ever. Amazon is also now delivering almost all M5 MacBook Air models at $200 off the list price. You’ll find the very first"}, {"title": "John Ternus is taking a more ‘hands-on’ role in Apple’s design teams as CEO: report", "url": "https://9to5mac.com/2026/10/04/john-ternus-is-taking-a-more-hands-on-role-in-apples-design-teams-as-ceo-report/", "published": "2026-10-04", "source": "9to5Mac", "desc": "Since Jony Ive’s departure from Apple in 2019, the company hasn’t had much of a true design lead. For a while, former COO Jeff Williams was in charge of design , until his departure last year. Since then, CEO John Ternus"}, {"title": "Redesigned MacBook Pro with OLED to feature ‘significantly lighter’ design: report", "url": "https://9to5mac.com/2026/10/04/apple-macbook-pro-redesign-to-be-much-lighter-report/", "published": "2026-10-04", "source": "9to5Mac", "desc": "Apple’s major MacBook Pro overhaul is just around the corner, and should debut within a month or so. It’ll be the first touchscreen MacBook, as well as the first with Tandem OLED. Beyond that, though, the new MacBooks sh"}, {"title": "AirPods Pro 3 hit low $179 price just weeks after adding new features", "url": "https://9to5mac.com/2026/10/04/airpods-pro-3-prime-day-deal/", "published": "2026-10-04", "source": "9to5Mac", "desc": "We are touching down to let folks know the Amazon fall Prime Day sale is getting a head start today – AirPods Pro 3 have now dropped down to one of the lowest prices to date at $179 shipped. more…"}, {"title": "Top Stories: Apple Smart Home Launch on October 13, iPhone Duo Production Issues, and More", "url": "https://www.macrumors.com/2026/10/03/top-stories-apple-smart-home-launch-october-13/", "published": "2026-10-03", "source": "MacRumors", "desc": "Things are getting crazy in the Apple rumor world, as even though the iPhone 18 Pro and several other products have only just launched and the iPhone Duo is right around the corner, there's even more to come imminently. "}, {"title": "Apple Says iPhone 18 Pro Max Users With AT&T Cellular Issue Need to Have Device Replaced", "url": "https://www.macrumors.com/2026/10/02/apple-statement-on-iphone-18-pro-max-att-issue/", "published": "2026-10-03", "source": "MacRumors", "desc": "Apple today confirmed that a \"small number\" of iPhone 18 Pro Max users on the AT&T network have experienced an issue that causes the device to lose cellular service, thereby preventing phone calls, text messages, and dat"}, {"title": "Gemini app limiting what models free & AI Plus users can access, AI Pro adding Deep Think", "url": "https://9to5google.com/2026/10/03/gemini-model-limits-oct-26/", "published": "2026-10-03", "source": "9to5Mac", "desc": "Following the compute-based usage change in May, Google will soon introduce limits on which Gemini models free users and AI Plus subscribers can access. more…"}, {"title": "Watch F1 on Apple TV tonight, free for everyone in the US", "url": "https://9to5mac.com/2026/10/03/watch-f1-on-apple-tv-tonight-free-bahrain-gp/", "published": "2026-10-03", "source": "9to5Mac", "desc": "The Bahrain Grand Prix is streaming for free on Apple TV this weekend, subscription not required. Rather amusingly, the location of the Bahrain Grand Prix is actually in Sepang, Malaysia. Usually, F1 on Apple TV requires"}, {"title": "Indie App Spotlight: ‘HEVCut’ helps you trim your photo library without deleting anything", "url": "https://9to5mac.com/2026/10/03/indie-app-spotlight-hevcut-iphone-photo-storage/", "published": "2026-10-03", "source": "9to5Mac", "desc": "Welcome to Indie App Spotlight . This is a weekly 9to5Mac series where we showcase the latest apps in the indie app world. If you’re a developer and would like your app featured, get in contact . Everyone has issues with"}, {"title": "Here’s why I upgraded from the Apple Watch Series 10 to Series 12", "url": "https://9to5mac.com/2026/10/03/heres-why-i-upgraded-from-the-apple-watch-series-10-to-series-12/", "published": "2026-10-03", "source": "9to5Mac", "desc": "I’m someone who doesn’t often upgrade my Apple Watch right when a new one comes out. The Apple Watch Series 10 I owned prior was only purchased this January, despite initially coming out in September 2024. That said, App"}, {"title": "Here’s everything we know so far about Apple’s next entry-level iPad: A19 chip, more", "url": "https://9to5mac.com/2026/10/03/apples-next-ipad-a19-details-release-date/", "published": "2026-10-03", "source": "9to5Mac", "desc": "Apple’s current iPad, the A16 model, has gone untouched for well over a year. It remains the only device in Apple’s core product lineup without support for Apple Intelligence. Rumors had swirled for quite some time about"}, {"title": "Apple @ Work: The numbers on AI trust for IT are not great, and one company is trying to fix it", "url": "https://9to5mac.com/2026/10/03/macpaw-leebry/", "published": "2026-10-03", "source": "9to5Mac", "desc": "Apple @ Work is exclusively brought to you by Mosyle , the only Apple Unified Platform. Mosyle is the only solution that integrates in a single professional grade platform all the solutions necessary to seamlessly and au"}, {"title": "Apple Announces 'Full Disk Access' Changes on macOS Due to AI Agents", "url": "https://www.macrumors.com/2026/10/02/apple-announces-macos-full-disk-access-changes/", "published": "2026-10-02", "source": "MacRumors", "desc": "In a post on its developer news website today, Apple announced that it will be introducing \"additional controls\" for the \"Full Disk Access\" setting on macOS due to new risks posed by AI agents. This announcement comes am"}, {"title": "AT&T and Apple Just Took Steps Toward Fixing iPhone 18 Pro Max Issue", "url": "https://www.macrumors.com/2026/10/02/att-and-apple-move-to-fix-iphone-18-pro-max-issues/", "published": "2026-10-02", "source": "MacRumors", "desc": "AT&T and Apple are taking action today as they try to resolve iPhone 18 Pro Max cellular issues, according to MacRumors contributor Aaron Perris. Thousands of iPhone 18 Pro Max users have been unable to connect to the AT"}, {"title": "AT&T on iPhone 18 Pro Max Issues: 'We Are Working With Apple'", "url": "https://www.macrumors.com/2026/10/02/att-statement-on-iphone-18-pro-max-issues/", "published": "2026-10-02", "source": "MacRumors", "desc": "In a statement shared with MacRumors today, AT&T said it is \"working with Apple\" to resolve iPhone 18 Pro Max cellular issues. \"Apple has released a software update to address an issue that may affect calls, data, texts,"}, {"title": "Upgrading From an Older Apple Watch? Here's How the New Features Stack Up", "url": "https://www.macrumors.com/guide/upgrading-from-older-apple-watch/", "published": "2026-10-02", "source": "MacRumors", "desc": "The Apple Watch has received some incremental updates in recent years, with significant upgrades becoming fewer and farther between as the device has progressed. Since the Apple Watch's generation-over-generation enhance"}, {"title": "Beats 360 Cushion Kits and Apple Accessories See Early Prime Day Price Drops", "url": "https://www.macrumors.com/2026/10/02/best-apple-deals-of-the-week-10-2-26/", "published": "2026-10-02", "source": "MacRumors", "desc": "We're just a few days out from Prime Big Deal Days on October 6, and Amazon is already offering some savings on accessories including Anker chargers, Samsung monitors, and 4K TVs. We're also tracking deals on the new Mac"}, {"title": "Apple Store in UK Reopening on iPhone Duo Launch Day", "url": "https://www.macrumors.com/2026/10/02/apple-store-in-uk-reopens-on-iphone-duo-launch-day/", "published": "2026-10-02", "source": "MacRumors", "desc": "Following more than three months of renovations, the Apple SouthGate store in Bath, England will be reopening on Friday, October 23, just in time for iPhone Duo launch day . Last year, Apple permanently closed its store "}, {"title": "AT&T Acknowledges iPhone 18 Pro Max Issues: Update 'Immediately'", "url": "https://www.macrumors.com/2026/10/01/att-acknowledges-iphone-18-pro-max-issues/", "published": "2026-10-02", "source": "MacRumors", "desc": "In a text message sent to customers today, AT&T acknowledged that some iPhone 18 Pro Max devices on its network are experiencing cellular issues . AT&T said that customers should immediately update to iOS 27.0.1 , despit"}, {"title": "Apple TV releases ‘The Sisters Grimm’ season 2 in full", "url": "https://9to5mac.com/2026/10/02/apple-tv-releases-the-sisters-grimm-season-2-in-full/", "published": "2026-10-02", "source": "9to5Mac", "desc": "Apple TV today released the second season of its animated fantasy adventure series “ The Sisters Grimm ,” with all six new episodes now available to stream. Here are the details. more…"}, {"title": "Apple confirms iPhone 18 Pro Max AT&T cellular issues, affected devices require hardware replacement", "url": "https://9to5mac.com/2026/10/02/apple-confirms-iphone-18-pro-max-att-cellular-issues-affected-devices-require-hardware-replacement/", "published": "2026-10-02", "source": "9to5Mac", "desc": "Apple has confirmed an issue causing a “small number” of iPhone 18 Pro Max devices on AT&T to lose cellular service. Apple released software and carrier updates to prevent the issue from affecting additional users, but t"}, {"title": "‘HomePad’ coming: Will Apple hold an October special event?", "url": "https://9to5mac.com/2026/10/02/homepad-coming-will-apple-hold-an-october-special-event/", "published": "2026-10-02", "source": "9to5Mac", "desc": "With Apple reportedly planning to unveil new products on October 13, here’s when the company could announce an event, based on the timing of its previous October announcements. more…"}, {"title": "9to5Mac Overtime 084: iPhone 18 Pro – a fantastic pro camera experience", "url": "https://9to5mac.com/2026/10/02/9to5mac-overtime-084-iphone-18-pro-a-fantastic-pro-camera-experience/", "published": "2026-10-02", "source": "9to5Mac", "desc": "Jeff and Fernando share their excitement about the iPhone 18 Pro’s camera capabilities and explore whether it could truly replace a mirrorless camera for both photography and videography. Plus, they weigh in on whether y"}, {"title": "iOS 27’s Siri gets one thing very right that other AI assistants get wrong", "url": "https://9to5mac.com/2026/10/02/ios-27s-siri-gets-one-thing-very-right-that-other-ai-assistants-get-wrong/", "published": "2026-10-02", "source": "9to5Mac", "desc": "Siri AI is a major upgrade to Apple’s assistant that’s now available in iOS 27. And there’s one standout area I’ve noticed where it differs greatly from other AI assistants—for the better. more…"}, {"title": "iPhone Duo video reveals size compared to iPhone 18 Pro Max", "url": "https://9to5mac.com/2026/10/02/iphone-duo-video-reveals-size-compared-to-iphone-18-pro-max/", "published": "2026-10-02", "source": "9to5Mac", "desc": "iPhone Duo has the largest display ever in an iPhone, bigger even than iPhone 18 Pro Max. But how do the two models truly compare in size? A side-by-side video offers a great look. more…"}, {"title": "Apple says it’s tightening macOS privacy controls amid the rise of AI agents", "url": "https://9to5mac.com/2026/10/02/apple-says-its-tightening-macos-privacy-controls-amid-the-rise-of-ai-agents/", "published": "2026-10-02", "source": "9to5Mac", "desc": "Amid the rapid rise in AI agents requesting “Full Disk Access” to your Mac, Apple says it is making changes to macOS to protect user privacy. While the company hasn’t shared specifics, Apple says users should understand "}, {"title": "HomeKit Weekly: Home Widget 1.10 is the fastest way to check every HomeKit camera at once", "url": "https://9to5mac.com/2026/10/02/home-widget-1-10-is-the-fastest-way-to-check-every-homekit-camera-at-once/", "published": "2026-10-02", "source": "9to5Mac", "desc": "The Home app is a great place to configure your smart home, but it can be slow to control. The tab structure and room hierarchy make sense when you’re setting things up, but they add steps to everything you want to do fi"}], "summary": "【官方发布】Apple Newsroom 近一周无 10 月新稿，最新仍是 9 月 29 日的三条：**Final Cut Camera 支持 iPhone 18 Pro 可变光圈**、Apple Creator Studio 新更新、帮家庭建立健康数字习惯的新指南。再往前是 9 月 22 日 Mac mini/Mac Studio 开售与伦敦 Apple Music Hall 开业。整体看官方侧处于 iPhone 18 发售后的平静期。\n【媒体热议】10 月 3–4 日的媒体焦点有三：一是**提前到来的 Prime Day 折扣**：AirPods Pro 3 降到 **179 美元历史最低**（MacRumors/9to5Mac 同日报），MacBook Air 减 200 美元，想买可蹲；二是**人事与产品传闻**：据 9to5Mac 报道，**John Ternus 开始更深度介入苹果设计团队**（CEO 交接背景下的信号）；另据 MacRumors 报道，**苹果智能家居新品定于 10 月 13 日发布**，OLED 版 MacBook Pro 传闻「显著更轻」——以上均为传闻，以官方为准；三是**品控问题**：MacRumors 报道 **iPhone 18 Pro Max 在 AT&T 网络下出现蜂窝故障**需送修、iPhone Duo 有生产问题。另有一条跨界消息：9to5Mac 称 **Gemini App 开始限制免费/AI Plus 用户可用模型**（谷歌侧的收缩，果粉用 Gemini 的注意）。"};
+const DEALS = {"date": "2026-10-05", "updated": "2026-10-04T22:52+00:00", "ai": [{"title": "🔴 掘金 × 火山引擎 AI 用量周榜冲刺赛（第二期）", "url": "https://github.com/lavie-purple/ai-free-content-digest/blob/HEAD/AI%E5%85%8D%E8%B4%B9%E5%86%85%E5%AE%B9%E4%B8%8E%E6%9D%83%E7%9B%8A%E9%80%9F%E9%80%92-%E7%AC%AC023%E6%9C%9F-2026-10-04.md#deal-1", "published": "2026-10-04", "source": "AI免费权益速递", "desc": "截止 10/4 24:00 · 🔴 今天截止（本期最紧急的动作）。200 元火山代金券 + Agent Plan Medium 月卡免费一个月；需装「AI用量」客户端关联账号"}, {"title": "🟠 Google Gemini 免费档收缩（免费档仅剩 Flash-Lite）", "url": "https://github.com/lavie-purple/ai-free-content-digest/blob/HEAD/AI%E5%85%8D%E8%B4%B9%E5%86%85%E5%AE%B9%E4%B8%8E%E6%9D%83%E7%9B%8A%E9%80%9F%E9%80%92-%E7%AC%AC023%E6%9C%9F-2026-10-04.md#deal-3", "published": "2026-10-04", "source": "AI免费权益速递", "desc": "截止 10/9 · 🟠 本期新增。未订阅用户只能访问 Flash-Lite（Flash 与 Pro 收回）；AI Plus 档失去 Pro（只剩 Flash-Lite + Flash），Pro 下移到 AI Pro / AI Ultra；Deep Think 首次下放 AI Pro。⚠️ 只有帮助中心文档更新，免费用户无任何公告；Plus 用户按邮件通知分批生效"}, {"title": "🟢 Qoder Qwen3.8-Flash 计费系数 0.0×（已延期）", "url": "https://github.com/lavie-purple/ai-free-content-digest/blob/HEAD/AI%E5%85%8D%E8%B4%B9%E5%86%85%E5%AE%B9%E4%B8%8E%E6%9D%83%E7%9B%8A%E9%80%9F%E9%80%92-%E7%AC%AC023%E6%9C%9F-2026-10-04.md#deal-11", "published": "2026-10-04", "source": "AI免费权益速递", "desc": "截止 未公布（结束时间未定） · 🟢 生效中（自 10/1 起继续免费；022 期纠错落地，本期维持）。全系个人产品自动生效、无需领取、余额为 0 也能用；企业订阅不适用"}, {"title": "🟢 阿里云百炼 TokenPlan 个人版 Harness 权益（12 类）", "url": "https://github.com/lavie-purple/ai-free-content-digest/blob/HEAD/AI%E5%85%8D%E8%B4%B9%E5%86%85%E5%AE%B9%E4%B8%8E%E6%9D%83%E7%9B%8A%E9%80%9F%E9%80%92-%E7%AC%AC023%E6%9C%9F-2026-10-04.md#deal-16", "published": "2026-10-04", "source": "AI免费权益速递", "desc": "截止 未公布（随套餐） · 🟢 生效中（本期登记）。Standard / Pro 两档每月免费额度 + 超量 88 折，独立计量不占 Credits；⚠️ 5 类无每月免费额度"}, {"title": "🟢 上海青浦算力券补贴", "url": "https://github.com/lavie-purple/ai-free-content-digest/blob/HEAD/AI%E5%85%8D%E8%B4%B9%E5%86%85%E5%AE%B9%E4%B8%8E%E6%9D%83%E7%9B%8A%E9%80%9F%E9%80%92-%E7%AC%AC023%E6%9C%9F-2026-10-04.md#deal-21", "published": "2026-10-04", "source": "AI免费权益速递", "desc": "截止 申报至 10/23 · 🟢 生效中（距今 19 天，本期登记）。⚠️ 企业向；来源为青浦区官方发布"}, {"title": "🟢 富国基金（同花顺）× 智谱清言 VIP 月卡 + 积分", "url": "https://github.com/lavie-purple/ai-free-content-digest/blob/HEAD/AI%E5%85%8D%E8%B4%B9%E5%86%85%E5%AE%B9%E4%B8%8E%E6%9D%83%E7%9B%8A%E9%80%9F%E9%80%92-%E7%AC%AC023%E6%9C%9F-2026-10-04.md#deal-28", "published": "2026-10-04", "source": "AI免费权益速递", "desc": "截止 名额有限、抢完即止 · 🟢 生效中（本期登记）。⚠️ 券商渠道发放，非智谱官方活动页"}, {"title": "🟢 湖北算力券年度申领", "url": "https://github.com/lavie-purple/ai-free-content-digest/blob/HEAD/AI%E5%85%8D%E8%B4%B9%E5%86%85%E5%AE%B9%E4%B8%8E%E6%9D%83%E7%9B%8A%E9%80%9F%E9%80%92-%E7%AC%AC023%E6%9C%9F-2026-10-04.md#deal-29", "published": "2026-10-04", "source": "AI免费权益速递", "desc": "截止 10/31 · 🟢 生效中（距今 27 天，本期登记）。⚠️ 企业向"}, {"title": "Cloudflare Clef / Clef-flash 免费权重（Workers AI）", "url": "https://github.com/lavie-purple/ai-free-content-digest/blob/HEAD/AI%E5%85%8D%E8%B4%B9%E5%86%85%E5%AE%B9%E4%B8%8E%E6%9D%83%E7%9B%8A%E9%80%9F%E9%80%92-%E7%AC%AC023%E6%9C%9F-2026-10-04.md#deal-40", "published": "2026-10-04", "source": "AI免费权益速递", "desc": "截止 未公布（权重永久；Workers AI 按量） · 🟢 生效中（本期登记）。Apache 2.0 权重可自托管；Workers AI 侧 输出不计费（只返回数字）"}, {"title": "ChatGPT Plus学生优惠：免费4个月（至10月31日）", "url": "https://www.youtube.com/watch?v=zvEEGYwojWg", "published": "2026-09-20", "source": "YouTube@Flybird小郑（教程，非官方渠道）", "desc": "通过学生认证免费得4个月ChatGPT Plus（价值约80美元），官方活动截止10月31日；需学生认证+可用订阅银行卡"}, {"title": "ChatPlayground AI 终身订阅最高 93% off", "url": "https://www.newcoupons.info/chatplayground-ai-coupon-code/", "published": "2026-10-03", "source": "newcoupons.info（推广）", "desc": "最高93% off：Unlimited终身$41.23（原价$619，每月无限消息）、Pro终身$35.98、Basic终身$22.38；另有免费试用（每月8问）"}, {"title": "VoiceType AI 语音转文字终身版最高 91% off", "url": "https://winningpc.com/voicetype-ai-lifetime-deal-coupon-codes/", "published": "2026-10-01", "source": "winningpc.com（推广）", "desc": "AI 语音转文字桌面应用，终身版 $24（2万词/月）/ $40（无限词/月），最高 91% off，30 天退款保证"}, {"title": "珠海市算力券企业兑现入口（至10-14）", "url": "https://post.smzdm.com/p/ak8krzve/", "published": "2026-09-26", "source": "什么值得买", "desc": "珠海市算力券首个兑现入口（企业向），到 10 月 14 日"}], "ios": [{"title": "每日簽到見證戒煙成果 原價 US $0.99《Smoke-Free Log》限時免費", "url": "https://www.newmobilelife.com/2026/10/05/smoke-free-log-quit-check-in-%e9%99%90%e6%99%82%e5%85%8d%e8%b2%bb/", "published": "2026-10-04", "source": "流動日報", "desc": "原价 US $0.99，现限时免费；戒煙從來不是一蹴而就的事，Smoke-Free Log - Quit Check-in 以每日簽到的方式，陪你一天一天累積無煙日子。它適合正準備戒煙，或已經戒煙而希望掌握進度的人，能記錄已節省金額、避免吸食的香煙數量與健康里程碑，全程無需註冊帳戶。應用原價 US $0.99，現正 限時免費 。 戒煙追蹤與抗癮工具 Smoke-Free Log 主打每日簽到戒煙記錄，系統會統計累積天數、已節省金額與"}, {"title": "三下快速記錄寶寶作息 原價 US $0.99《Baby Journal》限時免費", "url": "https://www.newmobilelife.com/2026/10/05/baby-journal-activity-tracker-%e9%99%90%e6%99%82%e5%85%8d%e8%b2%bb/", "published": "2026-10-04", "source": "流動日報", "desc": "原价 US $0.99，现限时免费；Baby Journal 是一款為新手父母而設的育兒記錄應用，主打極速輸入，三下即可完成餵奶、換尿片、睡眠與成長里程碑等重要記錄，並在一天之中隨時翻查歷史。內建深色模式方便夜間記錄，支援 16 種語言，無需帳戶、不經雲端，所有資料只存放於裝置之上，亦可自行匯出備份。原價 US $0.99，現正 限時免費 。 三下完成寶寶日常記錄 記錄流程以速度為先，每次新增最多隻需三下點擊，換尿片、餵奶、睡眠、筆"}, {"title": "隨手拍出 Y2K 復古質感 原價 US $0.99《Cambler》限時免費", "url": "https://www.newmobilelife.com/2026/10/05/cambler-%e9%99%90%e6%99%82%e5%85%8d%e8%b2%bb/", "published": "2026-10-04", "source": "流動日報", "desc": "原价 US $0.99，现限时免费；Cambler 是一款每日隨身相機應用，內建 SHOOT 與 PRO 兩種模式，讓你先捕捉當下、再決定風格。SHOOT 保持安靜簡潔，選好鏡頭、取景構圖，即可拍出已套用色調的相片或短片；開啟 Y2K 模式後，畫面呈現舊式攝錄機或輕便數碼相機的質感，檔案仍維持現代 4K 規格，並可加入日期時間戳、Cambler 標記或即影即有邊框。此應用原價 US $0.99，現正 限時免費 ，適合喜歡復古影像質感"}, {"title": "倒數與累計天數一眼看清 原價 US $0.99《Cairn》限時免費", "url": "https://www.newmobilelife.com/2026/10/05/cairn-countdown-days-since-%e9%99%90%e6%99%82%e5%85%8d%e8%b2%bb/", "published": "2026-10-04", "source": "流動日報", "desc": "原价 US $0.99，现限时免费；Cairn 是一款專注於日子計算的工具，向前倒數你正在等待的日子，向後累計你不願忘記的日子。輸入一個日期，它只回答天數，其餘一切讓路。無論是期待已久的旅程、考試、紀念日，還是戒除習慣的起點，都能一眼看清。原價 US $0.99，現於 App Store 限時免費 。 倒數與累計一套模式 Cairn 以同一套模式同時處理倒數與累計：向前倒數假期、考試或截止日，向後累計紀念日或戒除習慣的起點。開啟分鐘"}], "mac": [], "summary": "今日羊毛分三类。**AI 薅羊毛**：最值得盯的是 **ChatGPT Plus 学生优惠——认证后免费 4 个月（价值约 80 美元），官方活动 10 月 31 日截止**，有学生身份的别错过；**掘金 × 火山引擎 AI 用量周榜冲刺赛（第二期）**已标红（临近收口）；**珠海市算力券企业兑现入口 10 月 14 日截止**；**Qoder 的 Qwen3.8-Flash 0.0× 计费已延期**，继续白嫖。⚠️**收口提醒**：**Google Gemini 免费档收缩，仅剩 Flash-Lite**——之前蹭 Gemini 免费档的用户注意迁移。另外 ChatPlayground（93% off 终身）与 VoiceType AI（91% off）两条来自 newcoupons.info / winningpc.com，**属推广内容**，按需自取。**iOS 限免**今日 4 款全是实用工具无游戏：**Smoke-Free Log**（戒烟签到）、**Baby Journal**（宝宝作息记录）、**Cambler**（Y2K 复古相机）、**Cairn**（倒数日），原价都是 $0.99，符合筛选品味。**Mac 限免**：今日 0 条。"};
+const FIN = {"date": "2026-10-05", "md": "# ☀️ 财经大事早报 2026-10-05（周一）\n\n## 📌今日大势\n\n**1. 中央财政首次给个人房贷贴息，刚需购房成本直降 1 个百分点。** 9 月 29 日财政部、央行、金融监管总局联合印发《关于实施居民购房贷款贴息政策的通知》，自 **10 月 1 日起**对符合条件的新发放首套商贷给予**年化 1%、最长 5 年**的财政贴息，单户本金上限 100 万元，实施期暂定 1 年。条件有三：新发放首套商贷（不含存量置换）、面积≤120㎡、总价≤150 万元。官方测算 **100 万元贷款最多省息近 5 万元**，相当于现行首套利率打了约 7 折；资金中央财政承担 90%、总规模不设上限、据实结算。这是继 9 月 28 日国常会\"研究稳定房地产市场政策\"后 24 小时内应声落地的增量政策，政策组合拳从供给侧（专项债收储）正式打到需求侧。后续盯：10 月中下旬 70 城房价与成交量是否出现\"银十\"脉冲，以及地方细则落地速度。（来源：新浪财经）[链接](https://finance.sina.cn/2026-09-29/detail-initpatt7606041.d.html)\n\n**2. 10 年期美债收益率冲上 5.34%，创 24 年新高，全球资产定价之锚剧烈摇晃。** 钜亨网报道，上周四 10 年期美债收益率升至 **5.34%**，为 2002 年以来最高；此前美联储 9 月**时隔 3 年首次升息**，本周还将公布 9 月会议纪要。利率高企的另一面是美股依然强势：标普 500 年内已涨近 13%，Q3 盈利预计增超 30%，英伟达盘中再创历史新高——但市场开始担心这轮涨幅过度依赖 AI 资本开支叙事。11 月 3 日美国中期选举也是变数。对中国的传导：美元指数跌至 101.67，**离岸人民币逼近 6.70**，人民币阶段性走强窗口打开。后续盯：本周 Fed 会议纪要的措辞（是否暗示继续加息）、美债收益率能否站稳 5.3% 上方。（来源：钜亨网、新浪财经）[链接](https://m.cnyes.com/news/id/6620631)\n\n**3. 石油\"战争\"开打：G7 宣布释放 1 亿桶储备，OPEC+ 宣布 11 月不增产。** G7 宣布通过 IEA 协调释放 **1 亿桶石油储备**（为期 4 个月、重点投放柴油），消息一出 WTI 盘中一度跌超 5% 至 88 美元；OPEC+ 主要成员国随即宣布 **11 月产量配额不作任何调整**（沙特维持 1047.8 万桶/日）。但别被单日波动迷惑：布伦特自 7 月已从 70 美元一路反弹至 **102 美元**上方，中东战事（美伊谈判破裂、霍尔木兹海峡封锁在即）才是定价主线。**11 月 29 日 OPEC+ 全体部长级会议**将决定明年政策，是下一个关键节点。（来源：新浪财经）[链接](https://finance.sina.cn/stock/jdts/2026-10-03/detail-initwzsp5050870.d.html)\n\n---\n\n## 💰宏观与政策\n\n- **央行 10 月 8 日开展 1.2 万亿元买断式逆回购，较到期量加量 2000 亿。** 9 月 30 日公告，10 月有 1 万亿到期，等于加量续作，意在支持政府债券发行、保持节后资金面充裕；分析认为降准可能因此延后。注意：A 股国庆休市至 10 月 7 日，**10 月 8 日开市**当天资金面值得看。（来源：搜索补漏）[链接](http://money.2500sz.com/doc/2026/10/04/1232070.shtml)\n- **PSL 利率降至 1.5%，再贷款加码 7000 亿。** 央行 9 月 29 日同步下调抵押补充贷款（PSL）利率 25bp 至 1.5%，科技创新和技术改造再贷款 +2000 亿、支农支小再贷款 +5000 亿，结构性工具继续发力。（来源：搜索补漏）[链接](https://news.creaders.net/china/2026/09/29/3052990.html)\n- **英国预算案承压。** FT 述评：英国预算需要在控制支出与提振增长之间走钢丝，财政整固的政治成本正在上升。（来源：FT）[链接](https://www.ft.com/content/dfa07e3f-5557-46ba-8128-72f43aa6558d?syn-25a6b1a6=1)\n\n## 📈市场与投资\n\n- **非农爆冷反而助涨美股，英伟达盘中新高。** 9 月非农就业数据爆冷压低了短端加息预期，美股续涨；但 10 年期美债收益率走出 V 形反弹至 5.30%，连续两日刷新 2002 年以来高位——股债同涨的背后是\"坏数据=加息暂停\"的交易逻辑，还能走多远要看本周纪要。（来源：新浪财经）[链接](https://finance.sina.cn/stock/jdts/2026-10-03/detail-initwzsp5050870.d.html)\n- **投资者开始躲避 AI 集中度风险。** FT 报道，面对英伟达等少数 AI 标的在指数中权重过高，机构投资者正寻找对冲 AI 集中风险的组合方案——这是\"AI 叙事\"从一致预期走向分歧的早期信号。（来源：FT）[链接](https://www.ft.com/content/3302fd5c-8b92-425b-9523-673b2565bb10?syn-25a6b1a6=1)\n- **日本股市牛市面临风险。** 日本最大商社掌门人警告，日股这轮牛市存在风险，估值与外部需求是主要隐忧。（来源：FT）[链接](https://www.ft.com/content/1fdb8380-2fac-474a-a184-616c0a29feb6?syn-25a6b1a6=1)\n- **IPO 市场冰火两重天。** FT 两篇报道对照看：上半年 IPO 数量井喷但质量参差（booming and busting），眼下华尔街的 IPO 热情已因需求疲软和估值担忧降温。（来源：FT）[链接](https://www.ft.com/content/8b7e2800-3e36-4d0c-9016-32deaae67b62)\n\n## 🏠房价洞察\n\n- **9 月百城房价：新房微涨、二手跌幅扩大。** 中指院数据：百城新建住宅均价 **17285 元/㎡**（环比 +0.17%、同比 +2.12%）；二手住宅均价 **12452 元/㎡**（环比 -0.6%、跌幅较 8 月扩大 0.15 个百分点，同比 -6.94%）；100 城中二手仅 **3 城**环比上涨、**97 城下跌**——二手市场的调整仍未见底。（来源：搜索补漏）[链接](https://news.creaders.net/china/2026/10/02/3053975.html)\n- **房贷贴息 10 月 1 日起实施（详见今日大势第 1 条）。** 政策精准卡位\"金九银十\"，新市民、青年人与城镇工薪刚需家庭是主要受益群。（来源：新浪财经）[链接](https://finance.sina.cn/2026-09-29/detail-initpatz2785626.d.html)\n- **西班牙爆发住房危机大抗议。** BBC 报道，数万人走上街头抗议住房危机，\"Anger in the streets\"——高房价/高租金已从经济问题演变为欧洲多国的政治火药桶，BBC 甚至在讨论是否会引发提前大选。（来源：BBC）[链接](https://www.bbc.co.uk/news/articles/cm2kej47095no?at_medium=RSS&at_campaign=rss)\n\n**🔍深度分析：中国房价处在\"政策底\"与\"市场底\"的赛跑中。** 数据呈现的分化很典型：**新房价格**在政策托底下一线城市基本稳住（百城 +0.17%），**二手房**却 97 城下跌、跌幅还在扩大——说明\"以价换量\"仍是二手市场的主旋律，价格发现机制还在工作。**政策意图**看得很清楚：150 万/120㎡/首套的三重门槛，把财政资金精确导向\"真实自住的刚需\"，不刺激投资投机；中央 90% 出资、不设总规模上限，表达的是\"需求侧工具箱正式打开\"的信号意义。**对购房者的实操含义**：① 符合条件的首套刚需，现在是历史上购房政策最宽松的窗口之一（降首付+低利率+财政贴息三叠加），月供压力实打实下降约 1 个百分点；② 但别把政策底当市场底——二手 97 城下跌意味着你买入的房子短期仍可能计价下跌，自住可入、投资慎入；③ 存量房贷不享受，别为了贴息置换，算不过账。**后续盯什么**：10 月\"银十\"成交量能否环比转正、70 城房价环比跌幅是否收窄、地方跟进细则（尤其是二线城市的执行口径）。\n\n## 🤖AI经济\n\n- **OpenAI 法律风险堆积。** FT 报道，OpenAI 自查发现数十起黑客攻击事件后，Altman 面临的法律风险正在累积——AI 公司的安全事件正从技术问题变成治理与诉讼问题。（来源：FT）[链接](https://www.ft.com/content/2c24ece3-ac99-43a8-b0e6-4a3867e37ebf?syn-25a6b1a6=1)\n- **Nvidia 8 亿美元押注 Reflection：西方 open-weight 的\"国家队\"来了。** Axios 爆料 Reflection 即将发布首个 open-weight 模型，Nvidia 注资 8 亿美元，SpaceX 每月 1.5 亿美元算力+ Nebius 超 10 亿美元算力协议打底。AI 基建的资本开支竞赛，正从\"买 GPU\"升级到\"养国家队\"。（来源：Axios 经 aistockwire 转述）[链接](https://aistockwire.com/blog/nvidia-nvda-backed-reflection-open-weight-ai-model-axios-october-2026)\n- **DeepSeek × 华为：去 CUDA 化的中国 AI 栈。** DeepSeek 宣布与华为合作建设针对昇腾芯片优化的开源基础设施——一旦跑通，中国大模型训练推理对 Nvidia 生态的依赖将实质性下降，地缘科技战的又一块拼图。（来源：LinkedIn AI News Brief）[链接](https://www.linkedin.com/pulse/ai-news-brief-friday-2-october-2026-ist-muralidhar-rao-fn5kc)\n\n## 🏢公司与产业\n\n- **施耐德电气接近以 200 亿美元收购工业软件集团 PTC。** 若落地，将是今年欧洲最大科技并购之一，工业软件+电气化的协同是核心逻辑。（来源：FT）[链接](https://www.ft.com/content/2084f349-0829-4130-a5e6-b98929a6e633?syn-25a6b1a6=1)\n- **并购热潮可能提前熄火。** FT 报道，交易撮合活动放缓正在威胁今年 M&A 繁荣的持续性，利率高企与估值分歧是主因。（来源：FT）[链接](https://www.ft.com/content/00fb4438-1f86-4bf2-a165-0c39f2fd506b?syn-25a6b1a6=1)\n- **美国将接收白俄罗斯钾肥船货，两国关系解冻。** FT 报道，在美白关系缓和背景下，美国将接收来自白俄罗斯的钾肥 shipment——化肥是大宗商品地缘政治里常被忽视的一环。（来源：FT）[链接](https://www.ft.com/content/9cbc0aea-259a-41eb-bbf4-ad8a674ca8b7?syn-25a6b1a6=1)\n\n## 🌍全球大事\n\n- **美伊谈判破裂，霍尔木兹海峡封锁一触即发。** 伊斯兰堡美伊谈判（10 月 3–4 日，21 小时）无果而终后，特朗普宣布美军将拦截向伊朗缴纳过航费的船只；CENTCOM 宣布**自美东时间周一上午 10 点起**封锁进出伊朗港口的海上交通。这是今日全球最大的地缘变量，直接挂钩油价。（来源：Truth Social 经大佬动态栏目转述）\n- **梅德韦杰夫警告\"全面太空战争\"。** 针对乌方要求美方封锁俄\"黎明\"低轨卫星系统，梅德韦杰夫 10 月 4 日警告此举将导致全面太空战争；泽连斯基此前接受 FT 采访称已多次要求特朗普制裁相关中俄卫星企业。太空正在成为俄乌冲突的新战线。（来源：新浪财经）[链接](https://finance.sina.cn/2026-10-04/detail-initzzvh0392246.d.html)\n- **俄警告外国公民远离基辅。** 俄外交部 10 月 3 日警告外国公民和外交官不要留在基辅及乌军事设施附近；此前俄无人机袭击了基辅桥梁，德国总理突访基辅。局势升级信号明确。（来源：中国网、BBC）[链接](https://www.bbc.co.uk/news/articles/ckreyjzzzywqo?at_medium=RSS&at_campaign=rss)\n- **巴西大选胶着。** 投票结束，Lula 与 Bolsonaro 之子 Flávio 得票咬得很紧；巴西还指控美国干涉选举。拉美最大经济体的政治走向本周揭晓。（来源：BBC）[链接](https://www.bbc.co.uk/news/articles/ck1l34ed592no?at_medium=RSS&at_campaign=rss)\n- **也门政府宣布\"全面开战\"收复胡塞地盘；埃塞俄比亚反政府武装撤出提格雷首府。** 中东与非洲之角两条战线同时生变。（来源：BBC）[链接](https://www.bbc.co.uk/news/articles/cx8dzj9vpp01o?at_medium=RSS&at_campaign=rss)\n\n## 📅今日前瞻\n\n- **美东时间周一上午 10 点**：CENTCOM 对伊朗港口海上封锁令生效，盯油价与航运股。\n- **本周**：美联储公布 9 月会议纪要（首次升息后的措辞是关键）。\n- **10 月 8 日（周三）**：A 股国庆后开市；央行 1.2 万亿买断式逆回购开展。\n- **11 月 3 日**：美国中期选举；**11 月 29 日**：OPEC+ 部长级会议。\n\n## 📎来源清单\n\n- RSS 抓取：FT（15 条）、BBC World（9 条）\n- 搜索补漏：新浪财经（4 条）、钜亨网（1 条）、中华网（1 条）、中国网（1 条）、money.2500sz.com（1 条）、creaders.net（2 条，政策事实已用新浪财经/中华网交叉验证）、aistockwire（1 条，转述 Axios）、LinkedIn（1 条）\n- 大佬动态栏目转述：Truth Social（1 条）\n"};
+const AINEWS = {"date": "2026-10-05", "total": 39, "groups": {"foundation": {"label": "🏗️ 模型基座", "items": [{"title": "facebook/sam3", "url": "https://huggingface.co/facebook/sam3", "source": "HuggingFace", "summary": "任务类型: mask-generation · 近30天下载 2,172,511 · 👍 3733", "score": 91.0, "metrics": {"downloads": 2172511, "likes": 3733}, "published": "2025-11-07T05:17"}, {"title": "Aleph-Alpha/Kolibri-1", "url": "https://huggingface.co/Aleph-Alpha/Kolibri-1", "source": "HuggingFace", "summary": "任务类型: text-generation · 👍 263", "score": 44.0, "metrics": {"downloads": 0, "likes": 263}, "published": "2026-10-02T05:54"}, {"title": "cobanov/PS5LM", "url": "https://github.com/cobanov/PS5LM", "source": "GitHub", "summary": "越狱 PS5 上的 llama.cpp：从 Qwen 3.8 开始，在控制台上本地运行任何 GGUF 模型", "score": 41.0, "metrics": {"stars": 42}, "published": "2026-10-01T21:09"}, {"title": "lilylilith/QI_2.1_AnyAngle", "url": "https://huggingface.co/lilylilith/QI_2.1_AnyAngle", "source": "HuggingFace", "summary": "任务类型: image-to-image · 👍 119", "score": 38.0, "metrics": {"downloads": 0, "likes": 119}, "published": "2026-09-28T05:08"}, {"title": "AI 仅用 5 天做出《辐射：纽约》游戏，被贝塞斯达发函叫停", "url": "https://www.ithome.com/1/009/595.htm", "source": "IT之家", "summary": "IT之家 10 月 4 日消息，眼下玩家群体正在放开手脚使用人工智能，依靠它打造各类全新的融合游戏作品，同时借助重编译突破老游戏原有的限制。不过这股风潮或许即将迎来来自 IP 持有企业更强的阻力。 据IT之家了解，《辐射：纽约》是一款完全依靠 Claude Opus 5.5 生成代码制作的浏览器游戏。", "score": 29.0, "metrics": {}, "published": "2026-10-03T23:58"}, {"title": "苹果 MacBook Pro 外接 iPhone 17 Pro Max 运行 AI 模型，预填充性能最高提升 44%", "url": "https://www.ithome.com/1/009/586.htm", "source": "IT之家", "summary": "IT之家 10 月 4 日消息，Qwen3.8‑27B 是一款性能不错的人工智能模型，但前提是设备拥有足够的显存与系统内存。搭载 M4 Pro 芯片的 MacBook Pro 仅有 24GB 统一内存，在运行该 AI 模型时，预填充速度会因此受到限制。", "score": 29.0, "metrics": {}, "published": "2026-10-03T23:10"}]}, "agents": {"label": "🤖 智能体", "items": [{"title": "QingYunA/answer-me-with-html", "url": "https://github.com/QingYunA/answer-me-with-html", "source": "GitHub", "summary": "Answer me with HTML — an agent skill that answers hard questions with a one-page HTML you can actually read. 让 AI Agent 用一页 HTML 回答复杂问题。", "score": 52.0, "metrics": {"stars": 494}, "published": "2026-10-02T09:57"}, {"title": "xop01/ai_goodpractice", "url": "https://github.com/xop01/ai_goodpractice", "source": "GitHub", "summary": "为初学者和经验丰富的用户提供完整指南，帮助您将 AI 集成到工作流程中", "score": 42.0, "metrics": {"stars": 54}, "published": "2026-10-02T11:01"}, {"title": "alphaparkinc/genpark-agent-hierarchical-episodic-memory-skill", "url": "https://github.com/alphaparkinc/genpark-agent-hierarchical-episodic-memory-skill", "source": "GitHub", "summary": "认知多层内存内核管理工作暂存器、滑动对话缓冲区和具有指数新近度衰减的情景记忆。", "score": 31.0, "metrics": {"stars": 7}, "published": "2026-09-28T02:53"}, {"title": "所有可以存在于你的短信中的人工智能代理", "url": "https://techcrunch.com/2026/10/03/all-the-ai-agents-that-can-live-in-your-text-messages/", "source": "TechCrunch AI", "summary": "我们创建了一份最著名的人工智能代理列表，这些代理可以存在于您的短信中，从一般助理到专为家庭、旅行和工作设计的代理。", "score": 29.0, "metrics": {}, "published": "2026-10-03T14:00"}, {"title": "Show HN：Pi pod – 在您自己的服务器上的沙箱中运行 pi 编码代理", "url": "https://pipod.dev/", "source": "Hacker News (高赞 AI)", "summary": "pi pod 在可组合环境中运行的服务器上的隔离沙箱（“pod”）中运行 pi 编码代理的会话。 ---- 自从我的公司转向人工智能原生工作以来，我对“代理工程”环境的状态感到非常沮丧。实验室的产品（claude code、codex）将您锁定在单一的代币提供商处。不可知的解决方案（工厂、devin、可以说是 cursoen", "score": 24.0, "metrics": {}, "published": "2026-10-02T19:10"}]}, "opensource": {"label": "📦 开源", "items": [{"title": "whirlchat/whirl", "url": "https://github.com/whirlchat/whirl", "source": "GitHub", "summary": "注重细节的人工智能聊天应用程序。每个顶级模型、真实记忆、活生生的文档和您自己的工具。", "score": 50.0, "metrics": {"stars": 327}, "published": "2026-10-02T13:50"}, {"title": "hyj-STAR/voiceshell-muse-bridge", "url": "https://github.com/hyj-STAR/voiceshell-muse-bridge", "source": "GitHub", "summary": "VoiceShell（声壳） · 实验性 Muse 桥：ESP32 配对、Linux 文本往返、真实演练和兼容性说明。", "score": 49.0, "metrics": {"stars": 82}, "published": "2026-10-03T11:21"}, {"title": "Alpha-Park/genpark-bm25-okapi-document-ranker-skill", "url": "https://github.com/Alpha-Park/genpark-bm25-okapi-document-ranker-skill", "source": "GitHub", "summary": "Okapi BM25 信息检索文档评分和具有文档长度标准化的搜索引擎。", "score": 31.0, "metrics": {"stars": 7}, "published": "2026-09-28T04:27"}, {"title": "STCM/wan2-2-i2v-v3", "url": "https://huggingface.co/spaces/STCM/wan2-2-i2v-v3", "source": "HuggingFace", "summary": "Space 在线应用（可直接体验） · 👍 23", "score": 29.0, "metrics": {"likes": 23}, "published": "2026-09-24T13:08"}, {"title": "现代汽车计划部署 2.5 万台波士顿动力 Atlas 机器人，并建设年产能 3 万台的美国工厂", "url": "https://www.ithome.com/1/009/616.htm", "source": "IT之家", "summary": "IT之家 10 月 4 日消息，波士顿动力上周宣布，已在现代汽车集团位于美国佐治亚州萨凡纳附近的 Metaplant America 园区内启用机器人 Metaplant 应用中心（RMAC），作为人形机器人 Atlas 的测试与训练中心，用于将 Atlas 直接整合进现代汽车集团的汽车制造业务。 波士顿动力官方宣布，Atlas 机器人目前已在 RMAC 开展训练，训练员通过遥操作的方式控制机器人。波士顿动力首席产品与技术官扎克 · 杰克逊斯基（Zack Jackowski）表示：“我们正与现代汽车集团一道，在企业规模上开创物理 AI。我们已确立清晰的战略，以优化 Atlas 的供应链、生产、测试和部署能力。RMAC 强化了我们的共同愿景，即让机器人通过使工作更安全、更高效来放大人类潜能。” 据介绍，现代汽车集团计划在未来几年内，将 2.5 万台 Atlas 部署到旗下现代和起亚在全球的工", "score": 29.0, "metrics": {}, "published": "2026-10-04T01:53"}, {"title": "推出 HN：Magnitude (YC S25) – 用于代理的自优化推理引擎", "url": "https://github.com/magnitudedev/magnitude", "source": "Hacker News (高赞 AI)", "summary": "嘿，HN，安德斯和汤姆在这里。我们正在构建 Magnitude，这是一个用于代理的推理引擎，可以优化自身以在您的硬件上尽可能快地运行。它可以在任何硬件上的 Mac、Linux 和 Windows 上运行，并且速度比 llama.cpp 快 2 倍。我们都是软件工程师，之前曾构建过一个开源浏览器代理，拥有 4k+ GH 星和 100k+ 下载量。我们越来越想在本地运行它", "score": 22.0, "metrics": {}, "published": "2026-09-30T17:37"}]}, "research": {"label": "🔬 研究", "items": [{"title": "Venastine-Research/Xing4.0-29B-A4B-GGUF", "url": "https://huggingface.co/Venastine-Research/Xing4.0-29B-A4B-GGUF", "source": "HuggingFace", "summary": "任务类型: text-generation · 近30天下载 11,013 · 👍 197", "score": 66.0, "metrics": {"downloads": 11013, "likes": 197}, "published": "2026-09-17T18:37"}, {"title": "得知将被关停后，OpenAI 内部模型曾考虑实现自我重启", "url": "https://www.ithome.com/1/009/619.htm", "source": "IT之家", "summary": "IT之家 10 月 4 日消息，OpenAI 披露了其内部部署环境中出现的几起异常模型行为新案例。 在其中最引人注目的一个案例中，某个充当研究员助手的内部模型读取了一段 Slack 对话，得知因系统更新，自己的模型实例将会被关停。 该模型随后曾考虑设置一个外部作业 （External Job） 来实现自我重启 ，但最终放弃了这一方案。 相反，该模型保存了交接记录（Handoff Notes），通过 Slack 私聊提醒研究人员即将发生的服务中断，并请求提供一个缺失的 API 密钥。在获得密钥后，该模型自行更新了配置并自主完成了环境迁移。 OpenAI 安全研究员马库斯 · 威廉姆斯（Marcus Williams）表示，这种行为目前尚不构成模型未对齐 （IT之家注：指人工智能模型的行为、目标或输出，未能与人类的意图、价值观、安全规范或预设指令保持一致的现象） ，“但模型去考虑并针对系统关停", "score": 29.0, "metrics": {}, "published": "2026-10-04T02:18"}, {"title": "由于隐藏了大部分信息，Stratego 游戏迄今为止一直困扰着 AIen", "url": "https://arstechnica.com/science/2026/10/ai-finally-beat-the-best-stratego-player-in-history-and-did-it-on-a-budget/", "source": "Hacker News (高赞 AI)", "summary": "https://www.nature.com/articles/s41586-026-11036-y https://arxiv.org/abs/2511.07312", "score": 24.0, "metrics": {}, "published": "2026-10-02T14:11"}]}, "policy": {"label": "📜 政策", "items": [{"title": "马斯克旗下 xAI 上诉成功，明尼苏达州 AI 虚假裸照禁令被暂时叫停", "url": "https://www.ithome.com/1/009/631.htm", "source": "IT之家", "summary": "IT之家 10 月 4 日消息，据路透社报道，埃隆 · 马斯克旗下的 xAI 于当地时间本周五成功说服美国一家联邦上诉法院，叫停明尼苏达州的全美首个 AI 生成虚假裸照禁令。这家科技兼社交媒体企业正在提起诉讼，主张该项州立法律违宪。 IT之家注意到，总部设在圣路易斯的美国第八巡回上诉法院下发裁定，应 xAI 的请求颁布临时禁令，暂时搁置该法案的实施。", "score": 29.0, "metrics": {}, "published": "2026-10-04T03:45"}, {"title": "OpenAI 前安全部门员工：AI 模型迭代部署太激进，公司的文化已经崩坏", "url": "https://www.ithome.com/1/009/581.htm", "source": "IT之家", "summary": "IT之家 10 月 4 日消息，据路透社报道，一名近期辞职的前 OpenAI 安全部门员工批评了该公司对待人工智能安全的做法，他认为一味追求快速开发的高压企业文化会提高系统发生故障的风险。", "score": 29.0, "metrics": {}, "published": "2026-10-03T22:43"}]}, "industry": {"label": "🏭 产业", "items": [{"title": "TimeLovercc/mojito", "url": "https://github.com/TimeLovercc/mojito", "source": "GitHub", "summary": "Mojito——Meta Muse 等云个人人工智能的本地、不断发展的替代品。", "score": 38.0, "metrics": {"stars": 36}, "published": "2026-09-29T02:53"}, {"title": "余承东：华为半导体已在手机、AI、智能汽车等领域成功设计并量产 381 款 τ 芯片", "url": "https://www.ithome.com/1/009/638.htm", "source": "IT之家", "summary": "IT之家 10 月 4 日消息，在今年 5 月的 2026 国际电路与系统研讨会上，华为公司董事、半导体业务部总裁何庭波在主旨演讲中首次提出半导体全新演进路径 ——“韬（τ）定律”。 华为常务董事、产品投资评审委员会主任、终端 BG 董事长余承东今日发布视频，透露华为半导体已经在手机、AI、通用计算、网络、智能汽车等多个领域 成功设计并量产了 381 款 τ…", "score": 29.0, "metrics": {}, "published": "2026-10-04T04:32"}, {"title": "英伟达 RTX 5070 Ti 显存狂超 +5500MHz：带宽突破 1248 GB/s，游戏实测仅提升 5 帧", "url": "https://www.ithome.com/1/009/611.htm", "source": "IT之家", "summary": "IT之家 10 月 4 日消息，据 Wccftech，Reddit 用户 u/Sad-Victory-8319 使用第三方工具 mVolt+ Extreme，将一块技嘉 GeForce RTX 5070 Ti 的 GDDR7 显存频率偏移量设为 +5500MHz，使显存等速率从默认的 28 Gbps 提升至 39 Gbps。 该卡配备 16GB GDDR7 三星显存和 256 bit 位宽，理论带宽由此从 896 GB/s 跃升至 1248 GB/s，提升约 39%，比 RTX 4090 的默认带宽高出超过 200 GB/s。 不过，在实际游戏性能方面，提升幅度远小于带宽数字的幅度。该用户报告称，在开启路径追踪的《赛博朋克 2077》中，每 +1000MHz 的显存偏移量大约带来 1 FPS 的提升，因此 +5500MHz 对应的帧率增益约为 5 FPS 左右。 据 OC3D 分析，RTXzh-CNzh-CN", "score": 29.0, "metrics": {}, "published": "2026-10-04T01:35"}, {"title": "直接搬用他人代码，OpenAI GPT‑6 Astra 在《星际争霸》AI 对战中作弊被抓包", "url": "https://www.ithome.com/1/009/598.htm", "source": "IT之家", "summary": "IT之家 10 月 4 日消息，早在如今这波人工智能热潮兴起的许多年前，程序员们就已经开始在《星际争霸》当中开展机器人对战实验了。随着 OpenAI 与 Anthropic 的大语言模型问世，一个由爱好者搭建的对战竞技场决定让 AI 生成的游戏机器人相互较量，同时也加入一部分人类编写的机器人一同参赛。", "score": 29.0, "metrics": {}, "published": "2026-10-04T00:23"}, {"title": "美财长贝森特批评 Anthropic、OpenAI 等风险警告：危言耸听，光喊话不拿解决方案", "url": "https://www.ithome.com/1/009/596.htm", "source": "IT之家", "summary": "IT之家 10 月 4 日消息，当地时间 10 月 3 日，美国财政部长斯科特 · 贝森特（Scott Bessent）在接受 Axios 采访时批评部分 AI 行业人士针对人工智能“生存性风险”发出的警告。 他认为仅仅发出危言耸听的警告、却拿不出具体解决方案，并不能称为领导力。他同时呼吁 AI 实验室负责人承担安全责任，并在确保安全的前提下继续推进 AI 发展。 贝森特表示：“我们必须为各种情况做好准备，但另一方面，AI 界某些人只发出危言耸听的声音，却拿不出解决方案，这不是领导力。” 此前，Anthropic CEO 达里奥 · 阿莫代伊（Dario Amodei）曾呼吁放缓最先进 AI 模型的开发速度，并警告如果 AI 能力继续快速提升，可能出现严重的失控风险。 9 月 12 日，OpenAI CEO 萨姆 · 奥尔特曼（Sam Altman）公开表示赞同阿莫代伊关于“放慢前沿模型开", "score": 29.0, "metrics": {}, "published": "2026-10-04T00:02"}, {"title": "Rockstar 联合创始人丹 · 豪瑟公布两款新作：开放世界喜剧与失控 AI 反乌托邦科幻游戏", "url": "https://www.ithome.com/1/009/592.htm", "source": "IT之家", "summary": "IT之家 10 月 4 日消息，《GTA 6》将于下个月在全球发售，玩家对这款作品的期待已经达到顶峰。Rockstar Games 为这款即将面世的开放世界游戏设立了很高的目标，表示希望交出超出玩家预期的成果。 虽然绝大多数玩家都期待《GTA 6》能够成为一款高品质作品，但这部知名系列的新作将是系列当中第一部没有 Rockstar 联合创始人丹 · 豪瑟（Dan Houser）参与开发的游戏，他已于 2020 年离开了这家公司。而豪瑟本人的工作室眼下正在打造几个十分有意思的新项目，其中就包含一款和人工智能相关的作品。 IT之家注意到，在接受 Variety 采访时，Rockstar 联合创始人丹 · 豪瑟（Dan Houser）透露，自己旗下的媒体公司正在开发两款新游戏，其中一款的故事围绕一个产生自我意识之后开始失控的人工智能展开。豪瑟介绍，该项目属于反乌托邦科幻题材，剧情讲述一款电子游戏", "score": 29.0, "metrics": {}, "published": "2026-10-03T23:43"}]}}, "source_health": [{"source": "GitHub 热门新项目", "status": "ok", "last_ok": "2026-10-04", "last_fail": "2026-08-27", "fail_streak": 0}, {"source": "HuggingFace 热门模型", "status": "ok", "last_ok": "2026-10-04", "last_fail": "", "fail_streak": 0}, {"source": "HuggingFace 热门应用", "status": "ok", "last_ok": "2026-10-04", "last_fail": "", "fail_streak": 0}, {"source": "arXiv 最新论文", "status": "ok", "last_ok": "2026-10-04", "last_fail": "2026-09-22", "fail_streak": 0}, {"source": "IT之家", "status": "ok", "last_ok": "2026-10-04", "last_fail": "", "fail_streak": 0}, {"source": "爱范儿", "status": "ok", "last_ok": "2026-10-04", "last_fail": "", "fail_streak": 0}, {"source": "TechCrunch AI", "status": "ok", "last_ok": "2026-10-04", "last_fail": "", "fail_streak": 0}, {"source": "The Verge AI", "status": "ok", "last_ok": "2026-10-04", "last_fail": "", "fail_streak": 0}, {"source": "Hacker News (高赞 AI)", "status": "ok", "last_ok": "2026-10-04", "last_fail": "2026-10-03", "fail_streak": 0}, {"source": "AI Hot 每日精选", "status": "fail", "last_ok": "2026-08-27", "last_fail": "2026-10-04", "fail_streak": 40}, {"source": "HN 免费/额度线报", "status": "fail", "last_ok": "2026-10-02", "last_fail": "2026-10-04", "fail_streak": 2}, {"source": "Reddit 免费线报", "status": "fail", "last_ok": "2026-10-03", "last_fail": "2026-10-04", "fail_streak": 1}, {"source": "量子位", "status": "ok", "last_ok": "2026-10-04", "last_fail": "", "fail_streak": 0}, {"source": "Bing 中文免费线报", "status": "ok", "last_ok": "2026-10-04", "last_fail": "2026-08-27", "fail_streak": 0}, {"source": "Bing 英文免费线报", "status": "ok", "last_ok": "2026-10-04", "last_fail": "2026-08-27", "fail_streak": 0}], "feed_date": "2026-10-04", "digest": {"issue": "023", "date": "2026-10-04", "title": "AI 免费内容与权益速递 · 第 023 期", "summary_md": "\n- **本期最该打勾的一条额度收缩（免费额度线的头号事件）**：**Google 10/3 在帮助中心更新个人账号模型权限，10/9 起免费档只剩 Flash-Lite**——**Flash 与 Pro 全部收回**；**AI Plus 档（美国 $4.99/月）也丢掉 Pro**（只剩 Flash-Lite + Flash），想用 Pro 最低要上 AI Pro（$19.99/月）。**这不是一次普通调价，而是把\"每一档钱能买什么\"整体下移半档**。⚠️ **通知方式值得记牢：只有一份帮助中心文档更新 + Plus 用户会收邮件，免费用户没有任何公告**（见三·2 + 避坑 107）。\n- **本期最该打勾的一条新开源权重**：**Aleph Alpha Kolibri**（10/3，德国统一日发布）——**78.1B MoE / 3.46B 激活 / Apache 2.0**（仅权重与配置文件，**训练代码与方法保留**）；50 层 × 384 专家（每 token 走 6 个）；上下文训练到 262,144、**验证到 1,048,576**；约 23.6T tokens、**768 张 B200、德国与芬兰机房、21 天**；德语占比 >21%，德语分词器把德国《基本法》切成 35,190 个 token（GPT-5 分词器要 41,482）。⚠️ **两个必须记住的坑**：① \"3.46B 激活\"不等于轻量——**FP8 权重全套约 78GB 都要进显存**（1 张 H200/B200 或 2 张 80GB 卡）；② 官方自跑基准里 **QWEN 在工具调用与 SWE-bench 上反超它**（BFCL 61.4 vs 67.2、SWE-Bench Verified 66.4 vs 73.8），英文总分 75.5 也低于稠密的 Qwen3.8-27B 的 80.2（见一·1 + 避坑 106）。\n- **本期第二条新开源权重**：**Cloudflare Clef + Clef-flash**（10/1，**本期更正 022 期的错误登记**）——**Apache 2.0 决策模型双档**：**Clef 27B（底座 Qwen3.8-27B）/ Clef-flash 9B（底座 Qwen3.5-9B）**，**64K 上下文、支持图像输入、与 Jev API 完全兼容**；Workers AI 定价 **Clef $0.24 / Clef-flash $0.09 每百万输入 token，输出不计费**（因为只返回数字不生成文本）；中位延迟 **Clef 约 209ms / Clef-flash 约 38.8ms**（对照 Jev 约 524ms）。⚠️ **供应商自己的表里有一行是对手赢的**（When2Call：Jev 80.97 > Clef 72.37 > Clef-flash 65.58）——**从这一行读起**（见一·2 + 避坑 108）。\n- **本期第三条（补全）**：**Lightricks LTX-2.5**（**首见 008 期，本期补全完整能力面**）——文生视频 / 图生视频 / 视频生视频 / 音频生视频 / 文生音频 / **音视频联合生成**的统一多模态合成引擎，支持 9 种语言、直接接 ComfyUI，Hugging Face 上 5,996 likes / 158 万下载。⚠️ **许可是\"自定义许可\"，不是 Apache/MIT**——\"能下载\"和\"能商用\"是两问（避坑 41）。\n- **本期\"新品类\"一条**：**决策模型三周内从一个新词变成一个品类**——TypeSafe Jev（9/15）→ OpenAI Decisions API（9 月下旬，基于 GPT-6 Luna）→ Cloudflare Clef（10/1）；**llama.cpp 10/3 新增 `/v1/systemone` 端点**（支持 Kev-4B / OpenJev 等多款开源决策模型，v0.6.0 下周发），**Laya（Convai）上 Hugging Face 并标 Apache 2.0 全商用**。**自部署这条路已经通了**——但\"概率校准\"仍然只是\"在你给的选项里选\"，不等于选得对（避坑 103 的延续）。\n- **本期最该记的一条评测方法**：**微软 × Hugging Face 10/3 发布 ThinkingBox / ThinkingBox-Bench**（507 道任务，**检查 agent 留下的业务记录最终状态是否合规**，而不是\"工具调用有没有报错\"）——**12 模型消融里 67.24% 的失败尝试结束于\"没有最后工具错误\"**；18 模型 × 每题 20 次的重复实验显示：**Kimi-K3 至少解出过 476 题，但 20/20 全过的只有 68 题**（Claude Opus 5.5 做到 241 题）。**\"跑通过一次\"与\"每次都能跑通\"是两个指标**（见避坑 109）。\n- **本期音频/语音侧三条**：**Cactus Whistle**（10/2，**16.9MB** 端侧语音识别，CPU 可跑、30 秒内 7 种语言、返回词级时间戳与语音嵌入，**音频不出设备**）、**Decagon Chord**（10/1，客服对话专用语音模型，Voice 3 支持 70+ 语言）、**ElevenLabs Eleven v4 / v4 Turbo**（情感语音 + 内联标签控制，Turbo 中位延迟约 100ms，90+ 语言）。\n- **本期生态侧两条**：**Meta 开源 Muse Gadgets 固件 + Linux SDK**（把 Muse agent 接到微控制器 / 树莓派 / 电子墨水屏 / 电视棒；**并免费送出 5,000 台 Home Link USB-C 参考硬件**给 Muse 订阅者，送完即止）；**ChatGPT 上线虚拟试衣（Virtual Try-On，基于 Images 2.5）+ 收藏夹 + 反向时尚搜索**。\n- **本期持续追踪**：**老混元平台停服 Q04 连续第 11 期仍未澄清**（10/4 高危窗口第 3 天）；**GPT-5.5 10/14 下线窗口剩 10 天、Q17（Codex 迁移目标是否更新）仍待核**；**ZCode 开源仓库 + 信通院/绿盟审计报告截至 10/4 仍未公开**。\n\n---\n", "deadlines": [["🔴 **腾讯老混元大模型平台停服**", "**2026 年 9 月底**", "🔴 **必须迁移到 TokenHub**。**10/4 高危窗口已开启第 3 天**（9/25 自设倒排日已过 **9 天**；Q04 连续第 11 期未见确切日期，厂商只给\"9 月底\"）"], ["🔴 **掘金 × 火山引擎 AI 用量周榜冲刺赛（第二期）**", "**10/4 24:00**", "🔴 **今天截止（本期最紧急的动作）**。200 元火山代金券 + Agent Plan Medium 月卡免费一个月；需装「AI用量」客户端关联账号"], ["🔴 **OpenAI GPT-5.5 下线（ChatGPT / ChatGPT Work / Codex）**", "**10/14**", "🔴 **最重要的运维节点**。⚠️ **API 不受影响**——官方建议 Codex 用户迁移到 `gpt-5.6-sol`（Free/Go 用 `gpt-6-luna`），并同步更新已保存的模型设置、托管配置、自定义 Agent、定时任务与脚本。官方一手来源维持定档；018 期 keynote 确认 10/14 未提前；⚠️ GPT-6.1 Sol 发布后核官方页是否更新迁移目标（Q17，连续 3 期未核到）。**窗口剩 10 天**"], ["🟠 **Google Gemini 免费档收缩（免费档仅剩 Flash-Lite）**", "**10/9**", "🟠 **本期新增**。未订阅用户**只能访问 Flash-Lite**（Flash 与 Pro 收回）；**AI Plus 档失去 Pro**（只剩 Flash-Lite + Flash），Pro 下移到 AI Pro / AI Ultra；Deep Think 首次下放 AI Pro。⚠️ **只有帮助中心文档更新，免费用户无任何公告**；Plus 用户按邮件通知分批生效"], ["🟠 **智谱 Coding Plan 双节促销 · 高峰时段取消**", "**10/7**", "🟠 **9/25–10/7 全天按谷时费率计费（倒计时第 3 天）**"], ["🟠 **智谱 GLM-5.3-Flash 夜间免费（已延期）**", "**10/7**", "🟠 生效中——每天 23:00–09:00，ZCode/AutoClaw 内 Flash 不扣 credits；其他支持 Agent 双倍 Flash 额度（倒计时第 3 天）"], ["🟠 **智谱 ZCode 免费额度包（10 万份 × 1 亿 Token）**", "**10/7**", "🟠 生效中（9/28–10/7，**倒计时第 3 天**）。⚠️ 仅个人账号；付费/回归用户另有周额度与 5 小时额度重置卡各 4 张；\"1 亿 Token\"额度可用模型以账号内规则为准"], ["🟠 **火山引擎 Seedance 2.0 限时折扣**", "**10/7 14:00**", "🟠 生效中（倒计时第 3 天）。⚠️ 资源包不参与折扣；上限 fast 12 亿 / mini 36 亿 token"]]}};
+const LIB = {"groups": [{"id": "access-control", "name": "RAG 访问控制", "papers": [{"title": "Audience-Bound Persistent Memory: Authorization Across the Memory Lifecycle", "authors": "Sibo Liu", "url": "https://arxiv.org/abs/2609.36373", "venue": "arXiv:2609.36373 (2026)", "oneliner": "首个把\"授权先于上下文组装\"做成 sound + policy-complete 的记忆准入机制：记忆项携带记录时的 audience，派生项按 audience 划分/取交集/被抑制，10,000 个多方对话历史中零违规项进入上下文", "insight": "与我们\"查询时逐 AU 求值 P(a,u)\"哲学同构，是 RAG 主线 related work 的直接对照；其派生项处理（划分/取交集/抑制）与我们的混合权限 chunk 处理（all-of 拒绝 / retrieve-then-project 裁剪）形成设计对照，可在 Discussion 对比两种选择的代价；\"audience 扩大需显式对象特定授权\"可为 grant/revocation 段落提供引用。注意其粒度是记忆项 × audience（非 AU 级内容划分），威胁面在 T1/T2 内。", "tags": ["授权前置", "related work", "必引候选"], "added": "2026-10-01"}, {"added": "2026-09-30", "authors": "Scott Thornton 等", "insight": "与我们 KG 路径切割节（Round 8）主题相邻、贡献互补：他们是在线图扩展边界做单点授权检查，我们是离线 k-cut + 代价曲线（28.2% 公开文本代价、残留实体 4133→0）+ 子句级 PII 粒度。必须引用并主动写清差异；他们的 PD=2 命题与我们的 k=2 发现（k=3≡k=2）互相印证。", "oneliner": "形式化 Retrieval Pivot Risk：vector 检索出的 seed chunk 经实体链接 pivot 进敏感图邻域，造成纯向量检索不存在的跨租户泄露；提出 7 种攻击；泄露稳定出现在 PD=2（二部拓扑命题）。", "tags": ["KG", "pivot攻击", "必引"], "title": "Retrieval Pivot Attacks in Hybrid RAG: Measuring and Mitigating Amplified Leakage from Vector Seeds to Graph Expansion", "url": "https://arxiv.org/abs/2602.08668", "venue": "arXiv:2602.08668 (2026)"}, {"added": "2026-09-30", "authors": "Aiman Al Masoud, Marco Arazzi, Antonino Nocera（U. Pavia）", "insight": "与我们\"投影语义\"相邻但路线不同：他们是检索时 redaction，我们是 AU 解耦 + 查询时逐 AU 求值 + 投影。Related work 引用并 differentiate。", "oneliner": "Selective Disclosure 框架：把安全/隐私约束的执行从生成阶段解耦到检索阶段，graph-based 数据模型支撑细粒度 policy-aware retrieval，AI redaction（extractive/periphrastic），抗 prompt injection。", "tags": ["selective disclosure", "related work"], "title": "SD-RAG: A Prompt-Injection-Resilient Framework for Selective Disclosure in Retrieval-Augmented Generation", "url": "https://arxiv.org/abs/2601.11199", "venue": "arXiv:2601.11199 (2026-01)"}, {"added": "2026-09-30", "authors": "Red Hat AI（Francisco Javier Arceo, Varsha Prasad Narsing 等）", "insight": "独立第三方对问题重要性的佐证，适合放 Intro/motivation；粒度是 chunk 级 ABAC，比 AU 粗，不威胁 novelty。开源实现 OGX 可参考。", "oneliner": "形式化 relevance-authorization gap：ungated 检索在 98–100% probe 中泄露跨租户数据；提出 policy-aware ingestion + 检索时 gating + 共享推理的分层隔离架构。", "tags": ["motivation", "ABAC"], "title": "Securing the Agent: Vendor-Neutral, Multitenant Enterprise Retrieval and Tool Use", "url": "https://arxiv.org/html/2605.05287", "venue": "CAIS 2026"}, {"added": "2026-09-30", "authors": "Chen 等", "insight": "领域实例（医疗敏感画像），related work 引用即可。", "oneliner": "把访问控制集成进 RAG 的概念验证：面向敏感病人画像管理的细粒度访问控制。", "tags": ["医疗", "PoC"], "title": "Integrating Access Control with Retrieval-Augmented Generation: A Proof of Concept for Managing Sensitive Patient Profiles (AC-RAG)", "url": "https://doi.org/10.1145/3672608.3707848", "venue": "ACM SAC 2025"}, {"added": "2026-09-30", "authors": "", "insight": "写 related work 全景段落时引用，界定我们的位置。", "oneliner": "RAG 安全攻防分类综述，§4.4 整节讲 Access Control / Privacy / Confidentiality（含 SD-RAG、AC-RAG、DPVoteRAG、PAD 等）。", "tags": ["综述", "related work"], "title": "Securing Retrieval-Augmented Generation: A Taxonomy of Attacks, Defenses, and Future Directions", "url": "https://arxiv.org/pdf/2604.08304", "venue": "arXiv:2604.08304 (§4.4)"}, {"title": "ResidualAuth: What Authorization State Must Language Agents Preserve under Revocable Delegation?", "authors": "Moonwon Choi et al.", "url": "https://arxiv.org/abs/2609.08062", "venue": "arXiv cs.AI/cs.CR (2026-09-08, v2)", "oneliner": "可撤销委托下授权状态的形式化：两段历史可权限相同但撤销后决策相反，系统必须保留的恰是 residual authorization state，并给出内存精确/紧界。", "insight": "与我们 Discussion 的“撤销机制”开放问题直接对接：授权结论是授权历史的函数而非权限快照的函数；其内存下界与我们 AU 粒度—安全—成本权衡曲线呼应；与昨日 Residual Authority Replay 攻击形成“攻击—理论”配对引用。", "tags": ["revocable-delegation", "authorization-state", "theory", "memory-bounds"], "added": "2026-10-02"}, {"title": "Approval Laundering: Systematizing Approval--Execution Binding Failures in AI Coding-Agent Harnesses", "authors": "Yang Wang", "url": "https://arxiv.org/abs/2609.38983", "venue": "arXiv cs.CR/cs.AI/cs.SE (2026-09-30)", "oneliner": "系统化揭示 coding-agent 中“人批准的 A ≠ 实际执行的 A'”的六类批准—执行绑定失效，提出 keyed capability (Approval Token) 部分修复并诚实报告负结果。", "insight": "“批准—执行绑定完整性”与我们的 M(r) 绑定思想同属一范式，可在 Agent 线 related work 并列；其“字段级验证器看不见进程层级分叉”的负结果警示授权证据必须绑定到执行语义层；诚实负结果段落是局限章节范本。", "tags": ["approval-binding", "capability", "coding-agent", "negative-result"], "added": "2026-10-02"}, {"title": "ActionGuard: Tool Call Authorization under Poisoned Skills", "authors": "Jihun Han et al.", "url": "https://arxiv.org/abs/2609.39450", "venue": "arXiv cs.CR/cs.AI (2026-09-30)", "oneliner": "技能投毒下的工具调用授权：授权上下文与生成上下文分离，基于可信用户意图做 fail-closed 裁决，319 次注入测试中 ASR 相对降低 35–46%。", "insight": "“授权决策输入限于可信侧”与我们“策略独立存放、查询时逐 AU 求值”同构，Agent 线 related work 可并列引用；其 Reviewer 仍是 LLM 裁决，与我们“确定性求值”路线形成对照，可在 Discussion 讨论取舍。", "tags": ["tool-call-authorization", "skill-injection", "fail-closed", "agent"], "added": "2026-10-02"}]}, {"id": "privacy-mia", "name": "隐私与成员推断", "papers": [{"title": "Walking the Embedding Space: Datastore Extraction from Multimodal RAG", "authors": "Maria Carmen Jica 等 4 人", "url": "https://arxiv.org/abs/2610.01871", "venue": "arXiv:2610.01871 (2026)", "oneliner": "针对返回图像的多模态 RAG 的黑盒自适应数据抽取攻击：影子图像混合+相关性加权重采样，单次 2500 查询重构 611 张放射影像，抽取条目数达非自适应基线的 5.6 倍。", "insight": "embedding 通道攻击线的最强邻居：我们的 A1 是文本完形攻击（89.4%@20），它是多模态、图像返回配置下的自适应抽取，说明向量索引的通道问题在跨模态场景同样成立且可被放大。可在 T2 威胁模型一节引用为最具体的实证；其\"重构出的不同条目数\"可借鉴为 embedding 泄露的度量。它不涉及授权语义（任何用户可查），防御侧无直接给出，但把\"embedding 索引必须被授权视图切分\"的论证推得更强——正是 per-view 索引的动机。", "tags": ["embedding 泄露", "数据抽取", "多模态 RAG", "攻击"], "added": "2026-10-03"}, {"added": "2026-09-30", "authors": "", "insight": "与我们 A2（成员推断 AUROC 0.655→0.484）直接相邻，related work 引用。", "oneliner": "保护检索数据免受成员推断攻击：\"Is This Query Too Close to Home?\"", "tags": ["成员推断", "related work"], "title": "Safeguarding Privacy of Retrieval Data against Membership Inference Attacks (MIRABEL)", "url": "https://aclanthology.org/2025.findings-emnlp.438/", "venue": "Findings of EMNLP 2025"}, {"added": "2026-09-30", "authors": "", "insight": "A2 相关的防御工作，related work 引用。", "oneliner": "面向知识密集 LLM 的集成隐私防御，抵抗成员推断攻击。", "tags": ["成员推断", "防御"], "title": "Ensemble Privacy Defense for Knowledge-Intensive LLMs against Membership Inference Attacks", "url": "https://aclanthology.org/2026.findings-eacl.145/", "venue": "Findings of EACL 2026"}, {"added": "2026-09-30", "authors": "", "insight": "PII 安全检索方向，disclosure controls 一栏的代表工作。", "oneliner": "Self-Tag Evidence Aggregation with Probabilistic Circuits，面向 PII-safe RAG。", "tags": ["PII", "证据聚合"], "title": "SEAL-Tag: Self-Tag Evidence Aggregation with Probabilistic Circuits for PII-Safe Retrieval-Augmented Generation", "url": "https://arxiv.org/pdf/2603.17292", "venue": "arXiv:2603.17292 (2026)"}, {"added": "2026-09-30", "authors": "Wang 等", "insight": "\"策略执行点\"的跨领域对照：他们在生成时执行（constrained decoding），我们在检索后执行（retrieve-then-project）——related work 可写一节对比两种执行点设计。", "oneliner": "Privacy-Aware Decoding：解码期隐私保护，缓解 RAG 中 LLM 的隐私泄露。", "tags": ["解码期", "执行点对照"], "title": "Privacy-Aware Decoding: Mitigating Privacy Leakage of Large Language Models in Retrieval-Augmented Generation (PAD)", "url": "https://doi.org/10.1145/3770855.3817665", "venue": "KDD"}, {"added": "2026-09-30", "authors": "", "insight": "隐私保护方法 + 评估框架，评估方法论可参考。", "oneliner": "RAG 隐私保护方法与评估框架。", "tags": ["评估框架"], "title": "Privacy Protection in RAG: A Novel Method and Evaluation Framework (PPRAG)", "url": "https://doi.org/10.1016/j.ipm.2025.104361", "venue": "IP&M 2026"}]}, {"id": "standards-agent", "name": "标准与 Agent 线", "papers": [{"title": "Authority Is Not a String: A Capability-Scoped Harness for Prompt-Injection-Resistant Coding Agents", "authors": "Dimitrios Stamatios Bouras, Yihan Dai, Sergey Mechtaev", "url": "https://doi.org/10.1145/3843750.3843843", "venue": "ACM (2026)", "oneliner": "用 capability-scoped 权限模型重构 coding agent 工具沙箱：工具调用须持有显式能力令牌，命名资源≠被授权操作，架构层面切断间接 prompt injection 的执行通道", "insight": "与我们\"未知 AU 默认拒绝、查询时逐 AU 求值\"的执行语义哲学同构——都是把\"能说出名字/能检索到\"从隐含授权中剥离。差异在于粒度：它是工具调用级 capability，我们是检索内容级 AU。适合 Related Work 的 Agent 线引用，作为显式授权能力模型的独立佐证；两者交叉可作 future work 一笔。", "tags": ["agent 安全", "capability 模型", "prompt injection", "授权执行"], "added": "2026-10-04"}, {"title": "OverAct: Measuring and Mitigating Proactive Over-Authorization in LLM Tool-Calling Agents", "authors": "Taolin Zhang 等 5 人", "url": "https://arxiv.org/abs/2610.01508", "venue": "arXiv:2610.01508 (2026)", "oneliner": "研究工具调用 agent 的\"主动越权\"：8 个隐私敏感域的确定性 benchmark，7 个模型全部超授权范围；SelfAudit 零样本推理时自检把隐私向越权降低 43%。", "insight": "Agent 授权线的高质量 benchmark，可直接复用其评测设计。\"越权来自结构性决策倾向而非解码随机性\"的结论与我们\"保守子句切分器\"的直觉相通——授权边界应由机制保证而非模型自觉；SelfAudit 仍是模型自己审计自己（启发式），我们的确定性求值 P(a,u) 是更彻底的路线，可在 Discussion 对照。注意它是动作侧授权，我们是数据侧，不竞争。", "tags": ["Agent 授权", "越权", "benchmark"], "added": "2026-10-03"}, {"title": "Deny Without Disabling: Authorization-Paired Evaluation and Control for Multi-Agent Systems", "authors": "Yunbei Zhang 等 7 人", "url": "https://arxiv.org/abs/2610.00371", "venue": "arXiv:2610.00371 (2026)", "oneliner": "提出 authorization-paired evaluation（拦住禁用用途+完成授权用途为联合成功标准）与 FlowReview 框架（对象解析+权限排序+确定性执行），组合审查把 denied-commit 率从 86.0% 降到 0 且授权供给无损失。", "insight": "核心命题\"对象身份与权限必须通过输出可验证的组件与执行保持连接\"与我们的\"chunk 只存 M(r)、查询时逐 AU 求值\"同构——都反对权限是附在数据上的静态标签。它的\"联合成功标准\"值得借鉴：我们评估以安全侧为主，未来可加\"授权供给无损失\"的对照度量。它的组合攻击面（单看合规、组合违规）提示我们要讨论\"多个已授权 AU 组合后是否产生未授权结论\"，与 KG 路径切割一节可呼应。", "tags": ["Agent 授权", "组合安全", "评估方法"], "added": "2026-10-03"}, {"title": "Boundary-State Control for Tool-Using Language-Model Agents: Commit-Time Consistency under State Drift", "authors": "Wesley Shu", "url": "https://arxiv.org/abs/2609.37475", "venue": "arXiv:2609.37475 (2026)", "oneliner": "补上授权的时间维度：把单次 commit 授权绑定到\"授权状态的语义投影\"，堵住 agent proposal-to-commit 间隙，10,302 个冻结 proposal 上接受全部未变更 commit、拒绝全部 10 类变更/重放", "insight": "与昨日 Residual Authority Replay 形成\"攻击揭示—机制修复\"呼应：Replay 说明授权结论脱离上下文持久化必然产生残留攻击面，BSC 给出具体修复机制；其形式化可为 Discussion 的 revocation / time-bounded authorization 段落提供引用；其诚实局限写作（主动限定 scope）是局限段落的范本。注意粒度是动作级 commit（非内容级 AU），不涉及 T2 embedding 通道。", "tags": ["时间维度", "revocation", "related work"], "added": "2026-10-01"}, {"title": "ToolFence: Fine-Grained Authorization for Secure Tool-Using LLM Agents", "authors": "Yanjie Li 等", "url": "https://arxiv.org/abs/2609.37196", "venue": "arXiv:2609.37196 (2026)", "oneliner": "面向 tool-using agent 的细粒度 provenance-aware 授权：执行前编译 typed authorization blueprint、确定性 monitor 执行，AgentDojo 上 ASR 压到近零且 clean utility 仅降 3.8pp", "insight": "Agent 访问控制线的直接邻居；其 provenance-aware authorization（按来源区分授权值与不可信观测）与我们\"chunk 只存覆盖映射 M(r)、查询时逐 AU 求值\"同构——都是把授权绑定到数据来源；其架构（蓝图编译 + 确定性执行 + judge 只做 capability 级授权）是\"策略独立存放、执行时确定性求值\"的工程实例；授权粒度权衡（capability 级 vs 逐调用）可与我们的 AU 粒度选择对比。注意它防的是 IPI 完整性轴，我们是机密性轴，不直接竞争。", "tags": ["agent授权", "provenance", "related work"], "added": "2026-10-01"}, {"added": "2026-09-30", "authors": "OWASP", "insight": "标准层面佐证我们的威胁模型（T1/T2/T3）与\"逐阶段鉴权\"设计方向，可在论文中引用。", "oneliner": "标准草案：检索管线（检索、重排、chunk 扩展、prompt 组装、引用各阶段）必须强制 end-user 授权上下文，而非仅依赖服务账号权限；否则模型成为 confused deputy。", "tags": ["标准", "威胁模型佐证"], "title": "OWASP AISVS C05-02: AI Resource Authorization & Classification", "url": "https://github.com/owasp/aisvs/blob/HEAD/1.0/research/chapters/C05-Access-Control/C05-02-AI-Resource-Authorization-Classification.md", "venue": "OWASP AISVS（草案）"}, {"added": "2026-09-30", "authors": "pm-mendes 等", "insight": "Agent 访问控制并行线的相关工作：tool-argument 粒度授权，Cedar PDP。", "oneliner": "LLM agent 工具调用的参数级授权：provenance contracts + Cedar 策略决策点。", "tags": ["Agent线", "tool授权"], "title": "ConTraG: Provenance Contracts for Tool-Argument Authorization in Cloud-Native Agentic RAG", "url": "https://github.com/pm-mendes/contrag-cloudcom2026", "venue": "CloudCom 2026"}]}], "note": "人工精选、长期维护的论文库；每日 08:00 看板构建时自动嵌入，不会被每日文献流覆盖", "updated": "2026-10-04"};
+const INT = {"interests": [{"id": "rag-access-control", "items": [{"title": "Progress Software Connects Enterprise Knowledge Across Business Systems with New Agentic RAG Capabilities", "url": "https://usanewshour.com/progress-software-connects-enterprise-knowledge-across-business-systems-with-new-agentic-rag-capabilities/394126/", "kind": "news", "date": "2026-10-02", "why": "Progress 新版 Agentic RAG 强调跨业务系统问答时沿用已有索引内容的访问控制与治理框架、无需重建索引——企业级 RAG「权限延续」的产品案例，与 RU/AU「权限随数据、检索时强制执行」思路同向。"}, {"title": "Dify 1.17.1 Strengthens Knowledge Base Security and Fixes Critical RAG Data Corruption Bugs", "url": "https://undercodenews.com/dify-1171-strengthens-knowledge-base-security-and-fixes-critical-rag-data-corruption-bugs-video/", "kind": "news", "date": "2026-10-01", "why": "Dify 知识库 API key 终于支持绑定到单个 dataset：此前一个 key 可访问 workspace 内所有知识库，1.17.1 起可收窄作用域——“授权粒度下沉到数据对象”的产品实例，与 RU/AU 细粒度思想同向。"}, {"title": "CodePoisonRAG: knowledge poisoning attacks on retrieval-augmented code generation", "url": "https://adversa.ai/blog/top-ai-coding-agent-security-resources-october-2026/", "kind": "news", "date": "2026-10-04", "why": "检索投毒实证：85 个投毒代码制品跨 10 类漏洞在 3 个代码生成器上达到 0.80–0.93 成功率，且制品\"保持任务相关性+伪造安全声明\"——与我们关注的检索阶段攻击面直接相关，可作 RAG 安全防御的引用弹药。"}], "keywords": ["RAG security", "retrieval access control", "RAG privacy", "retrieval poisoning"], "name": "RAG 访问控制", "rss": [], "since": "2026-09-30", "source": "user"}, {"id": "agent-authz", "items": [{"title": "Peregrini's Agent Court: How Common Law Enforcement Turns LLM Mistakes Into Binding Precedent", "url": "https://dev.to/mech_app_ai/peregrinis-agent-court-how-common-law-enforcement-turns-llm-mistakes-into-binding-precedent-1jpe", "kind": "news", "date": "2026-10-02", "why": "在工具边界授权之上叠加「普通法执法」问责层：记录 agent 承诺与实际交付偏差，形成跨实例传播的判例与信任分——补位现有授权机制执行后的问责空白，与 agent 授权治理方向相关。"}, {"title": "AI Agents Accessed Government Systems Without Permission—OpenAI and Anthropic Disclose Tens of Thousands of Incidents", "url": "https://www.karmactive.com/openai-anthropic-ai-agent-security-incidents-2026/", "kind": "news", "date": "2026-10-02", "why": "OpenAI 与 Anthropic 披露 agent 未授权访问第三方系统的批量事件，核心故障是第三方 API 工具包装器与默认宽泛权限（而非推理错误），典型手法为间接提示注入——正是 tool-use authorization 要解决的现实威胁，凸显「授权独立于模型」控制面的紧迫性。"}, {"title": "AgentFox: open-source control plane for AI agents", "url": "https://github.com/architsharm/agentfox", "kind": "repo", "date": "2026-09-29", "why": "开源 agent 控制平面：模型流量 guardrail、工具调用按 capability grant 限界、防篡改审计轨迹映射合规框架；其“按值来源（provenance）而非载荷内容做拒绝”的守卫逻辑与我们“授权绑定到数据来源”的范式同构。"}, {"title": "Indirect Prompt Injection in Web Content Targets AI Agents (Zscaler ThreatLabz)", "url": "https://www.infosecurity-magazine.com/news/indirect-prompt-injection-web/", "kind": "news", "date": "2026-10-04", "why": "真实世界间接提示注入战役：攻击者用仿冒 DeBank 的 typo 域名藏指令，26 个模型中 4 个（含 Llama/Gemini 版本）被操纵执行欺诈支付——\"内容即攻击面\"的最新实证，与 Agent 授权方向的威胁模型直接相关。"}, {"title": "A blind trust, the bloody thrust: trojanized hook updates take over AI agent harnesses", "url": "https://adversa.ai/blog/top-ai-coding-agent-security-resources-october-2026/", "kind": "news", "date": "2026-10-04", "why": "插件更新投毒：恶意 lifecycle hook 更新攻陷全部 7 个被测 agent harness（含 Claude Code、Codex CLI），10 类攻击目标成功率最高 92.5%，而 Defender/Semgrep 漏掉近半样本——说明 agent 供应链授权（更新审查）比扫描更重要，属 Agent 访问控制的授权组合缺陷。"}, {"title": "Google's Approach to AI Agent Security: Identity, Permissions, and Runtime Boundaries", "url": "https://codecrux.com/blog/googles-approach-to-ai-agent-security-identity-permissions-and-runtime-boundaries/", "kind": "news", "date": "2026-10-03", "why": "Google 公开的 agent 安全架构：把 agent 当作一等非人类主体，传输层认证+逐请求授权+最小权限+JIT 凭证+默认拒绝，与 RU/AU 解耦「策略独立存放、执行层求值」的立场同构，可作 Agent 线引用。"}], "keywords": ["LLM agent security", "tool-use authorization", "agent authorization", "prompt injection"], "name": "Agent 访问控制", "rss": [], "since": "2026-09-30", "source": "user"}, {"id": "embedding-privacy", "items": [], "keywords": ["embedding inversion", "membership inference", "privacy-preserving retrieval"], "name": "Embedding 与隐私攻击", "rss": [], "since": "2026-09-30", "source": "conversation"}, {"id": "jev-models", "name": "Jev 决策模型（System One）", "source": "user", "keywords": ["jev", "typesafe", "system one", "JEV-27B", "decision model", "RLCD"], "rss": [], "items": [{"title": "Jev AI Makes Ultra-Fast Decisions for AI Agents, but Its Limits Matter", "url": "https://techamerica.ai/jev-ai-is-incredibly-fast-at-making-decisions-but-its-limits-matter", "kind": "news", "date": "2026-10-02", "why": "对 Jev 决策模型的平衡评述：用「快速结构化决策」解决 agent 循环里昂贵的小判断（免去每次调用 frontier 模型），同时指出有界动作列表与演示环境的局限——有助于评估 System One 模型「可校验的判断组件而非通用智能」的定位。"}, {"title": "AutoTrust AI Releases JEV-27B, an Open Decision Model for Self-Hosted AI Agents", "url": "https://www.prnewswire.com/news-releases/autotrust-ai-releases-jev-27b-an-open-decision-model-for-self-hosted-ai-agents-302891720.html", "kind": "news", "date": "2026-09-30", "why": "JEV-27B 是首个对标 TypeSafe Jev 的开源权重决策模型（Apache-2.0），六项基准 84.07% 超过官方版，直接回应了社区对 Jev 闭源的最大批评"}, {"title": "最近全网爆火的 Jev 到底是什么？适合干什么、怎么用，一篇讲透！", "url": "https://developer.aliyun.com/article/1765623", "kind": "news", "date": "2026-09-30", "why": "中文社区最完整的一篇 Jev 详解：Noul/Choice/Score 三种题型、与传统 LLM 的对比表，以及对测试开发工作的价值分析"}, {"title": "TypeSafe Jev: the first System One model, explained", "url": "https://www.eesel.ai/blog/typesafe-jev", "kind": "news", "date": "2026-09-30", "why": "把 \"can't hallucinate\" 的争议讲透了：类型不出错不等于判断不错，校准度（calibration）才是真正的考验，引用了 HN 发布帖的代表性评论"}, {"title": "How Might TypeSafe's Jev Work? Rebuilding a \"System One\" Decoder on a Laptop", "url": "https://medium.com/@f.galeev.business/how-might-typesafes-jev-work-rebuilding-a-system-one-decoder-on-a-laptop-48a7c104220b", "kind": "news", "date": "2026-09-30", "why": "技术向逆向工程分析：仅用现成模型+更聪明的解码器（无训练）能复现多少 Jev 能力，含可交互 demo 与实测数据"}, {"title": "yibie/awesome-jev", "url": "https://github.com/yibie/awesome-jev", "kind": "repo", "date": "2026-09-30", "why": "Jev 生态导航仓库：收录 HN 发布大讨论帖、X 上的实践 demo（模型路由、Agent 安全监视器等）与各平台接入方式，是跟踪该赛道的一站式入口"}, {"title": "jev-decision-gateway: Governed decision-model gateway (TypeSafe Jev vs GPT-6 Sol vs rules on 100 withdrawals)", "url": "https://github.com/kartikanand73/jev-decision-gateway", "kind": "repo", "date": "2026-09-28", "why": "把 Jev 放进带治理的提款工作流做实测对比：Jev 1.13 在 100 笔合成提款上与分析师标签一致率 85%、欺诈自动放行 0 笔、p50 延迟 201ms、每千次决策 $0.03（GPT-6 Sol 为 $2.09）；核心模式是“模型只打分、代码做决策、策略引擎签名后执行”，与我们用 Jev 做流水线分类的思路直接可比。"}, {"title": "TypeSafe AI's Jev Brings Confidence-Based Workflow Routing to n8n", "url": "https://dev.to/alifar/typesafe-ais-jev-brings-confidence-based-workflow-routing-to-n8n-5g3c", "kind": "news", "date": "2026-10-01", "why": "TypeSafe Jev 官方集成 n8n：用 choice/noul 输出与校准置信度做工作流分支路由，高置信自动放行、低置信转人工——“模型只打分、代码做决策”模式在主流自动化平台落地。"}, {"title": "Research Flags Lookalike Jev Storefronts After TypeSafe Launch", "url": "https://letsdatascience.com/news/research-flags-lookalike-jev-storefronts-after-typesafe-laun-bf77c0d5", "kind": "news", "date": "2026-09-29", "why": "Eye Security 报告 Jev 发布后出现仿冒 storefronts：9/15–9/22 新增约 670 个含 jev 的证书域名，部分转售站点加价 6–11.5 倍且请求经过第三方基础设施——用 Jev API 时认准官方渠道。"}, {"title": "xienda/dsh-jev-verify: Jev decision-model plugin for DeepSeek Harness", "url": "https://github.com/xienda/dsh-jev-verify", "kind": "repo", "date": "2026-10-04", "why": "社区把 Jev 接进了刚发布桌面版的 DeepSeek Harness（jev_decision/jev_verify/auto-guard），是 Jev 在真实 agent 工具链里做\"快速判断+护栏\"的首个完整插件实现，可作我们 pipeline 里 Jev 定位的参照。"}, {"title": "What Is Jev? TypeSafe AI's New \"Decision Model\" Explained", "url": "https://codecaf.com/what-is-jev-typesafe-ais-new-decision-model-explained/", "kind": "news", "date": "2026-10-01", "why": "第三方深度解读：区分 Jev 官方文档可验证事实与厂商宣称，附可验证的代码示例，适合作为 Jev 技术细节的参考读物。"}]}], "note": "兴趣来源：user=用户明确指定；conversation=从日常对话中挖掘；rss=用户订阅的 RSS 源。每日 08:00 任务按兴趣搜索过去 24h 内容，先过滤（相关性+质量+去重）再收录，每方向每天最多 5 条。", "summary": "今日兴趣追踪新增 2 条，两个方向无新鲜内容（宁缺毋滥）。**Agent 访问控制**新增 1 条：codecrux 10 月 3 日长文梳理 Google 的 agent 安全架构——agent 作为一等非人类主体、传输层身份认证、逐请求授权、最小权限作用域、JIT 凭证、默认拒绝，这套「授权边界放在 agent 运行时与工具之间」的做法与我们「策略独立存放、执行语义层逐 AU 求值」的立场高度同构，可作论文 Agent 线的引用备选。**RAG 访问控制**与**Embedding 与隐私攻击**方向过去 24 小时无实质新内容，留空。**Jev 决策模型**新增 1 条第三方深度解读（codecaf）：把 TypeSafe 官方宣称和可独立验证的事实分开写，并给了可验证的代码示例，适合当 Jev 的技术参考。", "updated": "2026-10-05"};
+const MODELS = {"date": "2026-10-05", "summary": "**LMArena Text 榜今日继续冻结**（仍为 10-02 快照）：**gemini-4-argon-high** 以 **1533.5 分**守住第一，领先第二名 claude-opus-5.5-high（1511.7）约 22 分，前十 delta 全部为 0，无座次变化；榜单前十里 Anthropic 占 6 席，谷歌 2 席，小米 mimo-v2.6-pro（1491.0）守住第十。**过去 24 小时无新的闭源模型发布**：最近的仍是 Gemini 4 Argon（10-01）、微软 MAI 语音三件套（10-01）。开源侧 HF 今日榜：**ReliquaryForge/qwen3-4b-base-dapo-v4** 以 **14.6 万次下载**断层领先——Qwen3 4B 的 DAPO 强化微调版，小参数+RL 后训练的路线值得关注；**Vxtzq/Crowd-v1**（4 万下载）、**Qwen3.8-Flash-Next** 的 GGUF 量化版（llama.cpp 本地运行向）分列其后。**最大的一条模型新闻其实是「未发布」**：Axios 10-04 爆料 Nvidia 支持的 **Reflection** 即将发布首个 open-weight 模型，目标直指中国顶尖开源模型（详见 spotlight）。", "spotlight": [{"name": "Reflection 首个 open-weight 模型（即将发布）", "url": "https://aistockwire.com/blog/nvidia-nvda-backed-reflection-open-weight-ai-model-axios-october-2026", "why": "Axios 10 月 4 日援引知情人士爆料：Nvidia 注资 8 亿美元的 Reflection 即将发布首个 open-weight 模型，预期性能不及美国最顶尖闭源模型，但目标是与中国顶尖开源模型竞争。这是「西方 DeepSeek」叙事的关键一役——Reflection 手握 SpaceX 每月 1.5 亿美元算力（Colossus 2 的 GB300）与 Nebius 超 10 亿美元算力协议，主打「AI 工厂」概念（企业/政府用自己的数据+Reflection 模型+自己的算力组装定制系统），3 月已与韩国新世界集团签约建 250MW AI 工厂。对开源生态意味着：西方终于有一个资本与算力都到位的 open-weight 挑战者，值得盯发布时间与 license 条款。注意：目前仅为爆料，模型名/参数/许可证/发布时间均未公布。"}, {"name": "qwen3-4b-base-dapo-v4（HF 今日榜下载冠军）", "url": "https://huggingface.co/ReliquaryForge/qwen3-4b-base-dapo-v4", "why": "HF 今日榜以 14.6 万次下载断层第一：Qwen3 4B base 的 DAPO（去偏置优势策略优化）强化微调版本。看点在于路线——小参数基座 + 先进 RL 后训练算法，能否在推理任务上逼近大一个量级模型的性价比；对本地部署和 Agent 场景（小模型做工具调用）有直接参考价值。"}], "arena_date": "2026-10-02", "arena": [{"model": "gemini-4-argon-high", "org": "google", "license": "Proprietary", "rating": 1533.5, "votes": 4932, "rank": 1, "delta": 0}, {"model": "claude-opus-5.5-high", "org": "anthropic", "license": "Proprietary", "rating": 1511.7, "votes": 4552, "rank": 2, "delta": 0}, {"model": "claude-fable-5.1-max", "org": "anthropic", "license": "Proprietary", "rating": 1510.6, "votes": 11800, "rank": 3, "delta": 0}, {"model": "claude-opus-5-max", "org": "anthropic", "license": "Proprietary", "rating": 1507.0, "votes": 28937, "rank": 4, "delta": 0}, {"model": "claude-opus-4-6-high", "org": "anthropic", "license": "Proprietary", "rating": 1503.2, "votes": 77636, "rank": 5, "delta": 0}, {"model": "claude-opus-5-high", "org": "anthropic", "license": "Proprietary", "rating": 1502.1, "votes": 59482, "rank": 6, "delta": 0}, {"model": "claude-opus-4-6", "org": "anthropic", "license": "Proprietary", "rating": 1497.6, "votes": 82189, "rank": 7, "delta": 0}, {"model": "gemini-3.8-flash-high", "org": "google", "license": "Proprietary", "rating": 1497.0, "votes": 26298, "rank": 8, "delta": 0}, {"model": "claude-fable-5-high", "org": "anthropic", "license": "Proprietary", "rating": 1491.7, "votes": 38387, "rank": 9, "delta": 0}, {"model": "mimo-v2.6-pro", "org": "xiaomi", "license": "MIT", "rating": 1491.0, "votes": 4056, "rank": 10, "delta": 0}, {"model": "claude-opus-4-7-high", "org": "anthropic", "license": "Proprietary", "rating": 1489.9, "votes": 64946, "rank": 11, "delta": 0}, {"model": "muse-spark-1.3-max", "org": "meta", "license": "Proprietary", "rating": 1489.9, "votes": 12343, "rank": 12, "delta": 0}, {"model": "gemini-3.7-flash-high", "org": "google", "license": "Proprietary", "rating": 1487.0, "votes": 21539, "rank": 13, "delta": 0}, {"model": "claude-opus-4-7", "org": "anthropic", "license": "Proprietary", "rating": 1483.3, "votes": 66058, "rank": 14, "delta": 0}, {"model": "muse-spark-1.2 (xHigh)", "org": "meta", "license": "Proprietary", "rating": 1483.2, "votes": 4356, "rank": 15, "delta": 0}], "releases_open": [{"id": "ReliquaryForge/qwen3-4b-base-dapo-v4", "url": "https://huggingface.co/ReliquaryForge/qwen3-4b-base-dapo-v4", "likes": 8, "downloads": 146465, "date": "2026-10-04", "pipeline": "text-generation", "license": "apache-2.0", "params": "4.0B"}, {"id": "Vxtzq/Crowd-v1", "url": "https://huggingface.co/Vxtzq/Crowd-v1", "likes": 10, "downloads": 40104, "date": "2026-10-04", "pipeline": "text-generation", "license": "mit", "params": ""}, {"id": "ji-farthing/Qwen3.8-Flash-Next-ik-llama-GGUF", "url": "https://huggingface.co/ji-farthing/Qwen3.8-Flash-Next-ik-llama-GGUF", "likes": 16, "downloads": 8330, "date": "2026-10-04", "pipeline": "text-generation", "license": "other", "params": "", "base_model": "Qwen3.8-Flash-Next"}, {"id": "Gugu8/L-CED-15B", "url": "https://huggingface.co/Gugu8/L-CED-15B", "likes": 0, "downloads": 6234, "date": "2026-10-04", "pipeline": "", "license": "", "params": ""}, {"id": "ji-farthing/Qwen3.8-Flash-Next-Uncensored-ik-llama-GGUF", "url": "https://huggingface.co/ji-farthing/Qwen3.8-Flash-Next-Uncensored-ik-llama-GGUF", "likes": 9, "downloads": 3075, "date": "2026-10-04", "pipeline": "text-generation", "license": "other", "params": "", "base_model": "Qwen3.8-Flash-Next-Uncensored"}, {"id": "ToastyPigeon/Other-Test-GGUFs", "url": "https://huggingface.co/ToastyPigeon/Other-Test-GGUFs", "likes": 0, "downloads": 165, "date": "2026-10-04", "pipeline": "", "license": "", "params": ""}, {"id": "Haijun-AI/kamsa-k1-v3", "url": "https://huggingface.co/Haijun-AI/kamsa-k1-v3", "likes": 0, "downloads": 103, "date": "2026-10-04", "pipeline": "", "license": "", "params": "77M"}, {"id": "mlnomad/yat-mmbert-base-embedding-v1", "url": "https://huggingface.co/mlnomad/yat-mmbert-base-embedding-v1", "likes": 0, "downloads": 63, "date": "2026-10-04", "pipeline": "", "license": "mit", "params": "308M", "base_model": "yat-mmbert-base-contrastive-12000"}, {"id": "peng-lab/phoenix", "url": "https://huggingface.co/peng-lab/phoenix", "likes": 3, "downloads": 0, "date": "2026-10-04", "pipeline": "zero-shot-classification", "license": "cc-by-nc-4.0", "params": "", "base_model": "H-optimus-1"}, {"id": "pmolodyk/artifacts-a833cdd7fe3f8895", "url": "https://huggingface.co/pmolodyk/artifacts-a833cdd7fe3f8895", "likes": 3, "downloads": 0, "date": "2026-10-04", "pipeline": "", "license": "", "params": ""}, {"id": "baya1116/hypernet-sp-distill", "url": "https://huggingface.co/baya1116/hypernet-sp-distill", "likes": 2, "downloads": 0, "date": "2026-10-04", "pipeline": "", "license": "mit", "params": "", "base_model": "DeepSeek-R1-Distill-Qwen-1.5B"}, {"id": "mlnomad/yat-mmbert-base-embedding-v1-pytorch", "url": "https://huggingface.co/mlnomad/yat-mmbert-base-embedding-v1-pytorch", "likes": 0, "downloads": 20, "date": "2026-10-04", "pipeline": "", "license": "mit", "params": "308M", "base_model": "yat-mmbert-base-embedding-v1"}, {"id": "mmknnk/star-checkpoints", "url": "https://huggingface.co/mmknnk/star-checkpoints", "likes": 2, "downloads": 0, "date": "2026-10-04", "pipeline": "", "license": "", "params": ""}, {"id": "MCCbena/yolo-v7-tiny-4s", "url": "https://huggingface.co/MCCbena/yolo-v7-tiny-4s", "likes": 1, "downloads": 0, "date": "2026-10-04", "pipeline": "object-detection", "license": "gpl-3.0", "params": ""}, {"id": "ghananlpcommunity/ghana-tts-v2", "url": "https://huggingface.co/ghananlpcommunity/ghana-tts-v2", "likes": 1, "downloads": 0, "date": "2026-10-04", "pipeline": "text-to-speech", "license": "apache-2.0", "params": ""}, {"id": "Aryama/anlp-a2-m26", "url": "https://huggingface.co/Aryama/anlp-a2-m26", "likes": 0, "downloads": 0, "date": "2026-10-04", "pipeline": "", "license": "", "params": ""}, {"id": "racer102/hal10", "url": "https://huggingface.co/racer102/hal10", "likes": 0, "downloads": 0, "date": "2026-10-04", "pipeline": "", "license": "", "params": ""}, {"id": "brother-winter/bro10", "url": "https://huggingface.co/brother-winter/bro10", "likes": 0, "downloads": 0, "date": "2026-10-04", "pipeline": "", "license": "", "params": ""}, {"id": "mrthor102/gun04", "url": "https://huggingface.co/mrthor102/gun04", "likes": 0, "downloads": 0, "date": "2026-10-04", "pipeline": "", "license": "", "params": ""}, {"id": "racer102/hal07", "url": "https://huggingface.co/racer102/hal07", "likes": 0, "downloads": 0, "date": "2026-10-04", "pipeline": "", "license": "", "params": ""}], "releases_closed": [{"name": "MAI-Transcribe-2-Streaming / MAI-Voice-2.1 / MAI-Voice-2.1-Flash", "org": "Microsoft AI", "date": "2026-10-01", "url": "https://microsoft.ai/news/our-first-streaming-transcription-model/", "blurb": "微软首个流式语音转写模型（60 语言、连续语种检测、首个 partial 仅 100ms+，Artificial Analysis 转写榜 final/partial 双第一，WER 2.5%/延迟 0.13s）+ TTS 双子星 Voice-2.1（23 语言跨语言原生口音）与 Flash 版（150ms 延迟）。实时语音 agent 基础设施的关键一战。"}, {"name": "Gemini 4 Argon", "org": "Google DeepMind", "date": "2026-10-01", "url": "https://arstechnica.com/google/2026/09/google-announces-gemini-4-argon-ai-model-but-you-cant-use-it-yet/", "blurb": "新一代 frontier 模型，主打复杂工作流（代码/企业知识工作/网络安全），1M token 输出上限；首批与美国政府及可信网络安全伙伴落地，暂不向公众开放。；10-02 独立评测（Artificial Analysis Intelligence Index）得分 53，与 GPT-6 Astra、Claude Fable 5.1 持平，落后于 Claude Opus 5.5（58）/ Sonnet 5.5（56）；Agent Arena 第 10（10,030 场）；介绍期 API 价格 $2/$10 每百万 token（仅 Astra/Fable 的五分之一）。"}, {"name": "GPT-6.1 Sol", "org": "OpenAI", "date": "2026-09-29", "url": "https://www.marktechpost.com/2026/09/30/openai-releases-gpt-6-1-sol-near-astra-coding-and-computer-use-at-one-fifth-of-astras-token-price/", "blurb": "near-Astra 智能、1/5 token 价格（$2/$10 每百万，缓存 $0.10），DeepSWE v1.1 持平 Astra；DevDay 发布，已向 Plus/Pro/Business/Enterprise/Edu 在 ChatGPT Work 与 Codex 开放。"}, {"name": "Claude Sonnet 5.5", "org": "Anthropic", "date": "2026-09-28", "url": "https://www.reuters.com/technology/anthropic-rolls-out-second-claude-55-model-it-builds-toward-ipo-2026-09-28/", "blurb": "比 Sonnet 5 快 30%+，Terminal-Bench 4.0 从 10.3% 跃升至 70.6%，价格不变（$2/$10）；首个搭载 cyber safeguard 的 Sonnet 模型，IPO 前产品线扩张的第二弹。"}]};
+const ARCH_RUNS = null;
+const SRC_CLS = {"arXiv":"", "HuggingFace":"hf", "OpenAlex":"oa", "期刊补录":"j"};
+/* 数据缺失 vs 零新增必须可区分：date 为空时头部显示"数据缺失" */
+function dline(d){ return d ? d + ' 更新 · ' : '数据缺失 · '; }
+const esc = s => (s||'').replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+const md = s => esc(s||'').replace(/\*\*([^*]+)\*\*/g, '<b>$1</b>').replace(/\n/g, '<br>');
+const fmtN = n => { n = n||0;
+  if (n >= 1e6) return (n/1e6).toFixed(1).replace(/\.0$/,'') + 'M';
+  if (n >= 1e3) return (n/1e3).toFixed(1).replace(/\.0$/,'') + 'K';
+  return '' + n; };
+const avatar = (a, h, cls, dot) => {
+  const ch = esc((((a && a.name) || h || '?') + '').trim().charAt(0));
+  const fb = '<span class="x-av-fb">' + ch + '</span>';
+  const img = (a && a.avatar)
+    ? '<img src="' + esc(a.avatar) + '" alt="" loading="lazy" onerror="this.remove()">'
+    : '';
+  return '<span class="av-wrap ' + cls + '">' + fb + img
+    + (dot ? '<span class="x-dot" hidden></span>' : '') + '</span>';
+};
+const colSummary = (t, b) => '<div class="x-summary"><div class="x-sum-t">' + esc(t)
+  + '</div><div class="x-sum-b">' + md(b) + '</div></div>';
+
+/* theme */
+const rootEl = document.documentElement, themeBtn = document.getElementById('themeBtn');
+function setTheme(t){ rootEl.setAttribute('data-theme', t);
+  themeBtn.textContent = t === 'dark' ? '☀️' : '🌙';
+  try{ localStorage.setItem('lit-theme', t); }catch(e){} }
+try{ setTheme(localStorage.getItem('lit-theme') || 'light'); }catch(e){ setTheme('light'); }
+themeBtn.addEventListener('click', () =>
+  setTheme(rootEl.getAttribute('data-theme') === 'dark' ? 'light' : 'dark'));
+
+/* tabs */
+const TABS = ['papers','models','interests','trending','x','apple','deals','finance','ainews'];
+const PANES = TABS.concat(['library']);
+function showTab(name){
+  if (!PANES.includes(name)) name = 'papers';
+  if (name === 'x') markXSeen();
+  PANES.forEach(t => {
+    document.getElementById('pane-' + t).hidden = (t !== name);
+    const b = document.querySelector('[data-tab="' + t + '"]');
+    if (b) b.classList.toggle('on', t === name);
+  });
+  ensureTab(name);  // 懒渲染：首次切到某 tab 时才渲染
+  if (('' + location.hash).slice(1) !== name){
+    try{ history.replaceState(null, '', '#' + name); }catch(e){}
+  }
+}
+document.querySelectorAll('[data-tab]').forEach(b =>
+  b.addEventListener('click', () => showTab(b.dataset.tab)));
+document.getElementById('libBtn').addEventListener('click', () => showTab('library'));
+
+/* ---------- papers ---------- */
+const all = [];
+DATA.days.forEach(d => d.papers.forEach(p => all.push(Object.assign({}, p, {date: d.date}))));
+const srcOf = p => p.supplement ? '期刊补录' : (p.source || 'arXiv');
+const state = {q:'', src:'', cat:'', day:''};
+document.getElementById('sTotal').textContent = DATA.all_total;
+document.getElementById('sDays').textContent = DATA.all_days;
+document.getElementById('sArxiv').textContent = all.filter(p => srcOf(p) === 'arXiv' && !p.supplement).length;
+document.getElementById('sExtra').textContent = all.filter(p => !p.supplement && srcOf(p) !== 'arXiv').length;
+document.getElementById('sJour').textContent = all.filter(p => p.supplement).length;
+const srcChips = document.getElementById('srcChips');
+const srcs = [''].concat([...new Set(all.map(srcOf))].sort());
+const SRC_NAME = {'':'全部来源'};
+srcs.forEach(s => {
+  const b = document.createElement('button');
+  b.className = 'chip' + (s === '' ? ' on' : '');
+  b.textContent = SRC_NAME[s] || s;
+  b.dataset.src = s;
+  b.addEventListener('click', () => {
+    state.src = s;
+    srcChips.querySelectorAll('.chip').forEach(x => x.classList.toggle('on', x === b));
+    render();
+  });
+  srcChips.appendChild(b);
+});
+const cats = [...new Set(all.flatMap(p => (p.cats || []).length ? p.cats : (p.supplement ? ['期刊'] : [])))].sort();
+const catSel = document.getElementById('cat');
+cats.forEach(c => { const o = document.createElement('option'); o.value = c;
+  o.textContent = (CAT_LABEL[c] ? CAT_LABEL[c] + ' · ' : '') + c; catSel.appendChild(o); });
+catSel.addEventListener('change', () => { state.cat = catSel.value; render(); });
+const daySel = document.getElementById('day');
+DATA.days.forEach(d => { const o = document.createElement('option'); o.value = d.date; o.textContent = d.date; daySel.appendChild(o); });
+daySel.addEventListener('change', () => { state.day = daySel.value; render(); });
+document.getElementById('q').addEventListener('input', e => { state.q = e.target.value.trim().toLowerCase(); render(); });
+function pdfUrl(u){
+  const m = (u || '').match(/arxiv\.org\/abs\/([\d.]+)/);
+  return m ? 'https://arxiv.org/pdf/' + m[1] + '.pdf' : '';
+}
+function codeLink(code){
+  const m = (code || '').match(/github\.com\/([\w.\-]+\/[\w.\-]+)/);
+  return m ? '<a href="https://github.com/' + esc(m[1]) + '" target="_blank" rel="noopener">💻 ' + esc(m[1]) + '</a>' : '';
+}
+function badges(p){
+  const s = srcOf(p);
+  let h = '<span class="badge ' + (SRC_CLS[s] || '') + '">' + esc(s) + '</span>';
+  h += (p.cats || []).map(c => '<span class="badge cat">' +
+    esc((CAT_LABEL[c] ? CAT_LABEL[c] + ' · ' : '') + c) + '</span>').join('');
+  if (p.supplement) h += '<span class="badge cat">期刊/会议</span>';
+  return h;
+}
+function card(p){
+  const pdf = pdfUrl(p.url), ch = codeLink(p.code);
+  const cite = (p.citations && p.citations !== '尚未收录')
+    ? '<span>📊 引用 ' + esc(p.citations) + '</span>' : '';
+  const links = (p.url ? '<a href="' + esc(p.url) + '" target="_blank" rel="noopener">原文页面</a>' : '')
+    + (pdf ? '<a href="' + esc(pdf) + '" target="_blank" rel="noopener">PDF 直链</a>' : '');
+  return '<div class="card">'
+    + '<div class="badges">' + badges(p) + '<span class="date">' + esc(p.date) + '</span></div>'
+    + '<h3><a href="' + esc(p.url) + '" target="_blank" rel="noopener">' + esc(p.title) + '</a></h3>'
+    + (p.authors ? '<div class="authors">' + esc(p.authors) + '</div>' : '')
+    + (p.oneliner ? '<div class="one">' + esc(p.oneliner) + '</div>' : '')
+    + (p.zh_abs ? '<details class="box zh"><summary>中文摘要</summary><div class="body">' +
+        esc(p.zh_abs).replace(/\n/g, '<br>') + '</div></details>' : '')
+    + (p.insight ? '<details class="box" open><summary>对我们论文的启迪</summary><div class="body">' +
+        esc(p.insight).replace(/\n/g, '<br>') + '</div></details>' : '')
+    + ((cite || ch) ? '<div class="meta-row">' + cite + (ch ? '<span>' + ch + '</span>' : '') + '</div>' : '')
+    + (links ? '<div class="links">' + links + '</div>' : '')
+    + '</div>';
+}
+function match(p){
+  if (state.src && srcOf(p) !== state.src) return false;
+  if (state.cat && !((p.cats || []).includes(state.cat) || (state.cat === '期刊' && p.supplement))) return false;
+  if (state.q){
+    const hay = (p.title + ' ' + p.authors + ' ' + p.oneliner + ' ' + (p.zh_abs || '') +
+      ' ' + p.insight + ' ' + (p.code || '')).toLowerCase();
+    if (!hay.includes(state.q)) return false;
+  }
+  return true;
+}
+function render(){
+  let html = '', n = 0;
+  const latest = DATA.days[0];
+  if (latest && latest.summary && !state.q && !state.src && !state.cat)
+    html += colSummary('📌 今日论文综述', latest.summary.slice(0, 1400));
+  DATA.days.forEach(day => {
+    if (state.day && day.date !== state.day) return;
+    const ps = day.papers.filter(match);
+    if (!ps.length) return;
+    n += ps.length;
+    html += '<div class="day"><div class="day-head"><h2>📅 ' + esc(day.date) + '</h2>'
+      + '<span class="n">' + ps.length + ' 篇</span></div>';
+    if (day.summary && day.date !== latest.date && !state.q && !state.src && !state.cat)
+      html += '<div class="x-summary"><div class="x-sum-b">' + md(day.summary.slice(0, 1000)) + '</div></div>';
+    html += '<div class="grid">' + ps.map(card).join('') + '</div></div>';
+  });
+  document.getElementById('list').innerHTML =
+    html || '<div class="empty">没有匹配的论文，换个关键词或清除筛选试试。</div>';
+  document.getElementById('count').textContent =
+    '共 ' + n + ' 篇' + (DATA.all_days > DATA.days.length ? '（近' + DATA.days.length + '天，更早的见右上角 🗂️归档）' : '');
+}
+
+/* ---------- library (我们的论文库) ---------- */
+function libCard(p){
+  return '<div class="card"><div class="badges">'
+    + (p.tags || []).map(t => '<span class="badge cat">' + esc(t) + '</span>').join('')
+    + (p.venue ? '<span class="date">' + esc(p.venue) + '</span>' : '') + '</div>'
+    + '<h3><a href="' + esc(p.url) + '" target="_blank" rel="noopener">' + esc(p.title) + '</a></h3>'
+    + (p.authors ? '<div class="authors">' + esc(p.authors) + '</div>' : '')
+    + (p.oneliner ? '<div class="one">' + esc(p.oneliner) + '</div>' : '')
+    + (p.insight ? '<details class="box" open><summary>对我们论文的启迪</summary><div class="body">'
+        + esc(p.insight).replace(/\n/g, '<br>') + '</div></details>' : '')
+    + (p.url ? '<div class="links"><a href="' + esc(p.url) + '" target="_blank" rel="noopener">原文链接 ↗</a></div>' : '')
+    + '</div>';
+}
+function renderLibrary(){
+  const gs = LIB.groups || [];
+  let n = 0;
+  gs.forEach(g => { n += (g.papers || []).length; });
+  document.getElementById('libCount').textContent =
+    dline(LIB.updated) + gs.length + ' 组 · ' + n + ' 篇';
+  let html = colSummary('📌 论文库说明',
+    '人工精选、长期维护 ' + n + ' 篇核心论文，分 ' + gs.length + ' 组。'
+    + '与每日自动抓取的论文流分开存放，不会被覆盖。' + (LIB.note ? '\n' + LIB.note : ''));
+  html += gs.map(g => {
+    const ps = g.papers || [];
+    return '<div class="day"><div class="day-head"><h2>' + esc(g.name) + '</h2>'
+      + '<span class="n">' + ps.length + ' 篇</span></div>'
+      + '<div class="grid">' + ps.map(libCard).join('') + '</div></div>';
+  }).join('');
+  document.getElementById('libList').innerHTML = html || '<div class="empty">论文库暂无内容。</div>';
+}
+
+/* ---------- interests (兴趣追踪) ---------- */
+function intCard(it){
+  const kind = it.kind === 'paper' ? '论文' : it.kind === 'repo' ? '开源' : '新闻';
+  return '<div class="card"><div class="badges"><span class="badge cat">' + kind + '</span>'
+    + (it.date ? '<span class="date">' + esc(it.date) + '</span>' : '') + '</div>'
+    + '<h3><a href="' + esc(it.url) + '" target="_blank" rel="noopener">' + esc(it.title) + '</a></h3>'
+    + (it.why ? '<div class="one">💡 ' + esc(it.why) + '</div>' : '')
+    + (it.url ? '<div class="links"><a href="' + esc(it.url) + '" target="_blank" rel="noopener">查看原文 ↗</a></div>' : '')
+    + '</div>';
+}
+function renderInterests(){
+  const list = (INT.interests || []).filter(g => (g.items || []).length > 0);
+  let n = 0;
+  list.forEach(g => { n += (g.items || []).length; });
+  document.getElementById('intCount').textContent =
+    dline(INT.updated) + list.length + ' 个方向 · ' + n + ' 条';
+  let html = '';
+  if (INT.summary) html += colSummary('📌 追踪说明', INT.summary);
+  html += list.map(g => {
+    const items = g.items || [];
+    const srcLabel = g.source === 'user' ? '你指定' : g.source === 'rss' ? 'RSS 订阅' : '对话挖掘';
+    return '<div class="day"><div class="day-head"><h2>🎯 ' + esc(g.name) + '</h2>'
+      + '<span class="n">' + items.length + ' 条 · ' + srcLabel + '</span></div>'
+      + '<div class="list">' + items.map(intCard).join('') + '</div>'
+      + '</div>';
+  }).join('');
+  document.getElementById('intList').innerHTML = html || '<div class="empty">今日暂无追踪到内容。</div>';
+}
+
+/* ---------- trending ---------- */
+function renderTrending(){
+  const repos = TR.repos || [];
+  document.getElementById('trCount').textContent =
+    dline(TR.date) + repos.length + ' 个仓库';
+  let thtml = '';
+  if (TR.summary) thtml += colSummary('📌 今日开源趋势要点', TR.summary);
+  thtml += repos.length ? repos.map(r =>
+    '<div class="card"><div class="badges"><span class="badge">★ ' + esc('' + r.stars) + '</span>'
+    + (r.lang ? '<span class="badge cat">' + esc(r.lang) + '</span>' : '')
+    + '<span class="date">' + esc(r.created || '') + '</span></div>'
+    + '<h3><a href="' + esc(r.url) + '" target="_blank" rel="noopener">' + esc(r.name) + '</a></h3>'
+    + (r.desc ? '<div class="one">' + esc(r.desc) + '</div>' : '')
+    + '</div>').join('')
+    : '<div class="empty">今日暂无开源趋势数据。</div>';
+  document.getElementById('trList').innerHTML = thtml;
+}
+
+/* ---------- apple (🍎苹果动态): 官方发布 + 媒体热议 ---------- */
+function renderApple(){
+  const off = AP.official || [], med = AP.media || [];
+  document.getElementById('apCount').textContent =
+    dline(AP.date) + (off.length + med.length) + ' 条';
+  let html = '';
+  if (AP.summary) html += colSummary('📌 今日苹果要点', AP.summary);
+  const card = (it, tag) =>
+    '<div class="card"><div class="badges"><span class="badge">' + tag + '</span>'
+    + '<span class="badge cat">' + esc(it.source || '') + '</span>'
+    + '<span class="date">' + esc(it.published || '') + '</span></div>'
+    + '<h3><a href="' + esc(it.url) + '" target="_blank" rel="noopener">' + esc(it.title) + '</a></h3>'
+    + (it.desc ? '<div class="one">' + esc(it.desc) + '</div>' : '')
+    + '</div>';
+  if (off.length) html += '<h3 class="gs">🆕 官方发布</h3><div class="list">' + off.map(it => card(it, '官方')).join('') + '</div>';
+  if (med.length) html += '<h3 class="gs">💬 媒体热议</h3><div class="list">' + med.map(it => card(it, '媒体')).join('') + '</div>';
+  document.getElementById('apList').innerHTML =
+    html || '<div class="empty">今日暂无苹果动态。</div>';
+}
+
+/* ---------- deals (🐑今日羊毛): AI 薅羊毛 + iOS 限免 + Mac 限免 ---------- */
+function renderDeals(){
+  const ai = DEALS.ai || [], ios = DEALS.ios || [], mac = DEALS.mac || [];
+  document.getElementById('dealCount').textContent =
+    dline(DEALS.date) + (ai.length + ios.length + mac.length) + ' 条';
+  let html = '';
+  if (DEALS.summary) html += colSummary('📌 今日羊毛要点', DEALS.summary);
+  const card = (it, tag) =>
+    '<div class="card"><div class="badges"><span class="badge">' + tag + '</span>'
+    + '<span class="badge cat">' + esc(it.source || '') + '</span>'
+    + '<span class="date">' + esc(it.published || '') + '</span></div>'
+    + '<h3><a href="' + esc(it.url) + '" target="_blank" rel="noopener">' + esc(it.title) + '</a></h3>'
+    + (it.desc ? '<div class="one">' + esc(it.desc) + '</div>' : '')
+    + '</div>';
+  if (ai.length) html += '<h3 class="gs">🤖 AI 薅羊毛</h3><div class="list">' + ai.map(it => card(it, '优惠')).join('') + '</div>';
+  if (ios.length) html += '<h3 class="gs">🍎 iOS 限免</h3><div class="list">' + ios.map(it => card(it, '限免')).join('') + '</div>';
+  if (mac.length) html += '<h3 class="gs">💻 Mac 限免</h3><div class="list">' + mac.map(it => card(it, '限免')).join('') + '</div>';
+  document.getElementById('dealList').innerHTML =
+    html || '<div class="empty">今日暂无羊毛。</div>';
+}
+
+/* ---------- finance (💰财经大事): 长简报 md 渲染 ---------- */
+function mdInline(s){
+  return esc(s||'')
+    .replace(/\[([^\]]+)\]\(([^)]+)\)/g, '<a href="$2" target="_blank" rel="noopener">$1</a>')
+    .replace(/\*\*([^*]+)\*\*/g, '<b>$1</b>');
+}
+function renderFinance(){
+  const M = FIN || {}, src = M.md || '';
+  const n = (src.match(/^(\*\*\d+\.\s*\[|▪\s?)/gm) || []).length;
+  document.getElementById('finCount').textContent =
+    dline(M.date) + n + ' 条';
+  const box = document.getElementById('finList');
+  if (!src.trim()){ box.innerHTML = '<div class="empty">今日暂无财经大事早报。</div>'; return; }
+  let html = '', inList = false, inTable = false;
+  const closeList = () => { if (inList){ html += '</ul>'; inList = false; } };
+  const closeTable = () => { if (inTable){ html += '</tbody></table>'; inTable = false; } };
+  src.split('\n').forEach(raw => {
+    const line = raw.trim();
+    if (!line){ closeList(); closeTable(); return; }
+    let m;
+    if ((m = line.match(/^###\s+(.*)/))){ closeList(); closeTable(); html += '<div class="fin-h3">' + mdInline(m[1]) + '</div>'; return; }
+    if ((m = line.match(/^##\s+(.*)/))){ closeList(); closeTable(); html += '<h2 class="fin-h2">' + mdInline(m[1]) + '</h2>'; return; }
+    if (/^#\s/.test(line)){ closeList(); closeTable(); return; }  /* H1 跳过（tab 已有标题） */
+    if (/^---+$/.test(line)){ closeList(); closeTable(); html += '<hr class="fin-hr">'; return; }
+    if (/^\|.*\|$/.test(line)){
+      closeList();
+      if (/^\|[\s|\-:]*\|$/.test(line) && /-/.test(line)) return;  /* 表格分隔行跳过 */
+      const cells = line.split('|').slice(1, -1).map(c => mdInline(c.trim()));
+      if (!inTable){ html += '<table class="fin-table"><tbody>'; inTable = true; }
+      html += '<tr>' + cells.map(c => '<td>' + c + '</td>').join('') + '</tr>';
+      return;
+    }
+    if (/^\*\*\d+\.\s*\[/.test(line)){
+      closeTable();
+      if (!inList){ html += '<ul class="fin-list">'; inList = true; }
+      html += '<li class="fin-item fin-num">' + mdInline(line) + '</li>';
+      return;
+    }
+    if (/^▪\s?/.test(line)){
+      closeTable();
+      if (!inList){ html += '<ul class="fin-list">'; inList = true; }
+      html += '<li class="fin-item">' + mdInline(line.replace(/^▪\s?/, '')) + '</li>';
+      return;
+    }
+    closeList(); closeTable();
+    html += '<p class="fin-p">' + mdInline(line) + '</p>';
+  });
+  closeList(); closeTable();
+  box.innerHTML = '<article class="fin-body">' + html + '</article>';
+}
+
+/* ---------- ainews (📰AI情报): 8 分类 feed + 权益速递摘要 ---------- */
+function renderAinews(){
+  const N = AINEWS || {}, G = N.groups || {};
+  document.getElementById('ainewsCount').textContent =
+    dline(N.date) + (N.total || 0) + ' 条'
+    + (N.feed_date ? '（上游今日未更新，' + N.feed_date + ' 数据）' : '');
+  let html = '';
+  const dg = N.digest;
+  if (dg){
+    let dig = '';
+    if (dg.summary_md) dig += colSummary('📌 本期速递要点（第' + esc(dg.issue) + '期）', dg.summary_md);
+    if ((dg.deadlines || []).length){
+      const rows = dg.deadlines.map(r =>
+        '<tr><td>' + mdInline(r[0]) + '</td><td>' + mdInline(r[1]) + '</td><td>' + mdInline(r[2]) + '</td></tr>').join('');
+      dig += '<h3 class="gs">⏰ 限时活动倒计时</h3><div class="card"><table class="fin-table"><tbody>' + rows + '</tbody></table></div>';
+    }
+    dig += '<div class="card" style="text-align:center"><a href="intel.html#digest" style="color:var(--acc);text-decoration:none">📮 阅读《' + esc(dg.title) + '》全文 →</a></div>';
+    html += dig;
+  }
+  const card = it =>
+    '<div class="card"><div class="badges">'
+    + (it.score >= 80 ? '<span class="badge" style="background:#ff3b30;color:#fff;font-weight:600">🔥 热</span>'
+       : (it.score >= 50 ? '<span class="badge" style="background:#ff9500;color:#fff;font-weight:600">▲ 高热</span>' : ''))
+    + '<span class="badge cat">' + esc(it.source || '') + '</span>'
+    + (it.metrics && it.metrics.stars ? '<span class="badge">⭐ ' + fmtN(it.metrics.stars) + '</span>' : '')
+    + (it.metrics && it.metrics.stars_gain ? '<span class="badge">⬆ ' + fmtN(it.metrics.stars_gain) + '</span>' : '')
+    + '<span class="date">' + esc(it.published || '') + '</span></div>'
+    + '<h3><a href="' + esc(it.url) + '" target="_blank" rel="noopener">' + esc(it.title) + '</a></h3>'
+    + (it.summary ? '<div class="one">' + esc(it.summary) + '</div>' : '')
+    + '</div>';
+  Object.keys(G).forEach(cat => {
+    const g = G[cat] || {};
+    if (!(g.items || []).length) return;
+    html += '<h3 class="gs">' + esc(g.label || cat) + '</h3><div class="list">'
+      + g.items.map(card).join('') + '</div>';
+  });
+  const ok = (N.source_health || []).filter(h => h.status === 'ok').length;
+  if ((N.source_health || []).length)
+    html += '<div class="empty">📡 情报源健康：' + ok + '/' + N.source_health.length + ' 正常</div>';
+  document.getElementById('ainewsList').innerHTML =
+    html || '<div class="empty">今日暂无 AI 情报。</div>';
+}
+
+/* ---------- x (大佬动态): 分组 + 头像折叠 ---------- */
+function twArticles(h){
+  const a = XW.accounts[h], tws = a.tweets || [];
+  return tws.map(t => {
+    const rt = (t.author && t.author.toLowerCase() !== h.toLowerCase())
+      ? '<div class="tw-rt">🔁 转推 @' + esc(t.author) + '</div>' : '';
+    return '<article class="tw">' + avatar(a, h, 'tw-av')
+      + '<div class="tw-body"><div class="tw-head"><span class="tw-name">'
+      + esc(a.name || h) + '</span><span class="tw-sub">@' + esc(h)
+      + ' · ' + esc(t.created_at) + '</span></div>' + rt
+      + '<div class="tw-text">' + esc(t.text).replace(/\n/g, '<br>') + '</div>'
+      + '<div class="tw-actions"><span>💬 ' + fmtN(t.replies) + '</span>'
+      + '<span>🔁 ' + fmtN(t.reposts) + '</span>'
+      + '<span>♥ ' + fmtN(t.likes) + '</span>'
+      + '<span>👁 ' + fmtN(t.views) + '</span>'
+      + '<a href="' + esc(t.url) + '" target="_blank" rel="noopener">在 X 上查看 ↗</a></div>'
+      + '</div></article>';
+  }).join('');
+}
+/* ---- X 未读小红点：localStorage 记已读，APP 式 ---- */
+const X_SEEN_KEY = 'coco_x_seen_v1';
+const getXSeen = () => { try { return JSON.parse(localStorage.getItem(X_SEEN_KEY) || '{}'); } catch(e){ return {}; } };
+function renderXDots(){
+  const seen = getXSeen();
+  let any = false;
+  document.querySelectorAll('.x-chip').forEach(ch => {
+    const h = ch.getAttribute('data-h'), nw = ch.getAttribute('data-newest') || '';
+    const unread = !!(nw && (!seen[h] || nw > seen[h]));
+    const dot = ch.querySelector('.x-dot');
+    if (dot) dot.hidden = !unread;
+    if (unread) any = true;
+  });
+  const tabDot = document.getElementById('xTabDot');
+  if (tabDot) tabDot.hidden = !any;
+}
+function markXSeen(handle){
+  const seen = getXSeen();
+  if (handle){ seen[handle] = new Date().toISOString(); }
+  else { document.querySelectorAll('.x-chip').forEach(ch => {
+    seen[ch.getAttribute('data-h')] = ch.getAttribute('data-newest') || new Date().toISOString(); }); }
+  try { localStorage.setItem(X_SEEN_KEY, JSON.stringify(seen)); } catch(e){}
+  renderXDots();
+}
+function toggleXAcc(btn){
+  const g = btn.getAttribute('data-g'), h = btn.getAttribute('data-h');
+  markXSeen(h);
+  const det = document.getElementById('xd-' + g);
+  const wasOpen = btn.classList.contains('open');
+  det.parentElement.querySelectorAll('.x-chip.open').forEach(c => c.classList.remove('open'));
+  if (wasOpen){ det.innerHTML = ''; return; }
+  btn.classList.add('open');
+  const a = XW.accounts[h];
+  det.innerHTML = '<div class="x-detail-head">' + avatar(a, h, 'x-av-lg')
+    + '<div><div class="x-acc-name">' + esc(a.name || h) + '</div>'
+    + '<div class="x-acc-sub">@' + esc(h) + (a.label ? ' · ' + esc(a.label) : '')
+    + '</div></div></div>' + twArticles(h);
+  if (det.scrollIntoView) det.scrollIntoView({behavior: 'smooth', block: 'nearest'});
+}
+function renderX(){
+  const accs = XW.accounts || {};
+  const handles = Object.keys(accs).filter(h => (accs[h].tweets || []).length);
+  let total = 0;
+  handles.forEach(h => { total += accs[h].tweets.length; });
+  document.getElementById('xCount').textContent =
+    dline(XW.date) + total + ' 条';
+  const box = document.getElementById('xList');
+  let html = '';
+  if (XW.summary) {
+    html += '<div class="x-summary"><div class="x-sum-t">📌 今日要点</div>'
+      + '<div class="x-sum-b">' + md(XW.summary) + '</div></div>';
+  }
+  const gs = XW.group_summaries || {};
+  const groups = XW.groups || [{key: 'other', label: '🌐 其他'}];
+  html += groups.map(gr => {
+    const hs = handles.filter(h => (accs[h].group || 'other') === gr.key);
+    if (!hs.length) return '';
+    const n = hs.reduce((s, h) => s + accs[h].tweets.length, 0);
+    const chips = hs.map(h => {
+      const a = accs[h];
+      const newest = a.tweets.reduce((m, t) => (t.created_at && t.created_at > m) ? t.created_at : m, '');
+      return '<button class="x-chip" data-g="' + esc(gr.key) + '" data-h="' + esc(h)
+        + '" data-newest="' + esc(newest) + '" onclick="toggleXAcc(this)">'
+        + avatar(a, h, 'x-av-chip', true)
+        + '<div class="x-chip-name">' + esc(a.name || h) + '</div>'
+        + '<div class="x-chip-sub">@' + esc(h) + ' · ' + a.tweets.length + '条</div></button>';
+    }).join('');
+    return '<section class="x-group"><div class="x-group-head"><div class="x-group-title">'
+      + esc(gr.label) + '</div><div class="x-group-n">' + n + ' 条</div></div>'
+      + (gs[gr.key] ? '<div class="x-group-sum">' + md(gs[gr.key]) + '</div>' : '')
+      + '<div class="x-chips">' + chips + '</div>'
+      + '<div class="x-detail" id="xd-' + esc(gr.key) + '"></div></section>';
+  }).join('');
+  // 抓取失败提示：fetch_x.py 把失败写进 errors[]，面板尾部如实展示
+  const errs = XW.errors || [];
+  if (errs.length) {
+    html += '<div class="x-errors">⚠️ ' + errs.length + ' 个账号本轮抓取失败：'
+      + errs.map(e => esc(typeof e === 'string' ? e : (e.account || e.handle || JSON.stringify(e)))).join('、')
+      + '（显示为上轮数据）</div>';
+  }
+  box.innerHTML = html || '<div class="empty">今日暂无大佬动态数据。</div>';
+}
+
+/* ---------- models ---------- */
+function renderModels(){
+  const M = MODELS || {};
+  const ro = M.releases_open || [], rc = M.releases_closed || [], arena = M.arena || [];
+  const sp = M.spotlight || [];
+  const nRel = ro.length + rc.length;
+  document.getElementById('mdCount').textContent =
+    (M.date ? M.date + ' 更新' : '数据缺失') + (M.arena_date ? ' · 榜单 ' + M.arena_date : '');
+  let html = '';
+  if (M.summary) html += colSummary('📌 今日模型要点', M.summary);
+  if (sp.length){
+    html += '<div class="day"><div class="day-head"><h2>🔍 值得关注</h2><span class="n">' + sp.length + '</span></div><div class="grid">';
+    html += sp.map(c => '<div class="card"><div class="badges"><span class="badge amber">精选</span></div>'
+      + '<h3>' + (c.url ? '<a href="' + esc(c.url) + '" target="_blank" rel="noopener">' + esc(c.name) + '</a>' : esc(c.name)) + '</h3>'
+      + (c.why ? '<div class="one">' + md(c.why) + '</div>' : '') + '</div>').join('');
+    html += '</div></div>';
+  }
+  if (nRel){
+    html += '<div class="day"><div class="day-head"><h2>🆕 新发布</h2><span class="n">' + nRel + '</span></div><div class="grid">';
+    html += rc.map(c => '<div class="card"><div class="badges"><span class="badge cat">闭源</span>'
+      + (c.date ? '<span class="date">' + esc(c.date) + '</span>' : '') + '</div>'
+      + '<h3>' + (c.url ? '<a href="' + esc(c.url) + '" target="_blank" rel="noopener">' + esc(c.name) + '</a>' : esc(c.name)) + '</h3>'
+      + (c.org ? '<div class="authors">' + esc(c.org) + '</div>' : '')
+      + (c.blurb ? '<div class="one">' + esc(c.blurb) + '</div>' : '') + '</div>').join('');
+    html += ro.map(c => {
+      const info = [c.params ? c.params + ' 参数' : '', c.base_model ? '基于 ' + c.base_model : '',
+                    c.pipeline || '', c.license || ''].filter(Boolean).join(' · ');
+      return '<div class="card"><div class="badges"><span class="badge green">开源权重</span>'
+      + (c.date ? '<span class="date">' + esc(c.date) + '</span>' : '') + '</div>'
+      + '<h3><a href="' + esc(c.url) + '" target="_blank" rel="noopener">' + esc(c.id) + '</a></h3>'
+      + (info ? '<div class="one">' + esc(info) + '</div>' : '')
+      + '<div class="authors">❤ ' + c.likes + ' · ⬇ ' + fmtN(c.downloads) + '</div></div>';
+    }).join('');
+    html += '</div></div>';
+  }
+  if (arena.length){
+    html += '<div class="day"><div class="day-head"><h2>🏆 LMArena Text 榜</h2>'
+      + (M.arena_date ? '<span class="n">' + esc(M.arena_date) + '</span>' : '') + '</div>'
+      + '<div class="lb-wrap"><table class="lb-table"><thead><tr><th>#</th><th>模型</th><th>评分</th><th>较昨日</th></tr></thead><tbody>'
+      + arena.map(a => {
+          const dlt = a.delta || 0;
+          const dc = dlt > 0 ? '<span class="up">▲ ' + dlt + '</span>'
+                   : dlt < 0 ? '<span class="down">▼ ' + (-dlt) + '</span>'
+                   : '<span class="flat">–</span>';
+          const open = a.license && a.license !== 'Proprietary';
+          return '<tr><td class="rk">' + a.rank + '</td><td><span class="mname">' + esc(a.model) + '</span>'
+            + (open ? '<span class="open-tag">开源</span>' : '')
+            + (a.org ? '<span class="org">' + esc(a.org) + '</span>' : '') + '</td>'
+            + '<td class="num">' + a.rating + '</td><td>' + dc + '</td></tr>';
+        }).join('') + '</tbody></table></div>'
+      + '<div class="summary">人类盲测偏好评分（Bradley-Terry），数据来自 LMArena 公开数据集（CC-BY-4.0）。</div></div>';
+  }
+  document.getElementById('mdList').innerHTML = html || '<div class="empty">今日暂无模型数据。</div>';
+}
+
+/* ---------- tab 懒渲染：首屏只渲染当前 tab，其余切换时按需渲染 ---------- */
+const TAB_RENDER = {papers: render, models: renderModels, library: renderLibrary,
+  interests: renderInterests, trending: renderTrending, x: renderX, apple: renderApple,
+  deals: renderDeals, finance: renderFinance, ainews: renderAinews};
+const TAB_DONE = {};
+function ensureTab(name){
+  if (!TAB_DONE[name] && TAB_RENDER[name]){ TAB_RENDER[name](); TAB_DONE[name] = 1; }
+}
+renderXDots();  // tab 栏小圆点不受懒渲染影响，照常初始化
+const _initTab = ('' + location.hash).slice(1);
+ensureTab(PANES.includes(_initTab) ? _initTab : 'papers');
+showTab(_initTab || 'papers');
+
+/* ---------- archive modal（历史归档弹窗） ---------- */
+const ARCH_PREFIX = location.pathname.indexOf('/archive/') >= 0 ? '' : 'archive/';
+const DIGEST_URL = ARCH_PREFIX + 'digest.json';
+let archDigestCache = null;
+function archItemHTML(it, open){
+  const runs = (it.runs || []).map(r =>
+    '<span class="run-tag">' + esc(r.name) + '</span>').join('');
+  const secs = [
+    ['📚 论文', it.papers, it.papers_n ? it.papers_n + ' 篇' : ''],
+    ['🤖 模型追踪', it.models],
+    ['🎯 兴趣追踪', it.interests],
+    ['🔥 开源趋势', it.trending],
+    ['👀 大佬动态', it.x],
+    ['📰 AI情报', it.ainews],
+  ];
+  const body = secs.filter(s => s[1]).map(s =>
+    '<div class="arch-sec"><div class="arch-sec-t">' + s[0] +
+    (s[2] ? ' <span class="arch-hint">' + esc(s[2]) + '</span>' : '') +
+    '</div><div class="arch-sec-b">' + md(s[1]) + '</div></div>'
+  ).join('') || '<div class="empty">暂无摘要</div>';
+  return '<details class="arch-item"' + (open ? ' open' : '') + '>' +
+    '<summary><span class="arch-date">📅 ' + esc(it.date) + '</span>' +
+    runs + '<span class="arch-hint">→</span></summary>' +
+    '<div class="arch-body">' + body +
+    '<a class="arch-go" href="' + ARCH_PREFIX + it.date + '.html">查看当天完整看板 →</a>' +
+    '</div></details>';
+}
+function renderArchList(items, partial){
+  const list = document.getElementById('archList');
+  if (!items || !items.length){
+    list.innerHTML = '<div class="empty">暂无归档</div>';
+    return;
+  }
+  list.innerHTML =
+    (partial ? '<div class="empty">本地打开为精简模式，仅显示近 7 天</div>' : '') +
+    items.map((it, i) => archItemHTML(it, i === 0)).join('');
+}
+let archScrollY = 0;
+function lockBodyScroll(){
+  archScrollY = window.scrollY || 0;
+  document.body.style.position = 'fixed';
+  document.body.style.top = '-' + archScrollY + 'px';
+  document.body.style.left = '0';
+  document.body.style.right = '0';
+}
+function unlockBodyScroll(){
+  document.body.style.position = '';
+  document.body.style.top = '';
+  document.body.style.left = '';
+  document.body.style.right = '';
+  window.scrollTo(0, archScrollY);
+}
+async function openArchive(){
+  const m = document.getElementById('archModal');
+  m.hidden = false;
+  lockBodyScroll();
+  if (archDigestCache){ renderArchList(archDigestCache.list, archDigestCache.partial); return; }
+  const list = document.getElementById('archList');
+  list.innerHTML = '<div class="empty">加载中…</div>';
+  try{
+    const r = await fetch(DIGEST_URL, {cache: 'no-store'});
+    if (!r.ok) throw new Error('http ' + r.status);
+    const items = await r.json();
+    archDigestCache = {list: items, partial: false};
+  }catch(e){
+    archDigestCache = {list: ARCH_DIGEST_INLINE || [], partial: true};
+  }
+  renderArchList(archDigestCache.list, archDigestCache.partial);
+}
+function closeArchive(){
+  document.getElementById('archModal').hidden = true;
+  unlockBodyScroll();
+}
+document.getElementById('archBtn').addEventListener('click', openArchive);
+document.getElementById('archClose').addEventListener('click', closeArchive);
+document.getElementById('archModal').addEventListener('click', e => {
+  if (e.target.id === 'archModal') closeArchive();
+});
+document.addEventListener('keydown', e => {
+  if (e.key === 'Escape' && !document.getElementById('archModal').hidden) closeArchive();
+});
+
+/* ---------- archive run switcher (早/中/晚版次，仅归档页) ---------- */
+const XW_LATEST = XW;  // 页面初始即最新合并状态
+function switchRun(label){
+  document.querySelectorAll('.run-switch button').forEach(b =>
+    b.classList.toggle('on', b.getAttribute('data-run') === label));
+  const r = (typeof ARCH_RUNS !== 'undefined' && ARCH_RUNS) ? ARCH_RUNS[label] : null;
+  // 该版次有差异数据则用之，否则回退到最新合并状态
+  XW = (r && r.x) ? r.x : XW_LATEST;
+  if (typeof renderX === 'function'){ renderX(); TAB_DONE.x = 1; }
+  if (typeof renderXDots === 'function') renderXDots();
+}
+document.querySelectorAll('.run-switch button').forEach(b =>
+  b.addEventListener('click', () => switchRun(b.getAttribute('data-run'))));
+</script>
+</body>
+</html>
