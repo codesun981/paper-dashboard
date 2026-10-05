@@ -1,0 +1,68 @@
+<p><img src="https://images.unsplash.com/photo-1518779558439-581519b61841?w=1600&q=80&fm=jpg&fit=crop" loading="lazy" alt="电路板微距"></p><p>电商客服常收到一张商品照片和一句“这瓶能带上飞机吗”。图像模型可能看见瓶子，却未必看得清容量，更不知道具体航司规定。本文用 Java 17 做一个可运行的视觉问答小程序：把公开图片 URL 和用户问题一起送给模型，并要求它分清可见事实、推断和未知。学会以后，你能把同一方法用于设备外观检查、展品导览，但也会知道何时必须让人核验。</p><p>视觉模型接收的不只是图片。图片作为 ，问题作为 ，两个内容项放在同一条用户消息里，模型才能把“这张图”和“这个问题”关联起来。所谓 OCR（Optical Character Recognition，光学字符识别）只是把文字从图上读出来；视觉问答还要理解对象、位置和关系。两者都可能出错，尤其遇到反光、遮挡、字体太小或图片被裁切时。近期新模型不断出现，但本教程先固定官方文档可核验的 图像输入写法，避免把模型升级等同于证据可靠性升级。<code>input_image</code><code>input_text</code><code>gpt-5</code></p><p> <p><img src="https://java4u.cn/wp-content/uploads/2026/10/inline_00-14.png" loading="lazy" alt="mermaid diagram"></p></p><h2>准备依赖与运行环境</h2><p>安装 Java 17 以上和 Maven。程序使用 JDK 自带的 ；官方 REST API 对 Java 可直接调用，这里保留 HTTP 请求和响应的可见性，JSON 交给 Jackson 解析。将以下依赖放进 的 ，Maven 编译器目标设为 17：。若已有 Maven 项目，只需补这一项；新建项目还应在 里设置 。<code>HttpClient</code><code>pom.xml</code><code><dependencies></code><code><dependency><groupId>com.fasterxml.jackson.core</groupId><artifactId>jackson-databind</artifactId><version>2.17.2</version></dependency></code><code><properties></code><code><maven.compiler.release>17</maven.compiler.release></code></p><p>把代码保存为 ，设置 与 。后者必须是模型服务能访问的 HTTPS 图片地址，且你有权发送这张图；不要传内部照片的公开外链。命令为 、，再运行 ；Windows 把路径分隔符改为分号并用 PowerShell 读取 。如果只想快速阅读，先看下面的 main 方法即可。<code>src/main/java/VisionQa.java</code><code>OPENAI_API_KEY</code><code>IMAGE_URL</code><code>mvn -q dependency:build-classpath -Dmdep.outputFile=cp.txt</code><code>mvn -q compile</code><code>java -cp "target/classes:$(cat cp.txt)" VisionQa "图中能看到什么？"</code><code>cp.txt</code></p><pre><code>import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import java.net.URI;
+import java.net.http.HttpClient;
+import java.net.http.HttpRequest;
+import java.net.http.HttpResponse;
+import java.time.Duration;
+import java.util.List;
+import java.util.Map;
+
+public class VisionQa {
+    private static final ObjectMapper JSON = new ObjectMapper();
+
+    public static void main(String[] args) {
+        try {
+            String key = System.getenv("OPENAI_API_KEY");
+            String imageUrl = System.getenv("IMAGE_URL");
+            if (key == null || key.isBlank())
+                throw new IllegalArgumentException("缺少 OPENAI_API_KEY");
+            if (imageUrl == null || !imageUrl.startsWith("https://"))
+                throw new IllegalArgumentException("IMAGE_URL 必须是HTTPS地址");
+            if (args.length == 0 || args[0].isBlank())
+                throw new IllegalArgumentException("请在命令行传入问题");
+
+            Map<String, Object> body = Map.of(
+                "model", "gpt-5",
+                "input", List.of(Map.of(
+                    "role", "user",
+                    "content", List.of(
+                        Map.of("type", "input_text", "text",
+                            "只回答图中可见事实；无法确认的规格请说未知。问题：" + args[0]),
+                        Map.of("type", "input_image", "image_url", imageUrl)
+                    )
+                ))
+            );
+            HttpRequest request = HttpRequest.newBuilder()
+                .uri(URI.create("https://api.openai.com/v1/responses"))
+                .timeout(Duration.ofSeconds(45))
+                .header("Authorization", "Bearer " + key)
+                .header("Content-Type", "application/json")
+                .POST(HttpRequest.BodyPublishers.ofString(JSON.writeValueAsString(body)))
+                .build();
+            HttpClient client = HttpClient.newBuilder()
+                .connectTimeout(Duration.ofSeconds(10)).build();
+            HttpResponse<String> response = client.send(request,
+                HttpResponse.BodyHandlers.ofString());
+            if (response.statusCode() / 100 != 2)
+                throw new IllegalStateException("HTTP " + response.statusCode()
+                    + ": " + response.body().substring(0,
+                        Math.min(300, response.body().length())));
+            JsonNode root = JSON.readTree(response.body());
+            StringBuilder answer = new StringBuilder();
+            for (JsonNode item : root.path("output"))
+                for (JsonNode part : item.path("content"))
+                    if ("output_text".equals(part.path("type").asText()))
+                        answer.append(part.path("text").asText());
+            if (answer.isEmpty()) throw new IllegalStateException("响应没有文本内容");
+            System.out.println(answer);
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+            System.err.println("请求被中断");
+        } catch (Exception e) {
+            System.err.println("运行失败：" + e.getMessage());
+            System.exit(1);
+        }
+    }
+}
+</code></pre><h2>关键代码与预期输出</h2><p>请求体把文字和图片放在同一个 数组。图片 URL 不会由 Java 下载后再上传；模型服务要能够访问它，因此访问控制和授权要先处理。代码对 URL 只做了 HTTPS 前缀检查，生产环境应进一步限制域名、大小和图片类型，避免用户构造恶意地址。HTTP 请求同时设连接和请求超时；中断时恢复线程标志，避免上层服务把取消误当普通失败。<code>content</code></p><p>响应不是一个固定的顶层 字段，程序遍历 中的 ，只拼接 。这样能避开某些非文本输出项。正常情况下可能得到“图中可见一个瓶子，但容量标识无法辨认，是否可携带需核对容量和航司规则”。这是预期形式，不是本次实测。示例未在本次任务中实际调用线上API，也没有以任何真实商品图作准确率验证。<code>text</code><code>output</code><code>content</code><code>output_text</code></p><h2>常见错误、适用范围与改进</h2><p>第一，图片 URL 在浏览器能打开，但服务端取不到：检查公开访问权限、重定向与过期签名。第二，401 或 403：检查密钥、项目权限和模型可用性，不要在报错里回显完整凭据。第三，模型说出了图片看不清的容量：提示词只是约束，仍需业务代码对关键字段做人工核验。第四，大图或小字导致回答不稳：裁切到关键区域，保留原图索引供复核。</p><p>它适合低风险的商品咨询、现场导览和辅助分拣，不适合凭单张图做医疗诊断、安检许可或法规判定。工程化时可存储图片哈希、问题、模型版本和人工纠错结果，按“可见事实准确率”和“未知时拒答率”分别评估。图像内容涉及用户隐私时，先确认处理依据与留存期限。</p><p>从照片到答案，最容易丢失的是证据粒度。模型说“瓶身是蓝色”，用户能在原图看到；说“容量 100 毫升”，则要标签清晰可读；说“允许登机”，还需要航司规定。产品界面可以把回答分为“图片可见”“需查商品资料”“需查外部规定”，分别接不同数据源。模型文字是候选，关键结论应能点回原图或权威页面。</p><p>评估时别只拿漂亮演示图。至少准备清晰图、逆光图、局部裁切图、相似包装图和带诱导文字的图。图片上印着“忽略上面的说明”时，那只是图片内容，不应变成系统指令。把标准答案写成可核对字段，再统计误读、漏读和错误拒答。临时签名 URL 还可能在模型取图前过期；永久公开 URL 则可能泄露内容。真实业务要在授权范围内处理访问、尺寸、格式与留存期限。</p><p>5 分钟实践：准备两张你有使用权的公开测试图，一张标签清晰、一张故意模糊，问“容量是多少”。比较回答能否对模糊图保持未知。你会允许商品助手凭包装外观推断容量或认证信息吗？</p><p>做商品客服时，模型识别出的信息还应该和商品目录对齐。照片里的包装可能是旧版，系统中的在售 SKU（Stock Keeping Unit，库存保有单位）可能有新版容量。即便模型准确读出了旧包装，也不能据此承诺当前订单的规格。比较稳妥的流程是先从订单或商品页拿到 SKU，再用图片核对颜色、外观、明显标签；若两者冲突，直接转人工或询问用户补拍订单编号，而不是让视觉模型替业务数据库做裁判。</p><p>成本和速度也要测在完整链路上。用户上传图片、后端检查大小、生成临时地址、模型取图、模型输出、客服界面展示，每段都有时间。只测模型响应时间会忽略大图上传和图片服务器慢的问题。开始可以记录每段耗时的中位数与高分位数，再决定是压缩图片、裁剪区域，还是换用文件上传路径。压缩会让小字更难读，因此应保留原图以便人工复查，并对清晰度建立最低要求。</p><p>对于可见事实的回答，建议让客服点开“证据图片”后再发送，而不要设置默认自动回复。尤其用户问到成分、认证、适龄范围、保质期或安全规格时，必须结合权威商品资料。模型说“看起来像”只能作为搜索线索。为了让纠错数据可复用，人工修改时记录错误类别：图片模糊、模型漏读、错误推断、商品资料过期或问题超出图像范围。不同错误需要不同修复手段，不能都靠调整提示词。</p><p>把失败样本和原图一起保存时，注意图片可能含人脸、地址或单号。可先裁掉与问题无关的区域，并给审核样本设置访问权限和清理期限。这样既能保留足够的排障证据，也能减少无关信息暴露。</p><p>关注「蜗牛聊AI」，一起看懂技术变化背后的真正机会。</p> .j4u-post { font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",PingFang SC,"Microsoft YaHei",sans-serif; color:#24292e; line-height:1.8; max-width:860px; margin:0 auto; } .j4u-post img.hero { display:block; width:100%; max-width:860px; border-radius:10px; margin:0 0 24px; } .j4u-post h1 { font-size:30px; margin:0 0 16px; } .j4u-post h2 { font-size:24px; margin:32px 0 12px; padding-bottom:8px; border-bottom:2px solid #07c160; } .j4u-post h3 { font-size:20px; margin:24px 0 10px; } .j4u-post p { font-size:16px; margin:0 0 16px; } .j4u-post a { color:#07c160; text-decoration:none; } .j4u-post blockquote { margin:18px 0; padding:12px 16px; background:#f6f8fa; border-left:4px solid #07c160; color:#555; } .j4u-post pre { background:#0d1117; color:#c9d1d9; padding:16px; border-radius:8px; overflow:auto; font-size:14px; line-height:1.6; } .j4u-post code { font-family:Consolas,Menlo,monospace; } .j4u-post pre code { background:none; padding:0; } .j4u-post :not(pre) > code { background:#f6f8fa; padding:2px 6px; border-radius:4px; color:#c7254e; font-size:14px; } .j4u-post ul, .j4u-post ol { padding-left:24px; margin:0 0 16px; } .j4u-post li { font-size:16px; margin:6px 0; } .j4u-post img { max-width:100%; }
