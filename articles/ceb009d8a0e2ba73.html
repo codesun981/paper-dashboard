@@ -1,0 +1,612 @@
+<div><div><article class="markdown-body entry-content container-lg" itemprop="text">
+<p dir="auto">DeepGEMM Ascend is a port of DeepGEMM to the HUAWEI Ascend platform. It is fully API-compatible with DeepGEMM and supports BF16, FP8, FP4 GEMM, MQA logits, and MegaMoE. On Ascend platforms, users can simply install the package and use the same APIs and development workflow as DeepGEMM on other supported platforms.</p>
+<p dir="auto">DeepGEMM Ascend provides a lightweight abstraction over the Ascend MAD (matrix multiply-add) primitives, hiding much of the complexity associated with fractal layouts, alignment constraints, address calculations, and verbose low-level parameters. This enables GEMM kernels to remain both concise and efficient. DeepGEMM Ascend makes extensive use of Ascend-specific optimization techniques, such as sparse data loading and coroutine-based pipelining, to approach the performance limits of the Ascend hardware. These implementations can also serve as references for extreme performance optimization on the Ascend platform.</p>
+<p dir="auto">Despite its lightweight codebase, DeepGEMM Ascend can achieve peak hardware performance across a wide range of matrix shapes.</p>
+<p dir="auto">DeepGEMM Ascend 是华为昇腾平台上的 DeepGEMM 实现。它完全兼容 DeepGEMM 的 API，支持 BF16、FP8、FP4 GEMM、MQA logits 和 MegaMoE 算子。DeepGEMM Ascend 和 DeepGEMM 使用相同的包名，用户只需安装当前包，即可沿用其他平台上 DeepGEMM 的 API 和开发流程。</p>
+<p dir="auto">DeepGEMM Ascend 对昇腾平台的矩阵乘加原语（MAD）提供了一个轻量的抽象，能够隐藏分形矩阵布局、对齐约束、地址计算、参数转换等细节，让 GEMM kernel 的实现保持简洁高效。DeepGEMM Ascend 广泛采用昇腾平台特有的优化技术，包括稀疏数据加载、基于协程的流水线等，以接近硬件的性能极限。这些实现也可以作为昇腾平台极致性能优化的参考。</p>
+<p dir="auto">DeepGEMM Ascend 代码轻量，并且在多种矩阵形状上能达到硬件极限性能。</p>
+
+<ul dir="auto">
+<li>2026.09.30: Initial release of DeepGEMM Ascend, with support for Ascend 950 devices. The kernels are designed to achieve near-peak hardware performance.</li>
+</ul>
+
+
+<ul dir="auto">
+<li>HUAWEI Ascend NPU (developed and validated on the Ascend 950 series)</li>
+<li>CANN 9.20 toolkit providing <code>bin/bisheng</code>, <code>bin/ld.lld</code></li>
+<li>Torch NPU package <code>torch_npu</code></li>
+<li>Python 3.10 or higher</li>
+<li>Compilers and standard libraries with C++20 <code>&lt;format&gt;</code> support</li>
+<li><code>tilelang</code>, used by the HC prenorm kernel (declared as a package dependency)</li>
+<li><code>tree-sitter</code> and <code>tree-sitter-cpp</code>, used to generate Python type stubs when building from source</li>
+</ul>
+
+<div class="highlight highlight-source-shell notranslate position-relative overflow-auto" dir="auto" data-snippet-clipboard-copy-content="# Submodule must be cloned
+git clone --recursive https://github.com/deepseek-ai/DeepGEMM-Ascend.git
+cd DeepGEMM-Ascend
+
+# Link some essential includes and build the C++ extension
+cat develop.sh
+./develop.sh"><pre><span class="pl-c"><span class="pl-c">#</span> Submodule must be cloned</span>
+git clone --recursive https://github.com/deepseek-ai/DeepGEMM-Ascend.git
+<span class="pl-c1">cd</span> DeepGEMM-Ascend
+
+<span class="pl-c"><span class="pl-c">#</span> Link some essential includes and build the C++ extension</span>
+cat develop.sh
+./develop.sh</pre></div>
+
+<div class="highlight highlight-source-shell notranslate position-relative overflow-auto" dir="auto" data-snippet-clipboard-copy-content="pip install . --no-build-isolation"><pre>pip install <span class="pl-c1">.</span> --no-build-isolation</pre></div>
+
+
+<p dir="auto">Please refer to <a href="https://github.com/deepseek-ai/DeepGEMM#interfaces" target="_blank" rel="noopener">DeepGEMM's interfaces</a> for the kernel APIs.</p>
+<div class="markdown-alert markdown-alert-note" dir="auto"><p class="markdown-alert-title" dir="auto"><svg data-component="Octicon" class="octicon octicon-info mr-2" viewbox="0 0 16 16" version="1.1" aria-hidden="true"><path d="M0 8a8 8 0 1 1 16 0A8 8 0 0 1 0 8Zm8-6.5a6.5 6.5 0 1 0 0 13 6.5 6.5 0 0 0 0-13ZM6.5 7.75A.75.75 0 0 1 7.25 7h1a.75.75 0 0 1 .75.75v2.75h.25a.75.75 0 0 1 0 1.5h-2a.75.75 0 0 1 0-1.5h.25v-2h-.25a.75.75 0 0 1-.75-.75ZM8 6a1 1 0 1 1 0-2 1 1 0 0 1 0 2Z"></path></svg>Note</p><p dir="auto">The scaling factor format on Ascend differs from NVIDIA's: each pair of UE8M0 scaling factors along the K dimension is packed into an <code>int16</code>, and the packed values are stored in MN-major order for optimal hardware efficiency.</p>
+</div>
+
+<p dir="auto">The library provides some utility functions besides the above kernels:</p>
+<ul dir="auto">
+<li><code>deep_gemm.set_num_sms</code> / <code>get_num_sms</code>: set/get the number of AI cores the kernels may use</li>
+<li><code>deep_gemm.set_npu_arch</code> / <code>get_npu_arch</code>: override/query the <code>dav-*</code> NPU architecture used for JIT compilation, <code>0</code> queries the device</li>
+<li><code>deep_gemm.set_mk_alignment_for_contiguous_layout</code> / <code>get_mk_alignment_for_contiguous_layout</code>: set/get the group-level M/K alignment for contiguous layout</li>
+<li><code>deep_gemm.get_theoretical_mk_alignment_for_contiguous_layout</code>: get the theoretical minimum M/K alignment</li>
+<li><code>deep_gemm.use_deterministic_algorithms</code> / <code>get_deterministic_algorithms</code>: enable/disable deterministic algorithms</li>
+<li><code>deep_gemm.transform_sf_into_required_layout</code>: transform scaling factors into the required layout</li>
+<li><code>deep_gemm.transform_k_grouped_sf_into_required_layout</code>: transform K-grouped scaling factors into the required layout</li>
+<li><code>deep_gemm.get_paged_mqa_logits_metadata</code>: build the scheduling metadata for the paged MQA kernels</li>
+<li><code>deep_gemm.aclnn_fp8_fp4_gemm_{nt, nn, tn, tt}</code> and <code>deep_gemm.aclnn_bf16_gemm_{nt, nn, tn, tt}</code>: ACLNN reference GEMMs used to cross-check the kernels in tests</li>
+</ul>
+
+<p dir="auto">Ascend home path is given by <code>ASCEND_HOME_PATH</code> or <code>ASCEND_TOOLKIT_HOME</code>.</p>
+<p dir="auto">Each <code>DG_JIT_*</code> variable falls back to the corresponding global <code>DJ_JIT_*</code> variable when unset, and is snapshotted when the JIT runtime is first created.</p>
+<ul dir="auto">
+<li>General
+<ul dir="auto">
+<li><code>DG_JIT_DEBUG</code>: <code>0</code> or <code>1</code>, enable JIT debugging features, including compiler commands, load-time reporting, and the selected config per shape; <code>0</code> by default</li>
+<li><code>DG_PRINT_CONFIGS</code>: <code>0</code> or <code>1</code>, print the selected config for each shape, <code>0</code> by default</li>
+</ul>
+</li>
+<li>JIT cache
+<ul dir="auto">
+<li><code>DG_JIT_CACHE_DIR</code>: string, cache directory (or a <code>:</code>-separated list of directories) for compiled kernels; lookup searches all paths front-to-back (first hit wins) and a cache miss compiles into the first path, <code>$HOME/.dj</code> by default</li>
+</ul>
+</li>
+<li>Compiler output and artifacts
+<ul dir="auto">
+<li><code>DG_JIT_PRINT_COMPILER_COMMAND</code>: <code>0</code> or <code>1</code>, print compiler and disassembler commands, <code>0</code> by default</li>
+<li><code>DG_JIT_PRINT_LOAD_TIME</code>: <code>0</code> or <code>1</code>, print kernel load time, <code>0</code> by default</li>
+<li><code>DG_JIT_KERNEL_DEBUG_INFO</code>: <code>0</code> or <code>1</code>, add Bisheng kernel debug information, <code>0</code> by default</li>
+</ul>
+</li>
+<li>Debugging
+<ul dir="auto">
+<li><code>DG_JIT_LAUNCH_TIMEOUT</code>: integer, Ascend kernel launch timeout in seconds; <code>300</code> by default, <code>0</code> disables it</li>
+<li><code>ASCEND_LAUNCH_BLOCKING</code>: synchronize the device after every launch, turning asynchronous launch errors into in-line failures</li>
+</ul>
+</li>
+</ul>
+
+<p dir="auto">Measured on Ascend 950DT (CANN 9.20) using <code>bench_msprof</code> with cold L2. Shapes and cases follow the DeepGEMM test suite and cover inference and training workloads of the DeepSeek model series; see <code>tests/</code> for reproduction.</p>
+
+<p dir="auto">Dense GEMM reaches up to <strong>99.8%</strong> of the hardware limit across types:</p>
+<markdown-accessiblity-table><table>
+<thead>
+<tr>
+<th align="center">Type</th>
+<th align="center">M</th>
+<th align="center">N</th>
+<th align="center">K</th>
+<th align="center">Latency (us)</th>
+<th align="center">Computation (TFLOPS)</th>
+<th align="center">Hardware limit (TFLOPS)</th>
+<th align="center">Utilization (%)</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td align="center">FP4×FP4</td>
+<td align="center">4096</td>
+<td align="center">7168</td>
+<td align="center">16384</td>
+<td align="center">565.6</td>
+<td align="center">1701</td>
+<td align="center">1730</td>
+<td align="center">98.3</td>
+</tr>
+<tr>
+<td align="center">FP8×FP4</td>
+<td align="center">4096</td>
+<td align="center">7168</td>
+<td align="center">16384</td>
+<td align="center">1117.8</td>
+<td align="center">861</td>
+<td align="center">865</td>
+<td align="center">99.5</td>
+</tr>
+<tr>
+<td align="center">FP8×FP8</td>
+<td align="center">4096</td>
+<td align="center">7168</td>
+<td align="center">16384</td>
+<td align="center">1117.6</td>
+<td align="center">861</td>
+<td align="center">865</td>
+<td align="center">99.5</td>
+</tr>
+<tr>
+<td align="center">BF16×BF16</td>
+<td align="center">4096</td>
+<td align="center">7168</td>
+<td align="center">16384</td>
+<td align="center">2229.9</td>
+<td align="center">431</td>
+<td align="center">432</td>
+<td align="center">99.8</td>
+</tr>
+</tbody>
+</table></markdown-accessiblity-table>
+<p dir="auto">FP8 GEMM for inference:</p>
+<markdown-accessiblity-table><table>
+<thead>
+<tr>
+<th align="center">M</th>
+<th align="center">N</th>
+<th align="center">K</th>
+<th align="center">Latency (us)</th>
+<th align="center">Computation (TFLOPS)</th>
+<th align="center">Memory bandwidth (GB/s)</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td align="center">128</td>
+<td align="center">2112</td>
+<td align="center">7168</td>
+<td align="center">15.0</td>
+<td align="center">258</td>
+<td align="center">1205</td>
+</tr>
+<tr>
+<td align="center">128</td>
+<td align="center">576</td>
+<td align="center">7168</td>
+<td align="center">10.1</td>
+<td align="center">105</td>
+<td align="center">564</td>
+</tr>
+<tr>
+<td align="center">128</td>
+<td align="center">24576</td>
+<td align="center">1536</td>
+<td align="center">20.6</td>
+<td align="center">468</td>
+<td align="center">2068</td>
+</tr>
+<tr>
+<td align="center">128</td>
+<td align="center">32768</td>
+<td align="center">512</td>
+<td align="center">10.4</td>
+<td align="center">415</td>
+<td align="center">1829</td>
+</tr>
+<tr>
+<td align="center">128</td>
+<td align="center">7168</td>
+<td align="center">16384</td>
+<td align="center">54.8</td>
+<td align="center">549</td>
+<td align="center">2456</td>
+</tr>
+<tr>
+<td align="center">128</td>
+<td align="center">4096</td>
+<td align="center">7168</td>
+<td align="center">19.0</td>
+<td align="center">397</td>
+<td align="center">1797</td>
+</tr>
+<tr>
+<td align="center">128</td>
+<td align="center">7168</td>
+<td align="center">2048</td>
+<td align="center">10.1</td>
+<td align="center">373</td>
+<td align="center">1670</td>
+</tr>
+<tr>
+<td align="center">4096</td>
+<td align="center">2112</td>
+<td align="center">7168</td>
+<td align="center">156.9</td>
+<td align="center">790</td>
+<td align="center">319</td>
+</tr>
+<tr>
+<td align="center">4096</td>
+<td align="center">576</td>
+<td align="center">7168</td>
+<td align="center">54.6</td>
+<td align="center">619</td>
+<td align="center">689</td>
+</tr>
+<tr>
+<td align="center">4096</td>
+<td align="center">24576</td>
+<td align="center">1536</td>
+<td align="center">362.2</td>
+<td align="center">854</td>
+<td align="center">137</td>
+</tr>
+<tr>
+<td align="center">4096</td>
+<td align="center">32768</td>
+<td align="center">512</td>
+<td align="center">164.3</td>
+<td align="center">837</td>
+<td align="center">129</td>
+</tr>
+<tr>
+<td align="center">4096</td>
+<td align="center">7168</td>
+<td align="center">16384</td>
+<td align="center">1117.6</td>
+<td align="center">861</td>
+<td align="center">186</td>
+</tr>
+<tr>
+<td align="center">4096</td>
+<td align="center">4096</td>
+<td align="center">7168</td>
+<td align="center">282.9</td>
+<td align="center">850</td>
+<td align="center">234</td>
+</tr>
+<tr>
+<td align="center">4096</td>
+<td align="center">7168</td>
+<td align="center">2048</td>
+<td align="center">143.4</td>
+<td align="center">838</td>
+<td align="center">181</td>
+</tr>
+</tbody>
+</table></markdown-accessiblity-table>
+
+<p dir="auto">Grouped GEMM for DeepSeek MoE experts (FP8×FP4, BF16 output). <code>#Groups</code> is the number of experts, and <code>M per group</code> the average tokens each receives.</p>
+<markdown-accessiblity-table><table>
+<thead>
+<tr>
+<th align="center">#Groups</th>
+<th align="center">M per group</th>
+<th align="center">N</th>
+<th align="center">K</th>
+<th align="center">Latency (us)</th>
+<th align="center">Computation (TFLOPS)</th>
+<th align="center">Memory bandwidth (GB/s)</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td align="center">4</td>
+<td align="center">8192</td>
+<td align="center">6144</td>
+<td align="center">7168</td>
+<td align="center">3722.4</td>
+<td align="center">818</td>
+<td align="center">104</td>
+</tr>
+<tr>
+<td align="center">4</td>
+<td align="center">8192</td>
+<td align="center">7168</td>
+<td align="center">3072</td>
+<td align="center">1778.0</td>
+<td align="center">856</td>
+<td align="center">98</td>
+</tr>
+<tr>
+<td align="center">4</td>
+<td align="center">8192</td>
+<td align="center">4096</td>
+<td align="center">4096</td>
+<td align="center">1356.1</td>
+<td align="center">855</td>
+<td align="center">148</td>
+</tr>
+<tr>
+<td align="center">4</td>
+<td align="center">8192</td>
+<td align="center">4096</td>
+<td align="center">2048</td>
+<td align="center">680.6</td>
+<td align="center">852</td>
+<td align="center">148</td>
+</tr>
+<tr>
+<td align="center">8</td>
+<td align="center">4096</td>
+<td align="center">6144</td>
+<td align="center">7168</td>
+<td align="center">3689.4</td>
+<td align="center">831</td>
+<td align="center">136</td>
+</tr>
+<tr>
+<td align="center">8</td>
+<td align="center">4096</td>
+<td align="center">7168</td>
+<td align="center">3072</td>
+<td align="center">1778.9</td>
+<td align="center">862</td>
+<td align="center">130</td>
+</tr>
+<tr>
+<td align="center">8</td>
+<td align="center">4096</td>
+<td align="center">4096</td>
+<td align="center">4096</td>
+<td align="center">1356.5</td>
+<td align="center">861</td>
+<td align="center">180</td>
+</tr>
+<tr>
+<td align="center">8</td>
+<td align="center">4096</td>
+<td align="center">4096</td>
+<td align="center">2048</td>
+<td align="center">681.0</td>
+<td align="center">858</td>
+<td align="center">179</td>
+</tr>
+</tbody>
+</table></markdown-accessiblity-table>
+
+<p dir="auto">MQA scoring for the DeepSeek Lightning Indexer. The kernel is FIX-pipe bound rather than compute bound, saturating the FIX pipe at 99% utilization.</p>
+<markdown-accessiblity-table><table>
+<thead>
+<tr>
+<th align="center">Type</th>
+<th align="center">Format</th>
+<th align="center">#Q Tokens</th>
+<th align="center">#K Tokens</th>
+<th align="center">#Heads</th>
+<th align="center">Dim</th>
+<th align="center">Latency (us)</th>
+<th align="center">Computation (TFLOPS)</th>
+<th align="center">Memory bandwidth (GB/s)</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td align="center">Prefill</td>
+<td align="center">FP8</td>
+<td align="center">4096</td>
+<td align="center">8192</td>
+<td align="center">32</td>
+<td align="center">128</td>
+<td align="center">302.6</td>
+<td align="center">681</td>
+<td align="center">283</td>
+</tr>
+<tr>
+<td align="center">Prefill</td>
+<td align="center">FP4</td>
+<td align="center">4096</td>
+<td align="center">8192</td>
+<td align="center">32</td>
+<td align="center">128</td>
+<td align="center">277.4</td>
+<td align="center">743</td>
+<td align="center">277</td>
+</tr>
+<tr>
+<td align="center">Decode</td>
+<td align="center">FP8</td>
+<td align="center">256</td>
+<td align="center">8192</td>
+<td align="center">32</td>
+<td align="center">128</td>
+<td align="center">150.9</td>
+<td align="center">565</td>
+<td align="center">2006</td>
+</tr>
+<tr>
+<td align="center">Decode</td>
+<td align="center">FP4</td>
+<td align="center">256</td>
+<td align="center">8192</td>
+<td align="center">32</td>
+<td align="center">128</td>
+<td align="center">124.2</td>
+<td align="center">708</td>
+<td align="center">1349</td>
+</tr>
+</tbody>
+</table></markdown-accessiblity-table>
+
+<p dir="auto">Mega MoE fuses EP dispatch, two grouped GEMMs, SwiGLU, and combine. Benchmarked over EP8 with top-k=6 (each token routed to 6 experts) and one shared expert; all values are averaged across 8 ranks.</p>
+<markdown-accessiblity-table><table>
+<thead>
+<tr>
+<th align="center">#Experts</th>
+<th align="center">Hidden</th>
+<th align="center">Intermediate</th>
+<th align="center">Tokens</th>
+<th align="center">Latency (us)</th>
+<th align="center">Computation (TFLOPS)</th>
+<th align="center">Memory bandwidth (GB/s)</th>
+<th align="center">Communication bandwidth (GB/s)</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td align="center">96</td>
+<td align="center">5120</td>
+<td align="center">2304</td>
+<td align="center">64</td>
+<td align="center">138.7</td>
+<td align="center">228.5</td>
+<td align="center">1850.0</td>
+<td align="center">37.5</td>
+</tr>
+<tr>
+<td align="center">96</td>
+<td align="center">5120</td>
+<td align="center">2304</td>
+<td align="center">256</td>
+<td align="center">225.5</td>
+<td align="center">562.5</td>
+<td align="center">1257.4</td>
+<td align="center">91.6</td>
+</tr>
+<tr>
+<td align="center">96</td>
+<td align="center">7168</td>
+<td align="center">3072</td>
+<td align="center">64</td>
+<td align="center">222.2</td>
+<td align="center">266.4</td>
+<td align="center">2136.9</td>
+<td align="center">32.8</td>
+</tr>
+<tr>
+<td align="center">96</td>
+<td align="center">7168</td>
+<td align="center">3072</td>
+<td align="center">256</td>
+<td align="center">359.2</td>
+<td align="center">659.2</td>
+<td align="center">1425.4</td>
+<td align="center">80.5</td>
+</tr>
+<tr>
+<td align="center">384</td>
+<td align="center">5120</td>
+<td align="center">2304</td>
+<td align="center">4096</td>
+<td align="center">2567.7</td>
+<td align="center">790.3</td>
+<td align="center">567.5</td>
+<td align="center">128.8</td>
+</tr>
+<tr>
+<td align="center">384</td>
+<td align="center">5120</td>
+<td align="center">2304</td>
+<td align="center">16384</td>
+<td align="center">9768.6</td>
+<td align="center">831.0</td>
+<td align="center">325.0</td>
+<td align="center">135.2</td>
+</tr>
+<tr>
+<td align="center">384</td>
+<td align="center">7168</td>
+<td align="center">3072</td>
+<td align="center">4096</td>
+<td align="center">4600.7</td>
+<td align="center">823.4</td>
+<td align="center">531.3</td>
+<td align="center">100.6</td>
+</tr>
+<tr>
+<td align="center">384</td>
+<td align="center">7168</td>
+<td align="center">3072</td>
+<td align="center">16384</td>
+<td align="center">17904.2</td>
+<td align="center">846.3</td>
+<td align="center">269.3</td>
+<td align="center">103.3</td>
+</tr>
+</tbody>
+</table></markdown-accessiblity-table>
+
+<p dir="auto">Prenorm GEMM for the DeepSeek mHC (Manifold-Constrained Hyper-Connections) module, which nearly saturates the HBM write bandwidth.</p>
+<markdown-accessiblity-table><table>
+<thead>
+<tr>
+<th align="center">M</th>
+<th align="center">N</th>
+<th align="center">K</th>
+<th align="center">Latency (us)</th>
+<th align="center">Computation (TFLOPS)</th>
+<th align="center">Memory bandwidth (GB/s)</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td align="center">13</td>
+<td align="center">24</td>
+<td align="center">28672</td>
+<td align="center">6.7</td>
+<td align="center">3</td>
+<td align="center">519</td>
+</tr>
+<tr>
+<td align="center">137</td>
+<td align="center">24</td>
+<td align="center">28672</td>
+<td align="center">9.6</td>
+<td align="center">20</td>
+<td align="center">1110</td>
+</tr>
+<tr>
+<td align="center">512</td>
+<td align="center">24</td>
+<td align="center">28672</td>
+<td align="center">15.4</td>
+<td align="center">46</td>
+<td align="center">2082</td>
+</tr>
+<tr>
+<td align="center">4096</td>
+<td align="center">24</td>
+<td align="center">28672</td>
+<td align="center">72.7</td>
+<td align="center">78</td>
+<td align="center">3276</td>
+</tr>
+<tr>
+<td align="center">8192</td>
+<td align="center">24</td>
+<td align="center">28672</td>
+<td align="center">136.7</td>
+<td align="center">82</td>
+<td align="center">3463</td>
+</tr>
+</tbody>
+</table></markdown-accessiblity-table>
+
+<ul dir="auto">
+<li>Project Leads: Kexing Zhou, Zhean Xu, Chenggang Zhao</li>
+<li>GEMM Kernels: Kexing Zhou, Zhean Xu, Yunfan Xiao, Yuhao Meng</li>
+<li>MQA Logits: Anyi Xu, Zhean Xu, Kaifeng Chen</li>
+<li>mHC Kernel: Yuxuan Zhou, Chenggang Zhao, Ruifan Xu, Huanqi Cao, Chenhao Xu</li>
+<li>MegaMoE: Zhean Xu</li>
+<li>SF Layout Kernels: Guanglin Li</li>
+<li>Infrastructure: Kexing Zhou, Kuai Yu</li>
+</ul>
+
+<p dir="auto">DeepGEMM-Ascend follows the design of the upstream <a href="https://github.com/deepseek-ai/DeepGEMM" target="_blank" rel="noopener">DeepGEMM</a> project, which is inspired by <a href="https://github.com/nvidia/cutlass" target="_blank" rel="noopener">CUTLASS</a>. The JIT runtime is provided by <a href="https://github.com/deepseek-ai/DeepJIT" target="_blank" rel="noopener">DeepJIT</a>. The mHC kernel is backed by <a href="https://github.com/tile-ai/tilelang" target="_blank" rel="noopener">Tilelang</a>. We sincerely thank the developers of these projects for their contributions, and gratefully acknowledge Huawei for its technical support and engineering expertise throughout the development of DeepGEMM-Ascend.</p>
+
+<p dir="auto">This code repository is released under the <a href="https://github.com/deepseek-ai/DeepGEMM-Ascend/blob/main/LICENSE" target="_blank" rel="noopener">MIT License</a>.</p>
+
+<p dir="auto">If you use DeepGEMM-Ascend in your work, please cite:</p>
+<div class="highlight highlight-text-bibtex notranslate position-relative overflow-auto" dir="auto" data-snippet-clipboard-copy-content="@misc{deepgemm_ascend2026,
+  title     = {DeepGEMM-Ascend: Clean and Efficient BLAS Kernel Library on Ascend NPU},
+  author    = {Kexing Zhou and Zhean Xu and Anyi Xu and Chenggang Zhao and
+               Yuxuan Zhou and Yunfan Xiao and Guanglin Li and Kaifeng Chen and Yuhao Meng and
+               Huanqi Cao and Ruifan Xu and Chenhao Xu and Kuai Yu},
+  year      = {2026},
+  publisher = {GitHub},
+  url       = {https://github.com/deepseek-ai/DeepGEMM-Ascend}
+}"><pre><span class="pl-k">@misc</span>{<span class="pl-en">deepgemm_ascend2026</span>,
+  <span class="pl-s">title</span>     = <span class="pl-s"><span class="pl-pds">{</span>DeepGEMM-Ascend: Clean and Efficient BLAS Kernel Library on Ascend NPU<span class="pl-pds">}</span></span>,
+  <span class="pl-s">author</span>    = <span class="pl-s"><span class="pl-pds">{</span>Kexing Zhou and Zhean Xu and Anyi Xu and Chenggang Zhao and</span>
+<span class="pl-s">               Yuxuan Zhou and Yunfan Xiao and Guanglin Li and Kaifeng Chen and Yuhao Meng and</span>
+<span class="pl-s">               Huanqi Cao and Ruifan Xu and Chenhao Xu and Kuai Yu<span class="pl-pds">}</span></span>,
+  <span class="pl-s">year</span>      = <span class="pl-s"><span class="pl-pds">{</span>2026<span class="pl-pds">}</span></span>,
+  <span class="pl-s">publisher</span> = <span class="pl-s"><span class="pl-pds">{</span>GitHub<span class="pl-pds">}</span></span>,
+  <span class="pl-s">url</span>       = <span class="pl-s"><span class="pl-pds">{</span>https://github.com/deepseek-ai/DeepGEMM-Ascend<span class="pl-pds">}</span></span>
+}</pre></div>
+</article></div></div>
