@@ -295,7 +295,7 @@ footer a{color:var(--acc);text-decoration:none}
 <button class="theme-btn" id="themeBtn" title="切换深浅色">🌙</button>
 </div>
 </header>
-<nav class="tabs" id="tabbar"><button class="tab" data-tab="papers">📚 论文 4<span class="fresh fresh-yday" title="数据为昨日，未更新到今日">昨日</span></button><button class="tab" data-tab="models">🤖 模型追踪 24<span class="fresh fresh-yday" title="数据为昨日，未更新到今日">昨日</span></button><button class="tab" data-tab="interests">🎯 兴趣追踪 18<span class="fresh fresh-yday" title="数据为昨日，未更新到今日">昨日</span></button><button class="tab" data-tab="trending">🔥 开源趋势 20<span class="fresh fresh-yday" title="数据为昨日，未更新到今日">昨日</span></button><button class="tab" data-tab="x">👀 大佬动态 64<span class="fresh fresh-yday" title="数据为昨日，未更新到今日">昨日</span> <span class="tab-dot" id="xTabDot" hidden></span></button><button class="tab" data-tab="apple">🍎 苹果动态 50<span class="fresh fresh-yday" title="数据为昨日，未更新到今日">昨日</span></button><button class="tab" data-tab="deals">🐑 今日羊毛 33<span class="fresh fresh-yday" title="数据为昨日，未更新到今日">昨日</span></button><button class="tab" data-tab="finance">💰 财经大事 0<span class="fresh fresh-yday" title="数据为昨日，未更新到今日">昨日</span></button><button class="tab" data-tab="ainews">📰 AI情报 39<span class="fresh fresh-yday" title="数据为昨日，未更新到今日">昨日</span></button></nav>
+<nav class="tabs" id="tabbar"><button class="tab" data-tab="papers">📚 论文 4<span class="fresh fresh-yday" title="数据为昨日，未更新到今日">昨日</span></button><button class="tab" data-tab="models">🤖 模型追踪 24<span class="fresh fresh-yday" title="数据为昨日，未更新到今日">昨日</span></button><button class="tab" data-tab="interests">🎯 兴趣追踪 18<span class="fresh fresh-yday" title="数据为昨日，未更新到今日">昨日</span></button><button class="tab" data-tab="trending">🔥 开源趋势 20<span class="fresh fresh-yday" title="数据为昨日，未更新到今日">昨日</span></button><button class="tab" data-tab="x">👀 大佬动态 64<span class="fresh fresh-yday" title="数据为昨日，未更新到今日">昨日</span> <span class="tab-dot" id="xTabDot" hidden></span></button><button class="tab" data-tab="apple">🍎 苹果动态 50<span class="fresh fresh-yday" title="数据为昨日，未更新到今日">昨日</span></button><button class="tab" data-tab="deals">🐑 今日羊毛 33<span class="fresh fresh-yday" title="数据为昨日，未更新到今日">昨日</span></button><button class="tab" data-tab="finance">💰 财经大事 38<span class="fresh fresh-yday" title="数据为昨日，未更新到今日">昨日</span></button><button class="tab" data-tab="ainews">📰 AI情报 39<span class="fresh fresh-yday" title="数据为昨日，未更新到今日">昨日</span></button></nav>
 <section class="tabpane" id="pane-papers">
 <div class="stats">
 <div class="stat"><b id="sTotal">–</b><span>收录论文</span></div>
@@ -653,7 +653,7 @@ function mdInline(s){
 }
 function renderFinance(){
   const M = FIN || {}, src = M.md || '';
-  const n = (src.match(/^(\*\*\d+\.\s*\[|▪\s?)/gm) || []).length;
+  const n = (src.match(/^(\*\*|[-•▪]\s)/gm) || []).length;
   document.getElementById('finCount').textContent =
     dline(M.date) + n + ' 条';
   const box = document.getElementById('finList');
@@ -677,16 +677,16 @@ function renderFinance(){
       html += '<tr>' + cells.map(c => '<td>' + c + '</td>').join('') + '</tr>';
       return;
     }
-    if (/^\*\*\d+\.\s*\[/.test(line)){
+    if (/^\*\*\d+\.\s/.test(line)){
       closeTable();
       if (!inList){ html += '<ul class="fin-list">'; inList = true; }
       html += '<li class="fin-item fin-num">' + mdInline(line) + '</li>';
       return;
     }
-    if (/^▪\s?/.test(line)){
+    if (/^(\*\*|[-•▪]\s)/.test(line)){
       closeTable();
       if (!inList){ html += '<ul class="fin-list">'; inList = true; }
-      html += '<li class="fin-item">' + mdInline(line.replace(/^▪\s?/, '')) + '</li>';
+      html += '<li class="fin-item">' + mdInline(line.replace(/^[-•▪]\s/, '')) + '</li>';
       return;
     }
     closeList(); closeTable();
