@@ -1,0 +1,22 @@
+<div><div><div class="flex flex-col gap-3"><p class="max-w-full text-body font-normal text-primary whitespace-pre-wrap wrap-break-word" dir="auto"><span class="max-w-full text-[length:inherit] font-[weight:inherit] text-[color:inherit]">New Research: We are releasing ExplorationBench, a benchmark for measuring how AI systems explore.
+
+Scientific discovery begins where known problems end: a system has to frame hypotheses, design experiments, and learn from the results. Evaluating this is hard. Genuinely new answers cannot be checked quickly, and in familiar domains a model can simply recall what it has seen.
+
+Addressing this challenge, researchers from Tencent Hy, Fudan University, and Tsinghua University built verifiable Alien Worlds. Their rules are executable, so every answer is checked exactly, and they conflict with familiar knowledge, so recall alone cannot solve the tasks.
+
+🔹 Two sandboxes: AlienCode (31 hidden rule changes, 70 tasks) and AlienLogic (24 patched inference rules, 70 theorems)
+🔹 A flawed manual, four rounds of self-designed probes, and closed-book tests after every round
+🔹 Every answer graded by an interpreter or a proof checker, with no LLM judge
+
+What we found across 10 frontier AI systems:
+1️⃣ Getting feedback is more effective than thinking alone. No AlienCode run starts above 15.7%; after four rounds the best reaches 89.0%, while the same turns without feedback stay at 0.5–11.0%.
+2️⃣ Designing the experiments matters. Replaying a system's own best probes gives it exactly the same evidence, yet in AlienCode 9 of 10 systems do worse than when they chose the probes themselves.
+3️⃣ Knowing a rule is not using it. Even when every required rule is stated correctly, tasks are solved only 73.4% of the time.
+4️⃣ One score hides a lot. The same system under the same budget ended anywhere from 5.7% to 79.0%, and rankings barely transfer between the two worlds.
+
+CL-bench asked whether models can learn from context. ExplorationBench asks whether they can discover the rules themselves.
+
+📄 Paper: </span><span class="max-w-full text-[length:inherit] font-[weight:inherit] text-[color:inherit]"><a href="https://arxiv.org/abs/2609.30199" class="rounded-xs x-link focus-visible:outline-ring hover:underline max-w-full text-[length:inherit] font-[weight:inherit] text-brand" rel="noopener" target="_blank">arxiv.org/abs/2609.30199</a></span><span class="max-w-full text-[length:inherit] font-[weight:inherit] text-[color:inherit]">
+🌐 Website &amp; leaderboard: </span><span class="max-w-full text-[length:inherit] font-[weight:inherit] text-[color:inherit]"><a href="https://explorationbench.com" class="rounded-xs x-link focus-visible:outline-ring hover:underline max-w-full text-[length:inherit] font-[weight:inherit] text-brand" rel="noopener" target="_blank">explorationbench.com</a></span><span class="max-w-full text-[length:inherit] font-[weight:inherit] text-[color:inherit]">
+📝 Blog: </span><span class="max-w-full text-[length:inherit] font-[weight:inherit] text-[color:inherit]"><a href="https://explorationbench.com/blog/" class="rounded-xs x-link focus-visible:outline-ring hover:underline max-w-full text-[length:inherit] font-[weight:inherit] text-brand" rel="noopener" target="_blank">explorationbench.com/blog/</a></span><span class="max-w-full text-[length:inherit] font-[weight:inherit] text-[color:inherit]">
+💻 Code (coming soon): </span><span class="max-w-full text-[length:inherit] font-[weight:inherit] text-[color:inherit]"><a href="https://github.com/Tencent-Hunyuan/ExplorationBench" class="rounded-xs x-link focus-visible:outline-ring hover:underline max-w-full text-[length:inherit] font-[weight:inherit] text-brand" rel="noopener" target="_blank">github.com/Tencent-Hunyua…</a></span></p></div></div></div>
