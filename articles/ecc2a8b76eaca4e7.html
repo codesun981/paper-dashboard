@@ -1,0 +1,24 @@
+<div><div><div class="docs-content nb-cl-prose mt-9 max-w-none"><p><a href="https://developers.cloudflare.com/web-search/" target="_blank" rel="noopener">Web Search API</a> is now available in beta. Web Search API lets your AI agents and applications search the Internet and ground their responses in live information, instead of guessing URLs or relying on a model's training cutoff.</p>
+<p>At launch, you can choose between three search providers: <a href="https://developers.cloudflare.com/web-search/providers/" target="_blank" rel="noopener">Ceramic.ai, Exa, and Linkup</a>. All three support Zero Data Retention for requests made through Cloudflare, and all have committed to Cloudflare's <a href="https://developers.cloudflare.com/bots/concepts/bot/verified-bots/" target="_blank" rel="noopener">verified bot</a> crawling standards.</p>
+<p>Web Search API runs through <a href="https://developers.cloudflare.com/ai-gateway/" target="_blank" rel="noopener">AI Gateway</a>, so search requests appear in your gateway logs and are billed to your AI Gateway credits at each provider's list API price, with no additional markup. You can also bring your own provider API key.</p>
+<p>Call Web Search API with the REST API:</p>
+<figure class="nb-code-figure" data-nb-lang="bash"><pre class="astro-code astro-code-themes github-light github-dark nb-shiki-c6xiwz" tabindex="0" data-language="bash" data-nb-lang="bash"><code><span class="line"><span class="nb-shiki-1t8gfj">curl</span><span class="nb-shiki-mdbnqw"> https://api.cloudflare.com/client/v4/accounts/</span><span class="nb-shiki-140thh">$CLOUDFLARE_ACCOUNT_ID</span><span class="nb-shiki-mdbnqw">/ai/websearch/</span><span class="nb-shiki-dzsirb"> \</span></span>
+<span class="line"><span class="nb-shiki-dzsirb">  --request</span><span class="nb-shiki-mdbnqw"> POST</span><span class="nb-shiki-dzsirb"> \</span></span>
+<span class="line"><span class="nb-shiki-dzsirb">  --header</span><span class="nb-shiki-mdbnqw"> "Authorization: Bearer </span><span class="nb-shiki-140thh">$CLOUDFLARE_API_TOKEN</span><span class="nb-shiki-mdbnqw">"</span><span class="nb-shiki-dzsirb"> \</span></span>
+<span class="line"><span class="nb-shiki-dzsirb">  --header</span><span class="nb-shiki-mdbnqw"> "Content-Type: application/json"</span><span class="nb-shiki-dzsirb"> \</span></span>
+<span class="line"><span class="nb-shiki-dzsirb">  --data</span><span class="nb-shiki-mdbnqw"> '{</span></span>
+<span class="line"><span class="nb-shiki-mdbnqw">    "query": "What are some fun things to do in Salt Lake City as fall approaches?",</span></span>
+<span class="line"><span class="nb-shiki-mdbnqw">    "provider": "ceramic",</span></span>
+<span class="line"><span class="nb-shiki-mdbnqw">    "limit": 5,</span></span>
+<span class="line"><span class="nb-shiki-mdbnqw">    "options": { "gateway": { "id": "default" } }</span></span>
+<span class="line"><span class="nb-shiki-mdbnqw">  }'</span></span></code></pre></figure>
+<p>Or from a Worker with the AI binding:</p>
+<figure class="nb-code-figure" data-nb-lang="ts"><pre class="astro-code astro-code-themes github-light github-dark nb-shiki-c6xiwz" tabindex="0" data-language="ts" data-nb-lang="ts"><code><span class="line"><span class="nb-shiki-1itgoe">const</span><span class="nb-shiki-dzsirb"> response</span><span class="nb-shiki-1itgoe"> =</span><span class="nb-shiki-1itgoe"> await</span><span class="nb-shiki-140thh"> env.</span><span class="nb-shiki-dzsirb">AI</span><span class="nb-shiki-140thh">.</span><span class="nb-shiki-1t8gfj">websearch</span><span class="nb-shiki-140thh">({</span></span>
+<span class="line"><span class="nb-shiki-140thh">	gatewayId: </span><span class="nb-shiki-mdbnqw">"default"</span><span class="nb-shiki-140thh">,</span></span>
+<span class="line"><span class="nb-shiki-140thh">	query: </span><span class="nb-shiki-mdbnqw">"What are some fun things to do in Salt Lake City as fall approaches?"</span><span class="nb-shiki-140thh">,</span></span>
+<span class="line"><span class="nb-shiki-140thh">	provider: </span><span class="nb-shiki-mdbnqw">"exa"</span><span class="nb-shiki-140thh">,</span></span>
+<span class="line"><span class="nb-shiki-140thh">	limit: </span><span class="nb-shiki-dzsirb">5</span><span class="nb-shiki-140thh">,</span></span>
+<span class="line"><span class="nb-shiki-140thh">});</span></span>
+<span class="line"></span>
+<span class="line"><span class="nb-shiki-1itgoe">const</span><span class="nb-shiki-dzsirb"> results</span><span class="nb-shiki-1itgoe"> =</span><span class="nb-shiki-1itgoe"> await</span><span class="nb-shiki-140thh"> response.</span><span class="nb-shiki-1t8gfj">json</span><span class="nb-shiki-140thh">();</span></span></code></pre></figure>
+<p>To get started, refer to <a href="https://developers.cloudflare.com/web-search/how-to-use/" target="_blank" rel="noopener">How to use Web Search API</a>.</p></div></div></div>
