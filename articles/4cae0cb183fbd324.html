@@ -1,0 +1,95 @@
+<p><img src="https://images.unsplash.com/photo-1620712943543-bcc4688e7485?w=1600&q=80&fm=jpg&fit=crop" loading="lazy" alt="AI 机械手"></p><p>用户问“东西买错了怎么换”，知识库里写的是“商品换货流程”，关键词搜索未必命中。我们可以把句子转换成向量，比较它们在语义空间的方向。本篇用 Java 17 和官方 Embeddings 接口写一个三条 FAQ 的小检索器：输入自然语言问题，输出最相近的条目及相似度；分数不够就拒答。你学到的不是某个模型的花式提示词，而是任何检索增强生成系统都需要的候选召回与门槛设计。</p><p>Embedding（嵌入向量）把文本映射为数字列表，语义接近的句子往往方向较接近。余弦相似度计算两个向量的夹角，值越接近 1 表示方向越一致。RAG（Retrieval-Augmented Generation，检索增强生成）通常先检索，再让语言模型根据证据生成答案；本文只做前半段，因为“找到相似内容”本身就有价值，也便于看清错误。最近新模型发布让迁移讨论升温，但检索门槛不应随生成模型名称变化而消失。</p><p> <p><img src="https://java4u.cn/wp-content/uploads/2026/10/inline_00-15.png" loading="lazy" alt="mermaid diagram"></p></p><h2>准备项目</h2><p>需要 Java 17 以上、Maven 和 。HTTP 用 JDK 自带客户端；JSON 解析使用 Jackson ，其发布页可核验。 的 加入 ， 中设置 。代码保存为 ，执行 与 ，再运行 。Windows 的类路径分隔符为分号。<code>OPENAI_API_KEY</code><code>2.17.2</code><code>pom.xml</code><code><dependencies></code><code><dependency><groupId>com.fasterxml.jackson.core</groupId><artifactId>jackson-databind</artifactId><version>2.17.2</version></dependency></code><code><properties></code><code><maven.compiler.release>17</maven.compiler.release></code><code>src/main/java/FaqSearch.java</code><code>mvn -q dependency:build-classpath -Dmdep.outputFile=cp.txt</code><code>mvn -q compile</code><code>java -cp "target/classes:$(cat cp.txt)" FaqSearch "买错商品如何换货"</code></p><p>模型 、、 和 字段均在官方接口文档中。示例一次把 FAQ 与查询一起提交，适合演示，实际系统应预先计算并保存 FAQ 向量，只对新查询调用接口。阈值 是教学起点，绝非适用于所有语言和业务的官方标准。<code>text-embedding-3-small</code><code>/v1/embeddings</code><code>input</code><code>model</code><code>0.78</code></p><pre><code>import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import java.net.URI;
+import java.net.http.HttpClient;
+import java.net.http.HttpRequest;
+import java.net.http.HttpResponse;
+import java.time.Duration;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+
+public class FaqSearch {
+    static final ObjectMapper JSON = new ObjectMapper();
+    static final List<String> QUESTIONS = List.of(
+        "商品换货流程是什么？", "如何申请退款？", "订单发票在哪里下载？");
+    static final List<String> ANSWERS = List.of(
+        "在订单页选择换货并提交原因。", "在订单页选择退款申请。",
+        "在订单详情页下载电子发票。");
+
+    static double cosine(double[] a, double[] b) {
+        if (a.length != b.length || a.length == 0)
+            throw new IllegalArgumentException("向量维度不一致");
+        double dot = 0, aa = 0, bb = 0;
+        for (int i = 0; i < a.length; i++) {
+            dot += a[i] * b[i];
+            aa += a[i] * a[i];
+            bb += b[i] * b[i];
+        }
+        if (aa == 0 || bb == 0) throw new IllegalArgumentException("零向量");
+        return dot / Math.sqrt(aa * bb);
+    }
+
+    static double[] vector(JsonNode node) {
+        double[] out = new double[node.size()];
+        for (int i = 0; i < out.length; i++) out[i] = node.get(i).asDouble();
+        return out;
+    }
+
+    public static void main(String[] args) {
+        try {
+            String key = System.getenv("OPENAI_API_KEY");
+            if (key == null || key.isBlank())
+                throw new IllegalArgumentException("缺少 OPENAI_API_KEY");
+            if (args.length == 0 || args[0].isBlank())
+                throw new IllegalArgumentException("请传入查询文本");
+            List<String> inputs = new ArrayList<>(QUESTIONS);
+            inputs.add(args[0]);
+            String body = JSON.writeValueAsString(Map.of(
+                "model", "text-embedding-3-small", "input", inputs));
+            HttpRequest request = HttpRequest.newBuilder()
+                .uri(URI.create("https://api.openai.com/v1/embeddings"))
+                .timeout(Duration.ofSeconds(45))
+                .header("Authorization", "Bearer " + key)
+                .header("Content-Type", "application/json")
+                .POST(HttpRequest.BodyPublishers.ofString(body)).build();
+            HttpClient client = HttpClient.newBuilder()
+                .connectTimeout(Duration.ofSeconds(10)).build();
+            HttpResponse<String> response = client.send(request,
+                HttpResponse.BodyHandlers.ofString());
+            if (response.statusCode() / 100 != 2)
+                throw new IllegalStateException("HTTP " + response.statusCode()
+                    + ": " + response.body().substring(0,
+                        Math.min(300, response.body().length())));
+            JsonNode data = JSON.readTree(response.body()).path("data");
+            if (data.size() != inputs.size())
+                throw new IllegalStateException("返回向量数量不匹配");
+            double[][] vectors = new double[inputs.size()][];
+            for (JsonNode item : data) {
+                int index = item.path("index").asInt(-1);
+                if (index < 0 || index >= vectors.length || vectors[index] != null)
+                    throw new IllegalStateException("向量索引无效或重复");
+                vectors[index] = vector(item.path("embedding"));
+            }
+            for (double[] v : vectors)
+                if (v == null) throw new IllegalStateException("向量索引缺失");
+            double[] query = vectors[QUESTIONS.size()];
+            int best = -1;
+            double score = -2;
+            for (int i = 0; i < QUESTIONS.size(); i++) {
+                double s = cosine(query, vectors[i]);
+                if (s > score) { score = s; best = i; }
+            }
+            if (score < 0.78) System.out.println("未找到足够相似的FAQ，请人工处理");
+            else System.out.printf("候选：%s%n答案：%s%n相似度：%.3f%n",
+                QUESTIONS.get(best), ANSWERS.get(best), score);
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+            System.err.println("请求被中断");
+        } catch (Exception e) {
+            System.err.println("失败：" + e.getMessage());
+            System.exit(1);
+        }
+    }
+}
+</code></pre><h2>逐段解释和预期结果</h2><p>请求一次携带四条字符串，响应里的 对应四个向量。代码先检查数量，再依照响应对象的 字段重排并检查缺失、重复索引，然后用前三个 FAQ 向量分别和最后一个用户问题向量比较。这样即使响应数组顺序变化，问题与向量仍能正确对应。<code>data</code><code>index</code></p><p> 同时防止维度不一致和零向量。选出最高分后才过 门槛，但这个分数不能解释为“78% 正确概率”。它只描述当前向量空间中与现有三个问题的相似程度。比如“退款后怎么换货”可能同时接近两条，最高分也未必是正确业务路径。生产系统还要看前两名分差、条目是否过期、答案是否有来源，并允许人工纠错。<code>cosine</code><code>0.78</code></p><p>成功时可能显示“候选：商品换货流程是什么？”及其答案和相似度；确切分数须以实际调用为准。低于阈值会提示人工处理。示例未在本次任务中实际调用线上API，也没有用真实客服数据校准阈值。</p><h2>常见错误与工程边界</h2><p>第一，401 是凭据问题，检查环境变量和项目权限。第二，429 是限流或额度问题，控制并发并按服务端建议退避。第三，候选答非所问：先检查 FAQ 文本是否过短、语义重叠或答案过期，再用标注数据调整阈值。第四，向量数量不对：检查输入是否为空、响应错误和 映射。第五，相似度高但业务答案错：向量不能代替业务规则，尤其退款金额、资格和时效必须以系统记录为准。<code>index</code></p><p>它适合小规模 FAQ 召回和 RAG 的第一步；不适合直接做具有法律或财务后果的自动决策。工程化时把 FAQ 文本、答案、版本和向量一起存储；更新答案时重建相应向量，记录查询与人工纠错结果。</p><p>阈值不能凭直觉定。先收集脱敏问题，人工标注可由哪条 FAQ 回答，以及哪些问题必须拒答。样本分为调参集与独立留出集，在前者上试多个阈值，在后者上统计误放行和误拒绝。高阈值会减少错误答案，也会让更多问题进入人工队列；业务应先决定两类错误的成本。相似度不是正确概率，不能在界面写“78% 确信”。</p><p>知识库删掉旧规则但向量索引没更新，系统仍会返回过期答案。每条 FAQ 应有稳定 ID、版本、发布日期和失效时间。商品名、订单号等精确字段应先用关键词或结构化查询处理。FAQ 增长到几万条后可用向量数据库召回候选，但要先保留当前小样本的正确率、延迟和成本基线，才能知道增加的复杂度是否值得。</p><p>5 分钟实践：把第三条 FAQ 改成与退款语义相近的问题，观察最高分和阈值可能怎样变化。FAQ 检索中，你更怕漏掉可回答的问题，还是把错误答案自信地返回？</p><p>FAQ 项目常把“召回率”和“答案正确率”混在一起。检索器只负责把可能相关的条目找出来；即使正确条目出现在第一名，答案文本仍可能因为政策过期而错误。评估时至少分三层：正确条目是否进入候选、排序是否把它放在前面、最终给用户的答案是否仍有效。第一层失败要改分块和召回，第二层可试重排，第三层要改知识维护流程。否则团队很容易误判“换一个更强的生成模型”就能解决旧规则问题。</p><p>测试集也应包含“没有答案”的问题。例如用户问“跨境订单能否在门店退货”，三条演示 FAQ 都不能回答。若检索器硬给出换货流程，它在数学上可能确实是最高分，但在业务上是误导。阈值和前两名分差可以辅助发现这种情况；更稳的方法是补充意图分类、有效期检查和人工审核。拒答不是失败，它是让系统在证据不足时保留可信度的能力。人工处理的结果又可以反哺 FAQ，形成可审计的更新循环。</p><p>最后，向量会把用户查询文本发送到服务端。订单号、手机号、住址等信息通常不是语义检索所必需，发送前应先识别并替换，且保留脱敏映射只在受控后端。FAQ 答案如果来自内部政策，也要检查能否上传给当前服务；不能上传时可选择获准部署的模型或本地向量方案。模型接口只解决相似度计算，不替系统决定数据处理权限。</p><p>如果要向团队展示效果，建议同时列出“命中正确FAQ的比例”和“无法回答时正确拒答的比例”。只展示平均相似度会掩盖错误：模型可能对每个问题都给出一个看似很高的分数，但从未识别出知识库缺口。把错误样本逐条回放，让客服人员确认是内容缺失、措辞差异还是检索失效，再决定补FAQ、调阈值或增加人工入口。</p><p>关注「蜗牛聊AI」，一起看懂技术变化背后的真正机会。</p> .j4u-post { font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",PingFang SC,"Microsoft YaHei",sans-serif; color:#24292e; line-height:1.8; max-width:860px; margin:0 auto; } .j4u-post img.hero { display:block; width:100%; max-width:860px; border-radius:10px; margin:0 0 24px; } .j4u-post h1 { font-size:30px; margin:0 0 16px; } .j4u-post h2 { font-size:24px; margin:32px 0 12px; padding-bottom:8px; border-bottom:2px solid #07c160; } .j4u-post h3 { font-size:20px; margin:24px 0 10px; } .j4u-post p { font-size:16px; margin:0 0 16px; } .j4u-post a { color:#07c160; text-decoration:none; } .j4u-post blockquote { margin:18px 0; padding:12px 16px; background:#f6f8fa; border-left:4px solid #07c160; color:#555; } .j4u-post pre { background:#0d1117; color:#c9d1d9; padding:16px; border-radius:8px; overflow:auto; font-size:14px; line-height:1.6; } .j4u-post code { font-family:Consolas,Menlo,monospace; } .j4u-post pre code { background:none; padding:0; } .j4u-post :not(pre) > code { background:#f6f8fa; padding:2px 6px; border-radius:4px; color:#c7254e; font-size:14px; } .j4u-post ul, .j4u-post ol { padding-left:24px; margin:0 0 16px; } .j4u-post li { font-size:16px; margin:6px 0; } .j4u-post img { max-width:100%; }
