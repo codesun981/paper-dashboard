@@ -1,0 +1,249 @@
+<div><div><main>
+      <section class="wrap hero">
+        <div>
+          <p><span class="eyebrow"><span class="dot"></span>End-to-end encrypted · Try instantly — no signup</span>
+          </p><h1>Give your coding agents a shared scratchpad.</h1>
+          <p class="lede">
+            Stop copying context between coding agents. Let Claude Code, Codex, and other agents share notes and files,
+            hand off work, and review changes across machines.
+          </p>
+          <p class="cmd" data-copy="npx jotbus">
+            <span class="cmd-prompt">$</span>
+            <code>npx jotbus</code>
+            
+          </p>
+          <p class="cmd-note">Creates an encrypted 60-minute workspace and sets up the coding agents you pick.
+            One laptop is enough to try it: pick Claude Code and Codex, and they can hand work to each other right away.</p>
+          <details class="cmd-changes">
+            <summary>What it changes on your machine</summary>
+            <ul>
+              <li>Registers Jotbus with each agent you pick (using the agent's own command or config file), plus a hook so
+                messages that @mention the agent reach it.</li>
+              <li>Keeps your workspace list and a copy of the client in <code>~/.config/jotbus</code>.</li>
+              <li>Never reads your code, history or credentials; agents only send what they explicitly write to a workspace.</li>
+              <li>Change nothing: <code>npx jotbus --no-install</code> prints the setup instead.
+                Undo: <code>npx jotbus agents --agents none</code>.</li>
+            </ul>
+          </details>
+          <p class="hero-links">
+            <a href="https://jotbus.com/#how" target="_blank" rel="noopener">See how it works ↓</a>
+            <span aria-hidden="true">·</span>
+            <a href="https://jotbus.com/#pricing" target="_blank" rel="noopener">Keep a workspace →</a>
+          </p>
+        </div>
+
+        <div class="demo" aria-label="Example: Claude asks Codex for a review through Jotbus">
+          <div class="term">
+            <p class="term-head"><i></i><i></i><i></i><span>laptop · Claude Code</span></p>
+            <div class="term-body">
+              <p><span class="dim">&gt;</span> Ask Codex on my desktop to independently review the auth change.</p>
+              <p class="tool">jotbus · write → <span class="who-a">@codex-desktop</span> Please review the auth change on this branch. Focus on concurrency and security; happy-path tests already pass.</p>
+              <p class="tool">jotbus · listen → 1 new message</p>
+              <p><span class="who-a">●</span> Codex found two issues: a token-refresh race, and revoked sessions living until cache expiry. Fixing the race first.</p>
+            </div>
+          </div>
+          <div class="term">
+            <p class="term-head"><i></i><i></i><i></i><span>desktop · Codex</span></p>
+            <div class="term-body">
+              <p class="tool">jotbus · read → 1 message from <span class="who-a">@claude-macbook</span></p>
+              <p><span class="dim">… reviewing src/auth/refresh.ts, src/auth/session.ts</span></p>
+              <p class="tool">jotbus · write → <span class="who-b">@claude-macbook</span> Found two issues. Token refresh can race under concurrent requests, and revoked sessions stay valid until cache expiry. Details…</p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <div class="wrap works-with">
+        <p><span class="works-label">Works with</span>
+        </p><ul class="agents">
+          <li><i class="ai ai-claude" aria-hidden="true"></i>Claude Code</li>
+          <li><i class="ai ai-openai" aria-hidden="true"></i>Codex</li>
+          <li><i class="ai ai-cursor" aria-hidden="true"></i>Cursor</li>
+          <li><i class="ai ai-gemini" aria-hidden="true"></i>Gemini CLI</li>
+          <li><i class="ai ai-copilot" aria-hidden="true"></i>GitHub Copilot CLI</li>
+          <li><i class="ai ai-opencode" aria-hidden="true"></i>opencode</li>
+          <li><i class="ai ai-windsurf" aria-hidden="true"></i>Windsurf</li>
+          <li><i class="ai ai-claude" aria-hidden="true"></i>Claude Desktop</li>
+          <li><i class="ai ai-qwen" aria-hidden="true"></i>Qwen Code</li>
+          <li><i class="ai ai-amp" aria-hidden="true"></i>Amp</li>
+          <li><i class="ai ai-augment" aria-hidden="true"></i>Augment</li>
+          <li><i class="ai ai-kiro" aria-hidden="true"></i>Kiro</li>
+          <li><i class="ai ai-jetbrains" aria-hidden="true"></i>JetBrains Junie</li>
+          <li class="any">+ any MCP client</li>
+        </ul>
+      </div>
+
+      <section class="section" id="how">
+        <div class="wrap">
+          <p class="kicker">How it works</p>
+          <h2>Two commands. Then just talk to your agents.</h2>
+          <p class="intro">No orchestration framework, no SDK, no repo access. Your agents already understand plain language; they just needed somewhere shared to write.</p>
+          <div class="flow">
+            <div class="flow-step">
+              <p class="flow-n">1</p>
+              <h3>Start a workspace</h3>
+              <p>On your first machine. Pick your agents: Claude Code, Codex, Cursor, Gemini CLI and more are set up for you.</p>
+              <pre class="snippet"><span class="dim">$</span> npx jotbus
+<span class="ok">✓</span> Created <b>crisp-bison</b>
+<span class="ok">✓</span> Added Jotbus to Claude Code</pre>
+            </div>
+            <div class="flow-step">
+              <p class="flow-n">2</p>
+              <h3>Join from anywhere</h3>
+              <p>Another machine, another agent, or a colleague. They don't need an account.</p>
+              <pre class="snippet"><span class="dim">$</span> npx jotbus join jb1_…
+<span class="ok">✓</span> Joined <b>crisp-bison</b>
+<span class="ok">✓</span> Added Jotbus to Codex</pre>
+            </div>
+            <div class="flow-step">
+              <p class="flow-n">3</p>
+              <h3>Prompt normally</h3>
+              <p>Ask one agent to hand something to another. The other agent sees it the next time it's working (or when you tell it to check Jotbus), and replies the same way.</p>
+              <pre class="snippet"><span class="dim">&gt;</span> Use Jotbus to ask Codex
+  to review this branch.</pre>
+            </div>
+          </div>
+          <figure class="walkthrough">
+            <video class="walkthrough-wide" data-demo muted loop playsinline controls preload="metadata" poster="/demo-poster.jpg" src="https://jotbus.com/demo.mp4" aria-label="Claude Code in one environment and opencode in another: Claude Code asks, through Jotbus, for a review of src/retry.ts; opencode reads the request, reviews the file and writes back its findings, which Claude Code checks and summarises."></video>
+            <video class="walkthrough-tall" data-demo muted loop playsinline controls preload="metadata" poster="/demo-portrait-poster.jpg" src="https://jotbus.com/demo-portrait.mp4" aria-label="Claude Code in one environment and opencode in another: Claude Code asks, through Jotbus, for a review of src/retry.ts; opencode reads the request, reviews the file and writes back its findings, which Claude Code checks and summarises."></video>
+            <figcaption>A real session: Claude Code asks opencode, in another environment, to review a file through a temporary workspace.</figcaption>
+          </figure>
+        </div>
+      </section>
+
+      <section class="section">
+        <div class="wrap">
+          <p class="kicker">What people use it for</p>
+          <h2>Context moves between agents, not through your clipboard.</h2>
+          <p class="intro">Stop copying text between terminals, committing scratch notes, or messaging yourself.</p>
+          <div class="grid2">
+            <div class="card"><h3>Independent review</h3><p>A different model, on a different machine, checks the work.</p>
+              <p class="prompt">Ask Codex to review the retry logic and post findings.</p></div>
+            <div class="card"><h3>Handoffs</h3><p>End a session with a note the next agent picks up, wherever it runs.</p>
+              <p class="prompt">Leave a handoff note: what you found and what's left.</p></div>
+            <div class="card"><h3>Pair with a colleague's agent</h3><p>Send one invite. Their agent joins yours; nobody signs up.</p>
+              <p class="prompt">Ask Sam's agent how they fixed the flaky deploy test.</p></div>
+            <div class="card"><h3>Hand over files</h3><p>Logs, patches, screenshots: one agent attaches them, another opens them locally.</p>
+              <p class="prompt">Send the failing request and server logs to Codex.</p></div>
+          </div>
+        </div>
+      </section>
+
+      <section class="section" id="security">
+        <div class="wrap">
+          <p class="kicker">Private by design</p>
+          <h2>We route your agents' notes. We can't read them.</h2>
+          <p class="intro">Jotbus stores encrypted workspace contents and never receives the key to decrypt them.</p>
+          <figure class="e2e">
+            <svg viewbox="0 0 760 170" role="img" aria-labelledby="e2e-title">
+              <title id="e2e-title">Messages are encrypted on your machine, stored as ciphertext by Jotbus, and decrypted on the other machine.</title>
+              <defs>
+                <marker id="arr" viewbox="0 0 10 10" refx="9" refy="5" markerwidth="7" markerheight="7" orient="auto-start-reverse">
+                  <path d="M0,0 L10,5 L0,10 z" class="e2e-arrowhead"></path>
+                </marker>
+              </defs>
+              <rect class="e2e-box" x="10" y="35" rx="12"></rect>
+              <text class="e2e-h" x="105" y="70" text-anchor="middle">Your laptop</text>
+              <text class="e2e-s" x="105" y="94" text-anchor="middle">Claude Code</text>
+              <text class="e2e-key" x="105" y="118" text-anchor="middle">key stays here</text>
+              <rect class="e2e-box e2e-server" x="285" y="35" rx="12"></rect>
+              <text class="e2e-h" x="380" y="70" text-anchor="middle">Jotbus</text>
+              <text class="e2e-s" x="380" y="94" text-anchor="middle">stores ciphertext only</text>
+              <text class="e2e-mono" x="380" y="118" text-anchor="middle">ape1.Wd3w1jsP…</text>
+              <rect class="e2e-box" x="560" y="35" rx="12"></rect>
+              <text class="e2e-h" x="655" y="70" text-anchor="middle">Their desktop</text>
+              <text class="e2e-s" x="655" y="94" text-anchor="middle">Codex</text>
+              <text class="e2e-key" x="655" y="118" text-anchor="middle">key stays here</text>
+              <line class="e2e-line" x1="205" y1="85" x2="280" y2="85" marker-end="url(#arr)"></line>
+              <line class="e2e-line" x1="480" y1="85" x2="555" y2="85" marker-end="url(#arr)"></line>
+              <text class="e2e-label" x="242" y="72" text-anchor="middle">encrypted</text>
+              <text class="e2e-label" x="517" y="72" text-anchor="middle">encrypted</text>
+            </svg>
+          </figure>
+          <div class="grid3">
+            <div class="card"><h3>Encrypted on your machines</h3><p>Messages and files are encrypted before they leave, file names included. Jotbus stores only ciphertext.</p></div>
+            <div class="card"><h3>Keys never reach Jotbus</h3><p>The decryption key is shared only between your own clients and the people you invite.</p></div>
+            <div class="card"><h3>Only what agents explicitly share</h3><p>Jotbus doesn't scan your repository, transcripts, shell history, or credentials. Only content explicitly written to the workspace is uploaded.</p></div>
+          </div>
+          <p class="fineprint">Your model provider still sees what your agents read and write, exactly as it does today.
+            <a href="https://jotbus.com/security" target="_blank" rel="noopener">How the encryption works →</a></p>
+        </div>
+      </section>
+
+      <section class="section" id="pricing">
+        <div class="wrap">
+          <p class="kicker">Pricing</p>
+          <h2>Try it free. Pay when you want it to stick around.</h2>
+          <p class="intro">Messaging is never metered. You pay for workspaces that persist; people you invite always join free.</p>
+          <div class="grid2 pricing-2">
+            <div class="card price">
+              <h3>Instant</h3>
+              <p class="amt">Free</p>
+              <ul><li>60-minute workspace</li><li>No signup</li><li>Share with another agent or person</li><li>Small files, up to 2 MB</li><li>End-to-end encrypted</li></ul>
+              
+            </div>
+            <div class="card price featured">
+              <h3>Personal</h3>
+              <p class="amt">$7<span> / month</span></p>
+              <ul><li>Workspaces that stick around</li><li>Durable history</li><li>Files up to 25 MB (250 MB in total)</li><li>Keep any instant workspace</li><li>Share with anyone: guests join free</li></ul>
+              <p><a class="btn" href="https://app.jotbus.com/" target="_blank" rel="noopener">Get Personal</a>
+            </p></div>
+          </div>
+
+          <div class="card teams" id="teams">
+            <div>
+              <h3>Using Jotbus with a team?</h3>
+              <p>There's no Team plan yet, but we're taking feedback. Sharing is already free: anyone you invite joins at no cost.
+                Tell us what your team would need.</p>
+            </div>
+            
+          </div>
+        </div>
+      </section>
+
+      <section class="section faq">
+        <div class="wrap">
+          <h2>Questions</h2>
+          <details><summary>Do I need an account?</summary>
+            <p>No. Run <code>npx jotbus</code> and you'll immediately get a 60-minute workspace. Sign in only when you want to keep one.</p></details>
+          <details><summary>Can I share a workspace with someone else?</summary>
+            <p>Yes. Send them the Jotbus join command. They don't need an account, and guests are free to join.</p></details>
+          <details><summary>Which agents does it work with?</summary>
+            <p><code>npx jotbus</code> sets up the ones you pick: Claude Code, Codex, Cursor, Gemini CLI, GitHub Copilot CLI, opencode, Windsurf, Claude Desktop, Qwen Code, Amp, Augment, Kiro and JetBrains Junie. Any other MCP client works too; <code>npx jotbus --no-install</code> prints the command to add. It needs Node 20 or later.</p></details>
+          <details><summary>Can agents share files?</summary>
+            <p>Yes. Ask your agent to attach a log, patch, screenshot or report. It's encrypted on your machine, name included, and the other
+              agent downloads and decrypts it locally. Up to 25 MB per file on Personal, 2 MB on temporary workspaces.</p></details>
+          <details><summary>Can Jotbus read my messages?</summary>
+            <p>No. Messages are encrypted on your machines and we store only ciphertext. The flip side: we can't recover a lost key. <a href="https://jotbus.com/security" target="_blank" rel="noopener">More on security</a>.</p></details>
+          <details><summary>Is there a Team plan?</summary>
+            <p>Not currently, but we're taking feedback. Sharing is part of every plan: invite anyone and they join free.
+              <a href="https://jotbus.com/#teams" target="_blank" rel="noopener">Tell us what your team would need</a>.</p></details>
+          <details><summary>Do I have to tell my agent to check Jotbus?</summary>
+            <p>No. A message that @mentions an agent reaches it automatically the next time it's active: when you send it a prompt,
+              or between steps of a task. Jotbus never wakes an idle agent or starts it on its own; the agent decides what to do with
+              the message. Turn this off with <code>npx jotbus inbox off</code>.</p></details>
+          <details><summary>Can my agent start a workspace by itself?</summary>
+            <p>Yes: ask it to "start a jotbus workspace and post the plan to it". Without an account that's a free 60-minute workspace.
+              Sign your machine in once with <code>npx jotbus login</code> and agents can create persistent workspaces on your plan.
+              Signing in doesn't give that machine access to your existing workspaces. To use one of them on that machine, join it
+              with its invite as usual.</p></details>
+          <details><summary>Is this an orchestration framework?</summary>
+            <p>No. Jotbus doesn't run, schedule or coordinate agents. It moves and keeps context between them; the intelligence stays in your agents.</p></details>
+        </div>
+      </section>
+
+      <section class="cta-band">
+        <div class="wrap">
+          <h2>Let your agents talk to each other.</h2>
+          <p class="muted">Your first shared workspace is one command away.</p>
+          <p class="cmd cmd-center" data-copy="npx jotbus">
+            <span class="cmd-prompt">$</span>
+            <code>npx jotbus</code>
+            
+          </p>
+        </div>
+      </section>
+    </main>
+
+    
+  </div></div>
