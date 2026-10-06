@@ -1,6 +1,6 @@
 <!DOCTYPE html><html lang="zh-CN"><head><meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>✨ 今日份新鲜 · 杂志</title><style>
+<title>✨ 今日份新鲜 · 便利贴</title><style>
 *{box-sizing:border-box;margin:0;padding:0}
 :root{--bg:#f5f5f7;--card:#fff;--ink:#1d1d1f;--sub:#6e6e73;--line:#e5e5ea;--acc:#0071e3}
 @media(prefers-color-scheme:dark){:root{--bg:#000;--card:#1c1c1e;--ink:#f5f5f7;--sub:#98989d;--line:#2c2c2e;--acc:#0a84ff}}
@@ -11,21 +11,25 @@ a{color:var(--acc);text-decoration:none}
 .dateline{font-size:13px;color:var(--sub);letter-spacing:.1em}
 footer{max-width:960px;margin:0 auto;padding:36px 20px 60px;color:var(--sub);font-size:13px;text-align:center}
 
-.hero{max-width:960px;margin:0 auto;padding:40px 20px 10px;text-align:center}
-.hero .k{font-size:13px;letter-spacing:.35em;color:var(--acc)}
-.hero h1{font-family:Georgia,"Songti SC",serif;font-size:52px;margin:12px 0;font-weight:700}
-.hero p{color:var(--sub);font-size:15px}
-.rule{max-width:960px;margin:18px auto;border:none;border-top:3px double var(--line)}
-.cols{max-width:960px;margin:0 auto;padding:10px 20px;display:grid;grid-template-columns:1fr 1fr;gap:28px}
-@media(max-width:640px){.cols{grid-template-columns:1fr}.hero h1{font-size:38px}}
-.mod h2{font-family:Georgia,"Songti SC",serif;font-size:22px;border-bottom:2px solid var(--ink);padding-bottom:8px;margin-bottom:14px}
-.card{margin-bottom:20px;break-inside:avoid}
-.k{font-size:12px;color:var(--acc);letter-spacing:.15em;text-transform:uppercase}
-.t{font-size:17px;line-height:1.65;margin:6px 0}
-.t::first-letter{font-size:1.6em;font-weight:700}
-.b{color:var(--sub);font-size:14px;line-height:1.75}
-.big{font-family:Georgia,serif;font-size:56px;font-weight:700}
+.hero{max-width:640px;margin:0 auto;padding:30px 20px 6px;text-align:center}
+.hero h1{font-size:clamp(28px,7vw,36px)}
+.hero p{color:var(--sub);margin-top:8px;font-size:14px}
+.wall{max-width:640px;margin:10px auto;padding:10px 20px 20px;display:flex;flex-direction:column;gap:20px;align-items:center}
+.note{width:100%;max-width:440px;padding:22px 20px;border-radius:6px;box-shadow:0 4px 14px rgba(0,0,0,.10);
+background:#fff7ae;transform:rotate(-1.1deg)}
+.note:nth-child(even){background:#d8ecff;transform:rotate(1.2deg)}
+.note:nth-child(3n){background:#ffe3ec;transform:rotate(-.5deg)}
+@media(prefers-color-scheme:dark){.note{background:#3a3413;color:#f5f5f7}
+.note:nth-child(even){background:#16283d}.note:nth-child(3n){background:#3d1626}}
+.pin{width:14px;height:14px;border-radius:50%;background:#e05555;margin:0 auto 10px;box-shadow:0 2px 4px rgba(0,0,0,.25)}
+.modname{font-size:12px;letter-spacing:.2em;opacity:.65;margin-bottom:8px}
+.k{font-size:12px;font-weight:700;opacity:.6;margin-bottom:6px}
+.t{font-size:16px;line-height:1.65}
+.b{font-size:14px;line-height:1.7;margin-top:8px;opacity:.75}
+.big{font-size:clamp(40px,11vw,58px);font-weight:800}
 </style></head><body>
 <div class="topbar"><a class="back" href="index.html">← 每日看板</a>
-<span class="dateline">2026-10-05</span></div><div class="hero"><div class="k">DAILY FRESH</div><h1>今日份新鲜</h1><p>📰 杂志版 · 2026 年 10 月 5 日</p></div><hr class="rule"><div class="cols"><div class="mod"><h2>🧊 冷知识</h2><div class="card"><div class="k">冷知识 1</div><div class="t">考拉的指纹和人类极其相似，连刑侦专家都分不清。</div></div><div class="card"><div class="k">冷知识 2</div><div class="t">打喷嚏时心跳会停一拍？并没有——只是胸腔压力变化让你产生了错觉。</div></div></div><div class="mod"><h2>🧸 开源小玩具</h2><div class="card"><div class="k">GitHub</div><div class="t">ZeroDayEvil/ai-security-tool</div><div class="b">🛡️ Free open-source AI-powered security terminal &amp; vulnerability scanner (CVE, SBOM). Supports SSH, SFTP…</div><div style="margin-top:6px;font-size:14px"><a href="https://github.com/ZeroDayEvil/ai-security-tool">去看看 →</a></div></div><div class="card"><div class="k">GitHub</div><div class="t">dmdhrumilmistry/security-harness</div><div class="b">A multi-agent application-security review harness for Claude Code (and, later, other AI agents). One router…</div><div style="margin-top:6px;font-size:14px"><a href="https://github.com/dmdhrumilmistry/security-harness">去看看 →</a></div></div></div><div class="mod"><h2>💡 每日一得</h2><div class="card"><div class="k">一句话</div><div class="t">&quot;最好的代码是没有代码。&quot;</div></div></div></div><footer>✨ 今日份新鲜 · 每天拆开都不一样<br>
+<span class="dateline">2026-10-06</span></div><div class="hero"><h1>✨ 今日份新鲜</h1><p>📌 便利贴版 · 今天的新鲜事，都贴墙上了</p></div><div class="wall"><div class="note"><div class="pin"></div><div class="modname">🔢 今日数字</div><div class="k">人体微生物细胞占比（按数量）</div><div class="big">90%</div><div class="b">按细胞数算，你身体里微生物和人体细胞几乎一半一半——&quot;你&quot;是谁，值得商榷。</div></div><div class="note"><div class="pin"></div><div class="modname">📜 历史上的今天</div><div class="k">1949 年</div><div class="t">中华人民共和国与朝鲜民主主义人民共和国建交。</div><div style="margin-top:8px;font-size:14px"><a href="https://zh.wikipedia.org/wiki/1949%E5%B9%B4">维基百科 →</a></div></div><div class="note"><div class="pin"></div><div class="modname">📜 历史上的今天</div><div class="k">1866 年</div><div class="t">清政府批准筹设天津机器局。</div><div style="margin-top:8px;font-size:14px"><a href="https://zh.wikipedia.org/wiki/1866%E5%B9%B4">维基百科 →</a></div></div><div class="note"><div class="pin"></div><div class="modname">📜 历史上的今天</div><div class="k">1979 年</div><div class="t">香港獅子山馬仔坑木屋區五級大火，許多居民在中秋節晚上無家可歸。</div><div style="margin-top:8px;font-size:14px"><a href="https://zh.wikipedia.org/wiki/1979%E5%B9%B4">维基百科 →</a></div></div><div class="note"><div class="pin"></div><div class="modname">🧊 冷知识</div><div class="k">冷知识 1</div><div class="t">蜗牛可以睡三年，一觉醒来接着爬。</div></div>
+<div class="note"><div class="pin"></div><div class="modname">🔢 今日数字 · 来自今晨的新闻</div><div class="k">Reflection Beam 总参数</div><div class="big">501B</div><div class="b">激活只有 23B 的 MoE，自称推理算力是西方同类开源模型的 1/4——「西方 DeepSeek」昨天正式入场，权重本月稍晚 Apache 2.0 开源。</div></div>
+<div class="note"><div class="pin"></div><div class="modname">🔢 今日数字 · 来自今晨的新闻</div><div class="k">华尔街为 Broadcom × Anthropic 筹集</div><div class="big">$60B</div><div class="b">创纪录的芯片交易融资规模。AI 基建的钱，正在从科技公司自掏腰包变成华尔街结构化融资。</div></div><div class="note"><div class="pin"></div><div class="modname">🧊 冷知识</div><div class="k">冷知识 2</div><div class="t">人类 DNA 如果展开，一条染色体就有约 2 米长。</div></div></div><footer>✨ 今日份新鲜 · 每天拆开都不一样<br>
 <span style="font-size:12px">由 COCO 每日 08:00 自动生成</span></footer></body></html>
