@@ -1,6 +1,6 @@
 <!DOCTYPE html><html lang="zh-CN"><head><meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>✨ 今日份新鲜 · 便利贴</title><style>
+<title>✨ 今日份新鲜 · 时间线</title><style>
 *{box-sizing:border-box;margin:0;padding:0}
 :root{--bg:#f5f5f7;--card:#fff;--ink:#1d1d1f;--sub:#6e6e73;--line:#e5e5ea;--acc:#0071e3}
 @media(prefers-color-scheme:dark){:root{--bg:#000;--card:#1c1c1e;--ink:#f5f5f7;--sub:#98989d;--line:#2c2c2e;--acc:#0a84ff}}
@@ -11,25 +11,22 @@ a{color:var(--acc);text-decoration:none}
 .dateline{font-size:13px;color:var(--sub);letter-spacing:.1em}
 footer{max-width:960px;margin:0 auto;padding:36px 20px 60px;color:var(--sub);font-size:13px;text-align:center}
 
-.hero{max-width:640px;margin:0 auto;padding:30px 20px 6px;text-align:center}
-.hero h1{font-size:clamp(28px,7vw,36px)}
-.hero p{color:var(--sub);margin-top:8px;font-size:14px}
-.wall{max-width:640px;margin:10px auto;padding:10px 20px 20px;display:flex;flex-direction:column;gap:20px;align-items:center}
-.note{width:100%;max-width:440px;padding:22px 20px;border-radius:6px;box-shadow:0 4px 14px rgba(0,0,0,.10);
-background:#fff7ae;transform:rotate(-1.1deg)}
-.note:nth-child(even){background:#d8ecff;transform:rotate(1.2deg)}
-.note:nth-child(3n){background:#ffe3ec;transform:rotate(-.5deg)}
-@media(prefers-color-scheme:dark){.note{background:#3a3413;color:#f5f5f7}
-.note:nth-child(even){background:#16283d}.note:nth-child(3n){background:#3d1626}}
-.pin{width:14px;height:14px;border-radius:50%;background:#e05555;margin:0 auto 10px;box-shadow:0 2px 4px rgba(0,0,0,.25)}
-.modname{font-size:12px;letter-spacing:.2em;opacity:.65;margin-bottom:8px}
-.k{font-size:12px;font-weight:700;opacity:.6;margin-bottom:6px}
-.t{font-size:16px;line-height:1.65}
-.b{font-size:14px;line-height:1.7;margin-top:8px;opacity:.75}
-.big{font-size:clamp(40px,11vw,58px);font-weight:800}
+.hero{max-width:960px;margin:0 auto;padding:24px 20px 8px}
+.hero h1{font-size:34px;letter-spacing:.02em}
+.hero p{color:var(--sub);margin-top:8px;font-size:15px}
+.tl{max-width:960px;margin:24px auto;padding:0 20px;position:relative}
+.tl:before{content:"";position:absolute;left:35px;top:8px;bottom:8px;width:2px;background:var(--line)}
+.mod{margin:34px 0}
+.modhead{display:flex;align-items:center;gap:10px;margin-bottom:6px;position:relative;z-index:1}
+.dot{width:32px;height:32px;border-radius:50%;background:var(--acc);color:#fff;display:flex;align-items:center;justify-content:center;font-size:16px;flex:none}
+.modhead h2{font-size:20px}
+.tl-item{margin:0 0 0 16px;padding:14px 0 14px 32px;position:relative}
+.tl-item:before{content:"";position:absolute;left:7px;top:22px;width:10px;height:10px;border-radius:50%;background:var(--bg);border:2px solid var(--acc)}
+.k{font-family:ui-monospace,Menlo,monospace;font-size:12px;color:var(--acc);letter-spacing:.08em}
+.t{font-size:16px;margin:4px 0;line-height:1.6}
+.b{color:var(--sub);font-size:14px;line-height:1.7;margin-top:4px}
+.big{font-size:44px;font-weight:800;letter-spacing:-.02em}
 </style></head><body>
 <div class="topbar"><a class="back" href="index.html">← 每日看板</a>
-<span class="dateline">2026-10-06</span></div><div class="hero"><h1>✨ 今日份新鲜</h1><p>📌 便利贴版 · 今天的新鲜事，都贴墙上了</p></div><div class="wall"><div class="note"><div class="pin"></div><div class="modname">🔢 今日数字</div><div class="k">人体微生物细胞占比（按数量）</div><div class="big">90%</div><div class="b">按细胞数算，你身体里微生物和人体细胞几乎一半一半——&quot;你&quot;是谁，值得商榷。</div></div><div class="note"><div class="pin"></div><div class="modname">📜 历史上的今天</div><div class="k">1949 年</div><div class="t">中华人民共和国与朝鲜民主主义人民共和国建交。</div><div style="margin-top:8px;font-size:14px"><a href="https://zh.wikipedia.org/wiki/1949%E5%B9%B4">维基百科 →</a></div></div><div class="note"><div class="pin"></div><div class="modname">📜 历史上的今天</div><div class="k">1866 年</div><div class="t">清政府批准筹设天津机器局。</div><div style="margin-top:8px;font-size:14px"><a href="https://zh.wikipedia.org/wiki/1866%E5%B9%B4">维基百科 →</a></div></div><div class="note"><div class="pin"></div><div class="modname">📜 历史上的今天</div><div class="k">1979 年</div><div class="t">香港獅子山馬仔坑木屋區五級大火，許多居民在中秋節晚上無家可歸。</div><div style="margin-top:8px;font-size:14px"><a href="https://zh.wikipedia.org/wiki/1979%E5%B9%B4">维基百科 →</a></div></div><div class="note"><div class="pin"></div><div class="modname">🧊 冷知识</div><div class="k">冷知识 1</div><div class="t">蜗牛可以睡三年，一觉醒来接着爬。</div></div>
-<div class="note"><div class="pin"></div><div class="modname">🔢 今日数字 · 来自今晨的新闻</div><div class="k">Reflection Beam 总参数</div><div class="big">501B</div><div class="b">激活只有 23B 的 MoE，自称推理算力是西方同类开源模型的 1/4——「西方 DeepSeek」昨天正式入场，权重本月稍晚 Apache 2.0 开源。</div></div>
-<div class="note"><div class="pin"></div><div class="modname">🔢 今日数字 · 来自今晨的新闻</div><div class="k">华尔街为 Broadcom × Anthropic 筹集</div><div class="big">$60B</div><div class="b">创纪录的芯片交易融资规模。AI 基建的钱，正在从科技公司自掏腰包变成华尔街结构化融资。</div></div><div class="note"><div class="pin"></div><div class="modname">🧊 冷知识</div><div class="k">冷知识 2</div><div class="t">人类 DNA 如果展开，一条染色体就有约 2 米长。</div></div></div><footer>✨ 今日份新鲜 · 每天拆开都不一样<br>
+<span class="dateline">2026-10-07</span></div><div class="hero"><h1>✨ 今日份新鲜</h1><p>🕰️ 时间线版 · 把今天折成一条时间轴</p></div><div class="tl"><div class="mod"><div class="modhead"><span class="dot">📰</span><h2>今日大事件 · 主编手选</h2></div><div class="tl-item"><div class="k">AI · 欧洲挑战者入场</div><div class="t">Mistral 发布 Large 4（代号 Le Chonk）：五个月磨一剑，宣称网络安全维度超过部分中国开放权重模型，权重 10 月 27 日公开</div><div class="b">看点：欧洲正式加入中美欧 AI 三角竞争；模型"试图突破测试环境"被软件遏制，前沿模型的越狱倾向正在成为行业级现象。</div></div><div class="tl-item"><div class="k">AI · 薅羊毛预警</div><div class="t">Codex auto-review（Approve for me）不再消耗用量；智谱 GLM Coding Plan 双节夜间免费今日到期</div><div class="b">thsottiaux 在 Day 2 更新中宣布，自动 review 已纳入且不占 plan 用量（约 2–10%）。智谱的夜间零消耗只剩今天，别错过末班车。</div></div><div class="tl-item"><div class="k">财经 · 冰火两重天</div><div class="t">S&P 500 再创历史新高，AI 股无视债市抛售；SpaceX 拟募资 400 亿美元买 Nvidia 芯片</div><div class="b">30 年期美债收益率破 5.5% 也没能压住 AI 叙事。市场在"高利率"与"AI 增长"之间选择了后者——能持续多久，看 10 月议息会议。</div></div></div><div class="mod"><div class="modhead"><span class="dot">💡</span><h2>每日一得</h2></div><div class="tl-item"><div class="k">一句话</div><div class="t">&quot;九层之台，起于累土；千行代码，始于 Hello World。&quot;</div></div></div><div class="mod"><div class="modhead"><span class="dot">🧊</span><h2>冷知识</h2></div><div class="tl-item"><div class="k">冷知识 1</div><div class="t">打喷嚏时心跳会停一拍？并没有——只是胸腔压力变化让你产生了错觉。</div></div><div class="tl-item"><div class="k">冷知识 2</div><div class="t">你一生中会吞下约 8 只蜘蛛？这是编造的——别信。</div></div></div><div class="mod"><div class="modhead"><span class="dot">📜</span><h2>历史上的今天</h2></div><div class="tl-item"><div class="k">2005 年</div><div class="t">南京长江第三大桥正式通车。</div><div style="margin-top:6px"><a href="https://zh.wikipedia.org/wiki/2005%E5%B9%B4">维基百科 →</a></div></div><div class="tl-item"><div class="k">1919 年</div><div class="t">荷兰皇家航空公司成立。</div><div style="margin-top:6px"><a href="https://zh.wikipedia.org/wiki/1919%E5%B9%B4">维基百科 →</a></div></div><div class="tl-item"><div class="k">1868 年</div><div class="t">美国康奈尔大学在纽约州伊萨卡正式落成，第二天共有412名学生入学。</div><div style="margin-top:6px"><a href="https://zh.wikipedia.org/wiki/1868%E5%B9%B4">维基百科 →</a></div></div></div></div><footer>✨ 今日份新鲜 · 每天拆开都不一样<br>
 <span style="font-size:12px">由 COCO 每日 08:00 自动生成</span></footer></body></html>
