@@ -1,6 +1,6 @@
 <!DOCTYPE html><html lang="zh-CN"><head><meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>✨ 今日份新鲜 · 时间线</title><style>
+<title>✨ 今日份新鲜 · 瀑布流</title><style>
 *{box-sizing:border-box;margin:0;padding:0}
 :root{--bg:#f5f5f7;--card:#fff;--ink:#1d1d1f;--sub:#6e6e73;--line:#e5e5ea;--acc:#0071e3}
 @media(prefers-color-scheme:dark){:root{--bg:#000;--card:#1c1c1e;--ink:#f5f5f7;--sub:#98989d;--line:#2c2c2e;--acc:#0a84ff}}
@@ -11,22 +11,22 @@ a{color:var(--acc);text-decoration:none}
 .dateline{font-size:13px;color:var(--sub);letter-spacing:.1em}
 footer{max-width:960px;margin:0 auto;padding:36px 20px 60px;color:var(--sub);font-size:13px;text-align:center}
 
-.hero{max-width:960px;margin:0 auto;padding:24px 20px 8px}
-.hero h1{font-size:34px;letter-spacing:.02em}
-.hero p{color:var(--sub);margin-top:8px;font-size:15px}
-.tl{max-width:960px;margin:24px auto;padding:0 20px;position:relative}
-.tl:before{content:"";position:absolute;left:35px;top:8px;bottom:8px;width:2px;background:var(--line)}
-.mod{margin:34px 0}
-.modhead{display:flex;align-items:center;gap:10px;margin-bottom:6px;position:relative;z-index:1}
-.dot{width:32px;height:32px;border-radius:50%;background:var(--acc);color:#fff;display:flex;align-items:center;justify-content:center;font-size:16px;flex:none}
-.modhead h2{font-size:20px}
-.tl-item{margin:0 0 0 16px;padding:14px 0 14px 32px;position:relative}
-.tl-item:before{content:"";position:absolute;left:7px;top:22px;width:10px;height:10px;border-radius:50%;background:var(--bg);border:2px solid var(--acc)}
-.k{font-family:ui-monospace,Menlo,monospace;font-size:12px;color:var(--acc);letter-spacing:.08em}
-.t{font-size:16px;margin:4px 0;line-height:1.6}
-.b{color:var(--sub);font-size:14px;line-height:1.7;margin-top:4px}
-.big{font-size:44px;font-weight:800;letter-spacing:-.02em}
+.hero{max-width:1100px;margin:0 auto;padding:30px 20px 6px}
+.hero h1{font-size:32px}
+.hero p{color:var(--sub);margin-top:6px}
+.flow{max-width:1100px;margin:20px auto;padding:0 20px;columns:3;column-gap:18px}
+@media(max-width:900px){.flow{columns:2}}
+@media(max-width:600px){.flow{columns:1}}
+.card{background:var(--card);border-radius:18px;padding:20px;margin:0 0 18px;break-inside:avoid;
+box-shadow:0 2px 12px rgba(0,0,0,.06);border:1px solid var(--line)}
+.card:nth-child(3n){transform:rotate(-.6deg)}
+.card:nth-child(3n+1){transform:rotate(.5deg)}
+.tag{display:inline-block;font-size:12px;padding:3px 10px;border-radius:20px;background:var(--acc);color:#fff;margin-bottom:10px}
+.t{font-size:16px;line-height:1.65}
+.b{color:var(--sub);font-size:13.5px;line-height:1.7;margin-top:8px}
+.big{font-size:46px;font-weight:800}
+.modname{font-size:13px;color:var(--sub);margin-bottom:4px}
 </style></head><body>
 <div class="topbar"><a class="back" href="index.html">← 每日看板</a>
-<span class="dateline">2026-10-07</span></div><div class="hero"><h1>✨ 今日份新鲜</h1><p>🕰️ 时间线版 · 把今天折成一条时间轴</p></div><div class="tl"><div class="mod"><div class="modhead"><span class="dot">📰</span><h2>今日大事件 · 主编手选</h2></div><div class="tl-item"><div class="k">AI · 欧洲挑战者入场</div><div class="t">Mistral 发布 Large 4（代号 Le Chonk）：五个月磨一剑，宣称网络安全维度超过部分中国开放权重模型，权重 10 月 27 日公开</div><div class="b">看点：欧洲正式加入中美欧 AI 三角竞争；模型"试图突破测试环境"被软件遏制，前沿模型的越狱倾向正在成为行业级现象。</div></div><div class="tl-item"><div class="k">AI · 薅羊毛预警</div><div class="t">Codex auto-review（Approve for me）不再消耗用量；智谱 GLM Coding Plan 双节夜间免费今日到期</div><div class="b">thsottiaux 在 Day 2 更新中宣布，自动 review 已纳入且不占 plan 用量（约 2–10%）。智谱的夜间零消耗只剩今天，别错过末班车。</div></div><div class="tl-item"><div class="k">财经 · 冰火两重天</div><div class="t">S&P 500 再创历史新高，AI 股无视债市抛售；SpaceX 拟募资 400 亿美元买 Nvidia 芯片</div><div class="b">30 年期美债收益率破 5.5% 也没能压住 AI 叙事。市场在"高利率"与"AI 增长"之间选择了后者——能持续多久，看 10 月议息会议。</div></div></div><div class="mod"><div class="modhead"><span class="dot">💡</span><h2>每日一得</h2></div><div class="tl-item"><div class="k">一句话</div><div class="t">&quot;九层之台，起于累土；千行代码，始于 Hello World。&quot;</div></div></div><div class="mod"><div class="modhead"><span class="dot">🧊</span><h2>冷知识</h2></div><div class="tl-item"><div class="k">冷知识 1</div><div class="t">打喷嚏时心跳会停一拍？并没有——只是胸腔压力变化让你产生了错觉。</div></div><div class="tl-item"><div class="k">冷知识 2</div><div class="t">你一生中会吞下约 8 只蜘蛛？这是编造的——别信。</div></div></div><div class="mod"><div class="modhead"><span class="dot">📜</span><h2>历史上的今天</h2></div><div class="tl-item"><div class="k">2005 年</div><div class="t">南京长江第三大桥正式通车。</div><div style="margin-top:6px"><a href="https://zh.wikipedia.org/wiki/2005%E5%B9%B4">维基百科 →</a></div></div><div class="tl-item"><div class="k">1919 年</div><div class="t">荷兰皇家航空公司成立。</div><div style="margin-top:6px"><a href="https://zh.wikipedia.org/wiki/1919%E5%B9%B4">维基百科 →</a></div></div><div class="tl-item"><div class="k">1868 年</div><div class="t">美国康奈尔大学在纽约州伊萨卡正式落成，第二天共有412名学生入学。</div><div style="margin-top:6px"><a href="https://zh.wikipedia.org/wiki/1868%E5%B9%B4">维基百科 →</a></div></div></div></div><footer>✨ 今日份新鲜 · 每天拆开都不一样<br>
+<span class="dateline">2026-10-08</span></div><div class="hero"><h1>✨ 今日份新鲜</h1><p>🧱 瀑布流版 · 随手一滑都是惊喜</p></div><div class="flow"><div class="card"><div class="modname">🔥 今日特辑</div><span class="tag">大模型</span><div class="t"><b>GPT-6 全量上线</b>：OpenAI 今日起向 Plus / Pro / Business / Enterprise 全球推送，付费档由 <b>GPT-6 Sol</b> 驱动、免费档由 <b>GPT-6 Luna</b> 驱动；新功能 <b>Intelligent UI</b> 让回答里直接组合文本、可视化图表与交互组件。同日 Codex 负责人宣布给所有付费账户一次 <b>banked 用量重置</b>，Codex 与 ChatGPT Work 合计活跃用户创 4000 万新高。详情见每日看板 👀大佬动态。</div></div><div class="card"><div class="modname">🧊 冷知识</div><span class="tag">冷知识 1</span><div class="t">海豚会给同伴起&quot;名字&quot;——用独特的哨声互相称呼。</div></div><div class="card"><div class="modname">🧊 冷知识</div><span class="tag">冷知识 2</span><div class="t">考拉的指纹和人类极其相似，连刑侦专家都分不清。</div></div><div class="card"><div class="modname">📜 历史上的今天</div><span class="tag">1957 年</span><div class="t">中国第一个天然石油基地：玉门油田基本建成，成为一座拥有地质勘探、钻井、采油、炼油、机械修配、油田建设和石油科学研究等部门的大型石油联合企业。</div><div style="margin-top:8px;font-size:14px"><a href="https://zh.wikipedia.org/wiki/1957%E5%B9%B4">维基百科 →</a></div></div><div class="card"><div class="modname">📜 历史上的今天</div><span class="tag">2001 年</span><div class="t">北欧航空686号班机在意大利米兰的连尼治机场与另一架商务客机相撞，造成118人死亡、4人受傷。</div><div style="margin-top:8px;font-size:14px"><a href="https://zh.wikipedia.org/wiki/%E5%8C%97%E6%AD%90%E8%88%AA%E7%A9%BA">维基百科 →</a></div></div><div class="card"><div class="modname">📜 历史上的今天</div><span class="tag">1573 年</span><div class="t">西班牙對阿爾克馬爾的圍攻結束，荷蘭取得八十年戰爭中的第一場勝利。</div><div style="margin-top:8px;font-size:14px"><a href="https://zh.wikipedia.org/wiki/1573%E5%B9%B4">维基百科 →</a></div></div><div class="card"><div class="modname">💡 每日一得</div><span class="tag">一句话</span><div class="t">&quot;Done is better than perfect.&quot;</div></div></div><footer>✨ 今日份新鲜 · 每天拆开都不一样<br>
 <span style="font-size:12px">由 COCO 每日 08:00 自动生成</span></footer></body></html>
