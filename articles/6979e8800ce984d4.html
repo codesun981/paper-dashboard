@@ -1,0 +1,12 @@
+<div><div><div class="post_content " id="paragraph">
+            
+            <p data-vmark="2f60"><a class="s_tag" href="https://www.ithome.com/" target="_blank" rel="noopener">IT之家</a> 10 月 8 日消息，微软于当地时间 10 月 7 日发布了其开源沙箱库操作系统 LiteBox 的首个标记版本 v0.1。不过，v0.1 版本的发布说明较为简略，微软表示将在后续版本中提供更详细的变更日志。</p><p data-vmark="e096">该项目是一套基于 Rust 开发、面向安全场景的 Library OS（库操作系统），通过缩减应用与宿主系统之间的接口来降低攻击面，目前仍处于持续开发阶段。</p><p data-vmark="c7df"><img src="https://img.ithome.com/images/v2/t.png" title="微软 LiteBox 沙箱库系统首个版本发布：基于 Rust 打造安全型 Library OS" loading="lazy"></p><p data-vmark="132d">LiteBox 最早于 2026 年 2 月公开。微软当时将其定位为面向沙箱场景的 Library OS，通过 Linux 虚拟化安全能力以及 Rust 语言特性，为应用提供隔离运行环境。其设计目标包括在 Linux 上沙箱化运行 Linux 应用、在 Windows 上运行未经修改的 Linux 程序，以及在 AMD SEV-SNP、OP-TEE 和微软 Linux 虚拟化安全机制等环境中运行程序。</p><p data-vmark="fdd8">与需要完整内核的虚拟机或共享宿主内核的容器不同，LiteBox 采用库操作系统模型，仅向底层平台暴露最小化的接口集合。LiteBox 的设计围绕“北向”和“南向”接口展开：北向接口提供基于 nix 和 rustix 风格的 POSIX 系统调用，南向接口则将 LiteBox 连接到宿主环境，宿主可以是 Linux、Windows 或专用硬件平台。这一分离设计使 LiteBox 能够在内核态和用户态两种模式下运行。</p><p data-vmark="5c7d"><img src="https://img.ithome.com/images/v2/t.png" title="微软 LiteBox 沙箱库系统首个版本发布：基于 Rust 打造安全型 Library OS" loading="lazy"></p><p data-vmark="baa5">据 GitHub 项目页面介绍，LiteBox 的典型用例包括在 Windows 上运行未经修改的 Linux 程序、在 Linux 上沙箱化 Linux 应用、基于 AMD SEV-SNP 运行程序、在 Linux 上运行 OP-TEE 程序以及运行在 LVBS 上。不过，Windows 运行器目前仅支持 x86-64 架构，尚未扩展至 Windows on Arm。</p><p data-vmark="d379">该项目被定位为特别适合机密计算场景。LiteBox 可在支持 AMD SEV-SNP 的硬件上运行，使工作负载在受保护的加密内存区域中执行，同时支持 OP-TEE 集成。</p><p data-vmark="2cb5">LiteBox 与 Google 的 gVisor 和亚马逊的 Firecracker 形成对比，前者在用户空间拦截系统调用，后者依赖轻量级虚拟机，而 LiteBox 的库操作系统架构旨在从设计上降低开销。不过目前尚无具体性能基准数据公布，微软也未说明该技术是否会最终集成到 Azure 或 Windows Subsystem for Linux 中。</p><p data-vmark="1319">微软在 GitHub 上提醒开发者，LiteBox 仍处于活跃开发阶段，API 和接口可能发生变化，建议需要长期稳定性的用户等待稳定版本发布，或做好适配更新的准备。IT之家后续将保持关注。</p>
+        </div>
+
+        
+        
+
+        
+
+
+            </div></div>
