@@ -1,0 +1,32 @@
+<p><img src="https://images.unsplash.com/photo-1591405351990-4726e331f141?w=1600&q=80&fm=jpg&fit=crop" loading="lazy" alt="服务器机柜"></p><p>Agent 能调用工具以后，最危险的误区是把“模型发来函数名”当作“系统已经批准执行”。真正的执行权应该在你的应用手里。下面这段 Java 17 代码为每次候选调用检查三件事：工具是否在白名单、金额是否为合法正数、累计预算是否还够；任何一步失败都不给执行器机会。它适用于采购草稿、工单变更、云资源申请等有外部副作用的流程。</p><p>OpenAI Function Calling 文档讲的是模型如何提出工具调用；它不替你完成组织权限、金额上限和审计。最新 GPT-6 产品与智能界面方向恰好提醒我们：把“计划”和“批准”做成用户可见的两个状态，而不是一键自动化。</p><p> <p><img src="https://java4u.cn/wp-content/uploads/2026/10/inline_00-24.png" loading="lazy" alt="mermaid diagram"></p></p><h2>环境与完整代码</h2><p>保存为 ，执行 。无第三方依赖，示例未在本次任务中实际调用模型或线上工具；请在你的 Java 17 环境先编译并运行，再接入实际执行器。<code>BudgetGate.java</code><code>javac BudgetGate.java && java BudgetGate</code></p><pre><code>import java.math.BigDecimal;
+import java.util.*;
+
+public class BudgetGate {
+  record Call(String tool, String amount, String requestId) {}
+  static final Set<String> ALLOW = Set.of("create_draft_purchase", "search_catalog");
+  static final BigDecimal LIMIT = new BigDecimal("500.00");
+  static BigDecimal spent = BigDecimal.ZERO;
+  static final List<String> audit = new ArrayList<>();
+
+  static boolean approve(Call c) {
+    if (!ALLOW.contains(c.tool())) return deny(c, "工具不在白名单");
+    final BigDecimal cost;
+    try { cost = new BigDecimal(c.amount()); }
+    catch (NumberFormatException e) { return deny(c, "金额格式错误"); }
+    if (cost.signum() < 0) return deny(c, "金额不能为负");
+    if (spent.add(cost).compareTo(LIMIT) > 0) return deny(c, "累计预算不足");
+    spent = spent.add(cost);
+    audit.add(c.requestId()+" ALLOW "+c.tool()+" "+cost);
+    return true;
+  }
+  static boolean deny(Call c, String reason) {
+    audit.add(c.requestId()+" DENY "+reason); return false;
+  }
+  public static void main(String[] args) {
+    System.out.println(approve(new Call("create_draft_purchase", "120.00", "r-1")));
+    System.out.println(approve(new Call("wire_money", "1.00", "r-2")));
+    System.out.println(approve(new Call("create_draft_purchase", "400.00", "r-3")));
+    audit.forEach(System.out::println);
+  }
+}
+</code></pre><p>预期输出依次为 、、：第一笔只创建草稿，第二笔工具不被允许，第三笔超过累计额度。不要把这里的内存变量直接用于生产；多实例服务必须用数据库事务或带条件写入的额度账本。<code>true</code><code>false</code><code>false</code></p><p>常见错误：仅限制工具名却不校验参数；把“创建草稿”和“提交付款”放在同一工具；重试时重复扣减；审计日志包含密钥或原始敏感提示词。它适合低到中风险、规则清晰的流程，不适合让模型自行决定付款、删库或人事处分。工程化改进包括租户隔离、幂等键、每工具限额和人工双人复核。5分钟练习：为 加“单笔超过 200 元必须 REVIEW”的返回状态。<code>create_draft_purchase</code></p><h2>预算是产品能力，不是财务报表</h2><p>最实用的预算规则通常分三层：单次调用限制爆炸半径，单个任务限制循环，租户日限额控制总体风险。调用前冻结额度，执行成功后确认，失败或取消后释放，才能避免并发任务都读到“余额充足”。若工具会产生不可逆副作用，预算通过也不等于可以执行：界面还要显示工具名、参数摘要、预计金额和确认人。审计记录至少包含请求 ID、模型版本、策略版本、决策、执行结果与操作者；但不应完整保存敏感提示词或凭据。上线后按拒绝原因统计：工具名频繁被拒，说明能力设计要拆分；预算频繁被拒，说明需要排队或重新分配额度，而不是悄悄把阈值调高。</p><p>官方文档：。你的Agent应该按调用次数、金额还是风险等级先触发人工确认？<a href="https://developers.openai.com/api/docs/guides/function-calling" target="_blank" rel="noopener">Function calling</a></p><p>关注「蜗牛聊AI」，一起看懂技术变化背后的真正机会。</p> .j4u-post { font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",PingFang SC,"Microsoft YaHei",sans-serif; color:#24292e; line-height:1.8; max-width:860px; margin:0 auto; } .j4u-post img.hero { display:block; width:100%; max-width:860px; border-radius:10px; margin:0 0 24px; } .j4u-post h1 { font-size:30px; margin:0 0 16px; } .j4u-post h2 { font-size:24px; margin:32px 0 12px; padding-bottom:8px; border-bottom:2px solid #07c160; } .j4u-post h3 { font-size:20px; margin:24px 0 10px; } .j4u-post p { font-size:16px; margin:0 0 16px; } .j4u-post a { color:#07c160; text-decoration:none; } .j4u-post blockquote { margin:18px 0; padding:12px 16px; background:#f6f8fa; border-left:4px solid #07c160; color:#555; } .j4u-post pre { background:#0d1117; color:#c9d1d9; padding:16px; border-radius:8px; overflow:auto; font-size:14px; line-height:1.6; } .j4u-post code { font-family:Consolas,Menlo,monospace; } .j4u-post pre code { background:none; padding:0; } .j4u-post :not(pre) > code { background:#f6f8fa; padding:2px 6px; border-radius:4px; color:#c7254e; font-size:14px; } .j4u-post ul, .j4u-post ol { padding-left:24px; margin:0 0 16px; } .j4u-post li { font-size:16px; margin:6px 0; } .j4u-post img { max-width:100%; }
