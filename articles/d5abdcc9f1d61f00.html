@@ -1,0 +1,44 @@
+<p><img src="https://images.unsplash.com/photo-1620712943543-bcc4688e7485?w=1600&q=80&fm=jpg&fit=crop" loading="lazy" alt="AI 机械手"></p><p>Agent 最危险的误解是“模型说要执行，所以系统就执行”。函数调用（Function Calling）只是一种让模型提出工具与参数建议的协议；真正调用数据库、发货接口或邮件服务的权限仍在你的 Java 程序手里。本文不绑定某一家 SDK，而是先实现所有 Agent 都该有的执行门：工具白名单、参数格式、次数预算和默认拒绝。它能在你接上 Gemini、其他模型或 MCP（Model Context Protocol，模型上下文协议）工具前先守住边界。</p><p>官方 Gemini API 文档将 Function Calling 描述为把 Agent 工作流连接到外部 API 的能力。关键架构是双回合：模型返回 function call 候选；宿主验证后执行；再把工具结果送回模型。模型永远不能越过宿主直接产生副作用。</p><p> <p><img src="https://java4u.cn/wp-content/uploads/2026/10/inline_00-21.png" loading="lazy" alt="mermaid diagram"></p></p><h2>运行前提</h2><p>Java 17+ 即可，本例没有网络和密钥，因为安全门应能脱离模型独立测试。模型侧必须按官方 Function Calling 文档声明同名工具 schema；这里的 代表解析后的候选，而不是替代官方 API 请求。<code>ToolCall</code></p><pre><code>javac AgentGate.java && java AgentGate
+</code></pre><h2>完整代码</h2><p>代码只允许查询订单和创建草稿；拒绝取消订单等副作用工具。每轮最多两次工具调用，并把订单号限制为十位大写字母数字。 是可替换的受限适配器，真实实现中再接数据库或 HTTP 客户端，并分别设置连接与请求超时。<code>execute</code></p><pre><code>import java.util.*;
+import java.util.regex.Pattern;
+
+public class AgentGate {
+  record ToolCall(String name, Map<String, String> args) {}
+  static final Set<String> ALLOWED = Set.of("get_order", "create_reply_draft");
+  static final Pattern ORDER = Pattern.compile("[A-Z0-9]{10}");
+  static final int MAX_CALLS = 2;
+
+  static String authorize(ToolCall call, int used) {
+    if (used >= MAX_CALLS) return "DENY: 调用预算已用尽";
+    if (!ALLOWED.contains(call.name())) return "DENY: 工具不在白名单";
+    if (call.name().equals("get_order")) {
+      String id = call.args().get("order_id");
+      if (id == null || !ORDER.matcher(id).matches()) return "DENY: 非法订单号";
+    }
+    if (call.name().equals("create_reply_draft")) {
+      String text = call.args().get("text");
+      if (text == null || text.isBlank() || text.length() > 500) return "DENY: 草稿长度不合法";
+    }
+    return "ALLOW";
+  }
+  static String execute(ToolCall call) {
+    return switch (call.name()) {
+      case "get_order" -> "ORDER_FOUND: delivery=processing";
+      case "create_reply_draft" -> "DRAFT_CREATED: no external message sent";
+      default -> throw new IllegalArgumentException("unreachable");
+    };
+  }
+  public static void main(String[] args) {
+    List<ToolCall> suggestions = List.of(
+        new ToolCall("get_order", Map.of("order_id", "AB12CD34EF")),
+        new ToolCall("cancel_order", Map.of("order_id", "AB12CD34EF")),
+        new ToolCall("create_reply_draft", Map.of("text", "您的订单正在处理中。")));
+    int used = 0;
+    for (ToolCall call : suggestions) {
+      String verdict = authorize(call, used);
+      if (verdict.equals("ALLOW")) { System.out.println(execute(call)); used++; }
+      else System.out.println(verdict + " -> " + call.name());
+    }
+  }
+}
+</code></pre><p>预期输出先返回订单状态，再拒绝 ，最后仅创建一份草稿。这个次序说明：模型可以提出危险工具，但宿主拒绝不在白名单的名称。此次已用 编译并实际运行，输出符合预期；没有调用任何模型、数据库或线上工具。<code>cancel_order</code><code>javac AgentGate.java</code></p><h2>不要跳过的三层判断</h2><p>第一层是：默认拒绝、按业务最小授权；第二层是：枚举、长度、正则、金额范围和权限主体逐项校验；第三层是：限制轮数、调用次数、并发和总耗时。只做其中一层不够。例如允许 但不验证订单归属，仍可能泄露数据；限制两次调用但允许 同样危险。<strong>工具种类</strong><strong>参数</strong><strong>资源预算</strong><code>get_order</code><code>delete_all</code></p><p>常见错误有三类：一，把模型输出当可信 JSON 而不进行 schema 验证；二，把“创建草稿”和“发送消息”共用同一工具；三，只记录成功调用而不记录拒绝原因。工程化应为每次决定保存工具、参数摘要、授权主体、规则版本、耗时和结果哈希；日志不可写入完整敏感参数。涉及支付、删除、外发的工具还应要求人类二次确认和幂等键。</p><h2>适用范围与练习</h2><p>适合客服助手、内部知识查询、代码审阅的只读工具与有人工确认的工作流；不适合让 Agent 自主执行转账、删库、发布生产配置。五分钟练习：加入 ，只允许金额 0–100 且不产生退款；再写一个测试证明 一定被拒绝。<code>refund_preview</code><code>refund_execute</code></p><p>你的 Agent 最先该限制的是工具种类、参数范围还是调用次数？</p><p>关注「蜗牛聊AI」，一起看懂技术变化背后的真正机会。</p> .j4u-post { font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",PingFang SC,"Microsoft YaHei",sans-serif; color:#24292e; line-height:1.8; max-width:860px; margin:0 auto; } .j4u-post img.hero { display:block; width:100%; max-width:860px; border-radius:10px; margin:0 0 24px; } .j4u-post h1 { font-size:30px; margin:0 0 16px; } .j4u-post h2 { font-size:24px; margin:32px 0 12px; padding-bottom:8px; border-bottom:2px solid #07c160; } .j4u-post h3 { font-size:20px; margin:24px 0 10px; } .j4u-post p { font-size:16px; margin:0 0 16px; } .j4u-post a { color:#07c160; text-decoration:none; } .j4u-post blockquote { margin:18px 0; padding:12px 16px; background:#f6f8fa; border-left:4px solid #07c160; color:#555; } .j4u-post pre { background:#0d1117; color:#c9d1d9; padding:16px; border-radius:8px; overflow:auto; font-size:14px; line-height:1.6; } .j4u-post code { font-family:Consolas,Menlo,monospace; } .j4u-post pre code { background:none; padding:0; } .j4u-post :not(pre) > code { background:#f6f8fa; padding:2px 6px; border-radius:4px; color:#c7254e; font-size:14px; } .j4u-post ul, .j4u-post ol { padding-left:24px; margin:0 0 16px; } .j4u-post li { font-size:16px; margin:6px 0; } .j4u-post img { max-width:100%; }
