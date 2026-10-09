@@ -1,0 +1,29 @@
+<p><img src="https://images.unsplash.com/photo-1558494949-ef010cbdcc31?w=1600&q=80&fm=jpg&fit=crop" loading="lazy" alt="数据中心机房"></p><p>检索增强生成（RAG）常被误解成“把资料塞给模型就不会胡说”。实际风险在最后一公里：模型可能拿一段旧条款支持新结论，或把两个来源拼成一个看似合理的回答。解决办法不是再写一条“请诚实”的提示词，而是让模型输出候选声明与来源 ID，再用确定性代码逐条检查。这样，界面能清楚显示“已证实”“资料过期”还是“缺证据”。</p><p>OpenAI Structured Outputs 文档提供让输出贴合 JSON Schema 的路径；本文先展示不依赖密钥的本地门禁。线上接入时，把模型的结构化结果喂给 ，而不是直接展示模型文本。<code>verify</code></p><p> <p><img src="https://java4u.cn/wp-content/uploads/2026/10/inline_00-25.png" loading="lazy" alt="mermaid diagram"></p></p><h2>环境与完整代码</h2><p>Python 3.10+ 无第三方依赖，保存为 ，运行 。本次在本机 Python 3.9.6 运行，两个断言通过；真实模型未被调用。<code>citation_gate.py</code><code>python citation_gate.py</code></p><pre><code>from datetime import date, timedelta
+
+SOURCES = {
+    "policy-2026": {"text": "报销上限为2000元", "updated": date(2026, 10, 1)},
+    "legacy-2024": {"text": "旧流程需纸质单", "updated": date(2024, 1, 1)},
+}
+
+def verify(claims: list[dict], today=date(2026, 10, 8)) -> list[dict]:
+    result = []
+    for claim in claims:
+        ids = claim.get("source_ids", [])
+        if not ids:
+            result.append({"claim": claim.get("text"), "status": "BLOCK", "reason": "没有来源"}); continue
+        found = [SOURCES.get(i) for i in ids]
+        if None in found:
+            result.append({"claim": claim["text"], "status": "BLOCK", "reason": "来源ID不存在"}); continue
+        if any(today - s["updated"] > timedelta(days=365) for s in found):
+            result.append({"claim": claim["text"], "status": "REVIEW", "reason": "来源超过一年"}); continue
+        if not any(claim["text"] in s["text"] for s in found):
+            result.append({"claim": claim["text"], "status": "BLOCK", "reason": "来源未覆盖该声明"}); continue
+        result.append({"claim": claim["text"], "status": "ALLOW", "reason": "证据覆盖且新鲜"})
+    return result
+
+good = [{"text": "报销上限为2000元", "source_ids": ["policy-2026"]}]
+bad = [{"text": "可免审付款", "source_ids": ["legacy-2024"]}]
+assert verify(good)[0]["status"] == "ALLOW"
+assert verify(bad)[0]["status"] == "REVIEW"
+print(verify(good) + verify(bad))
+</code></pre><p>预期结果是一条 和一条 。关键规则是“声明级覆盖”而非“回答末尾挂一个链接”；生产环境还要做语义蕴含检查、版本化索引和来源权限过滤。<code>ALLOW</code><code>REVIEW</code></p><p>常见错误：只引用最相似文档却不检查是否支持结论；混用不同生效日期的政策；把内部文档 ID 直接暴露给无权限用户；相信模型自己判断新鲜度。该方式适合制度问答、知识库助手和客服草稿，不适合在缺少权威材料时假装能给出事实答案。工程化时把 映射为 UI 徽标与人工队列。5分钟练习：新增“来源必须属于当前部门”的字段检查。<code>ALLOW/REVIEW/BLOCK</code></p><h2>不要把引用做成装饰</h2><p>有效引用至少有三个粒度：文档级证明“来自哪里”，段落级证明“依据在哪一段”，声明级证明“这句话由哪条材料支撑”。知识库更新时，索引和来源版本应一起更新；否则旧向量仍能召回，却不再代表现行规则。对于金额、期限、资格这类高风险声明，可以让系统在缺证据时只展示相关原文，不生成结论。还应监控被拦截的原因：如果大量回答因“来源过期”进入 REVIEW，问题通常在内容治理而非提示词。上线前选二十个真实问题，让业务负责人逐句判断引用是否足够；把错例加入回归集，才能知道一次模型升级是否悄悄降低了证据质量。</p><p>官方文档：。你会把“无法给出处”显示为拒答，还是降级为待核实草稿？<a href="https://developers.openai.com/api/docs/guides/structured-outputs" target="_blank" rel="noopener">Structured model outputs</a></p><p>关注「蜗牛聊AI」，一起看懂技术变化背后的真正机会。</p> .j4u-post { font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",PingFang SC,"Microsoft YaHei",sans-serif; color:#24292e; line-height:1.8; max-width:860px; margin:0 auto; } .j4u-post img.hero { display:block; width:100%; max-width:860px; border-radius:10px; margin:0 0 24px; } .j4u-post h1 { font-size:30px; margin:0 0 16px; } .j4u-post h2 { font-size:24px; margin:32px 0 12px; padding-bottom:8px; border-bottom:2px solid #07c160; } .j4u-post h3 { font-size:20px; margin:24px 0 10px; } .j4u-post p { font-size:16px; margin:0 0 16px; } .j4u-post a { color:#07c160; text-decoration:none; } .j4u-post blockquote { margin:18px 0; padding:12px 16px; background:#f6f8fa; border-left:4px solid #07c160; color:#555; } .j4u-post pre { background:#0d1117; color:#c9d1d9; padding:16px; border-radius:8px; overflow:auto; font-size:14px; line-height:1.6; } .j4u-post code { font-family:Consolas,Menlo,monospace; } .j4u-post pre code { background:none; padding:0; } .j4u-post :not(pre) > code { background:#f6f8fa; padding:2px 6px; border-radius:4px; color:#c7254e; font-size:14px; } .j4u-post ul, .j4u-post ol { padding-left:24px; margin:0 0 16px; } .j4u-post li { font-size:16px; margin:6px 0; } .j4u-post img { max-width:100%; }
