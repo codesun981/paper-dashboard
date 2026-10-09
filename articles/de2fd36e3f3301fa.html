@@ -1,0 +1,38 @@
+<p><img src="https://images.unsplash.com/photo-1517077304055-6e89abbf09b0?w=1600&q=80&fm=jpg&fit=crop" loading="lazy" alt="工作台上的笔记本"></p><p>把发票图片交给视觉模型，确实能省掉手输；但“模型说是 128.00 元”不等于系统该付款。更稳妥的做法是：模型只产生候选字段，本地程序以 重算含税金额、检查币种和上限，再把通过或拒绝的理由交给界面。你将得到一个可以复制的最小链路，也能把同样的门禁迁移到合同、收据和质检单。<code>Decimal</code></p><p>OpenAI 的 Images and vision 文档说明 Responses API 可接收图像输入。本文用 REST 而非 SDK，目的是让请求、超时和错误分支对初学者可见。模型 ID 请以目标账号的 Models 页面为准；代码中的 是示例占位，调用前替换为你账户可用模型。<code>gpt-6</code></p><p> <p><img src="https://java4u.cn/wp-content/uploads/2026/10/inline_00-26.png" loading="lazy" alt="mermaid diagram"></p></p><h2>环境准备与完整代码</h2><p>Python 3.10+，安装 ，设置 ，再运行 。示例未在本次任务中实际调用线上 API；已在本机完成语法检查。<code>pip install requests</code><code>export OPENAI_API_KEY='...'</code><code>python receipt_gate.py receipt.jpg</code></p><pre><code>import base64, json, os, sys
+from decimal import Decimal, InvalidOperation
+import requests
+
+API = "https://api.openai.com/v1/responses"
+def gate(data: dict) -> tuple[bool, str]:
+    try:
+        subtotal = Decimal(str(data["subtotal"]))
+        tax = Decimal(str(data["tax"]))
+        total = Decimal(str(data["total"]))
+    except (KeyError, InvalidOperation):
+        return False, "字段缺失或金额不是数字"
+    if data.get("currency") != "CNY": return False, "仅接受CNY票据"
+    if total > Decimal("2000"): return False, "超过自动处理上限"
+    if abs(subtotal + tax - total) > Decimal("0.01"):
+        return False, "小计、税额与总额不一致"
+    return True, "允许进入人工确认"
+
+def main(path: str) -> None:
+    key = os.environ.get("OPENAI_API_KEY")
+    if not key: raise SystemExit("请设置OPENAI_API_KEY")
+    image = base64.b64encode(open(path, "rb").read()).decode()
+    prompt = "识别票据，严格只返回JSON：subtotal,tax,total,currency"
+    body = {"model":"gpt-6", "input":[{"role":"user","content":[
+        {"type":"input_text","text":prompt},
+        {"type":"input_image","image_url":"data:image/jpeg;base64,"+image}]}]}
+    try:
+        r = requests.post(API, headers={"Authorization":f"Bearer {key}","Content-Type":"application/json"}, json=body, timeout=30)
+        r.raise_for_status()
+        text = r.json()["output"][0]["content"][0]["text"]
+        ok, reason = gate(json.loads(text)); print({"approved": ok, "reason": reason})
+    except (requests.RequestException, KeyError, json.JSONDecodeError) as e:
+        print({"approved": False, "reason": f"调用或解析失败: {e}"})
+
+if __name__ == "__main__":
+    if len(sys.argv) != 2: raise SystemExit("用法: python receipt_gate.py receipt.jpg")
+    main(sys.argv[1])
+</code></pre><p>关键点有三个：不要用浮点数算钱；不要允许模型决定“批准”；不要把原始票据和密钥写进日志。成功时预期输出 ，仍不是自动付款。<code>{'approved': True, 'reason': '允许进入人工确认'}</code></p><p>常见失败：一是图片太大或格式不被账户支持，先压缩并核对视觉文档；二是模型返回 Markdown 围栏而非 JSON，应在生产中启用结构化输出或做更严格解析；三是网络超时，代码已设 30 秒，生产环境还应重试并加幂等键；四是发票有多税率，不能沿用单一小计公式。</p><p>它适合低风险预录入和人工前置核验，不适合绕过财务审批、税务判断或未获授权的证件处理。下一步可把字段置信度、供应商白名单和审计 ID 写入数据库。5分钟练习：把 2000 改成你的团队阈值，并给 增加“日期不得晚于今天”的规则。<code>gate</code></p><h2>把它接进真实页面</h2><p>页面至少应该同时展示原图缩略图、模型原始候选、本地复算值和拒绝原因。不要只用一枚绿色“已通过”徽标：使用者需要能看出是“识别到 128.00”“规则算出 128.00”，还是“金额相差 0.02”。若模型无法读取图片，保留上传记录并让用户补图；若规则不通过，允许修正字段但要求说明原因。对发票号、身份证号等敏感字段，日志只保留哈希或局部掩码，原图按组织保留期自动删除。批量场景可先排队、限制单用户并发，并把同一文件的 SHA-256 作为幂等键，避免重试造成重复报销草稿。</p><p>官方文档：。你的业务里，哪一个AI提取字段必须由本地规则二次确认？<a href="https://developers.openai.com/api/docs/guides/images-vision" target="_blank" rel="noopener">Images and vision</a></p><p>关注「蜗牛聊AI」，一起看懂技术变化背后的真正机会。</p> .j4u-post { font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",PingFang SC,"Microsoft YaHei",sans-serif; color:#24292e; line-height:1.8; max-width:860px; margin:0 auto; } .j4u-post img.hero { display:block; width:100%; max-width:860px; border-radius:10px; margin:0 0 24px; } .j4u-post h1 { font-size:30px; margin:0 0 16px; } .j4u-post h2 { font-size:24px; margin:32px 0 12px; padding-bottom:8px; border-bottom:2px solid #07c160; } .j4u-post h3 { font-size:20px; margin:24px 0 10px; } .j4u-post p { font-size:16px; margin:0 0 16px; } .j4u-post a { color:#07c160; text-decoration:none; } .j4u-post blockquote { margin:18px 0; padding:12px 16px; background:#f6f8fa; border-left:4px solid #07c160; color:#555; } .j4u-post pre { background:#0d1117; color:#c9d1d9; padding:16px; border-radius:8px; overflow:auto; font-size:14px; line-height:1.6; } .j4u-post code { font-family:Consolas,Menlo,monospace; } .j4u-post pre code { background:none; padding:0; } .j4u-post :not(pre) > code { background:#f6f8fa; padding:2px 6px; border-radius:4px; color:#c7254e; font-size:14px; } .j4u-post ul, .j4u-post ol { padding-left:24px; margin:0 0 16px; } .j4u-post li { font-size:16px; margin:6px 0; } .j4u-post img { max-width:100%; }
