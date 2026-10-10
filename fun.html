@@ -1,6 +1,6 @@
 <!DOCTYPE html><html lang="zh-CN"><head><meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>✨ 今日份新鲜 · 瀑布流</title><style>
+<title>✨ 今日份新鲜 · 深夜电台</title><style>
 *{box-sizing:border-box;margin:0;padding:0}
 :root{--bg:#f5f5f7;--card:#fff;--ink:#1d1d1f;--sub:#6e6e73;--line:#e5e5ea;--acc:#0071e3}
 @media(prefers-color-scheme:dark){:root{--bg:#000;--card:#1c1c1e;--ink:#f5f5f7;--sub:#98989d;--line:#2c2c2e;--acc:#0a84ff}}
@@ -11,22 +11,25 @@ a{color:var(--acc);text-decoration:none}
 .dateline{font-size:13px;color:var(--sub);letter-spacing:.1em}
 footer{max-width:960px;margin:0 auto;padding:36px 20px 60px;color:var(--sub);font-size:13px;text-align:center}
 
-.hero{max-width:1100px;margin:0 auto;padding:30px 20px 6px}
-.hero h1{font-size:32px}
-.hero p{color:var(--sub);margin-top:6px}
-.flow{max-width:1100px;margin:20px auto;padding:0 20px;columns:3;column-gap:18px}
-@media(max-width:900px){.flow{columns:2}}
-@media(max-width:600px){.flow{columns:1}}
-.card{background:var(--card);border-radius:18px;padding:20px;margin:0 0 18px;break-inside:avoid;
-box-shadow:0 2px 12px rgba(0,0,0,.06);border:1px solid var(--line)}
-.card:nth-child(3n){transform:rotate(-.6deg)}
-.card:nth-child(3n+1){transform:rotate(.5deg)}
-.tag{display:inline-block;font-size:12px;padding:3px 10px;border-radius:20px;background:var(--acc);color:#fff;margin-bottom:10px}
-.t{font-size:16px;line-height:1.65}
-.b{color:var(--sub);font-size:13.5px;line-height:1.7;margin-top:8px}
-.big{font-size:46px;font-weight:800}
-.modname{font-size:13px;color:var(--sub);margin-bottom:4px}
+body{background:#0b0b14 !important;color:#eceaf2 !important}
+.topbar .back,.topbar .dateline{color:#8e8ca0 !important}
+footer{color:#8e8ca0 !important}
+a{color:#9db8ff !important}
+.hero{max-width:640px;margin:0 auto;padding:56px 24px 12px}
+.hero .k{font-size:12px;letter-spacing:.4em;color:#9db8ff}
+.hero h1{font-size:clamp(34px,9vw,52px);font-weight:700;margin-top:10px}
+.hero p{color:#8e8ca0;margin-top:10px;font-size:14px}
+.story{max-width:640px;margin:0 auto;padding:44px 24px;border-top:1px solid #23232f}
+.story .k{font-size:12px;letter-spacing:.3em;color:#9db8ff;margin-bottom:16px}
+.big{font-size:clamp(44px,13vw,84px);font-weight:800;line-height:1.1}
+.mid{font-family:Georgia,"Songti SC",serif;font-size:clamp(19px,5vw,25px);line-height:1.9}
+.sub{color:#a9a7bd;font-size:15px;line-height:1.9;margin-top:16px}
+.wave{display:flex;gap:5px;align-items:flex-end;height:26px;margin:18px 0 4px}
+.wave span{width:4px;background:#9db8ff;border-radius:2px;animation:wv 1.2s ease-in-out infinite}
+.wave span:nth-child(2){animation-delay:.15s}.wave span:nth-child(3){animation-delay:.3s}
+.wave span:nth-child(4){animation-delay:.45s}.wave span:nth-child(5){animation-delay:.6s}
+@keyframes wv{0%,100%{height:8px}50%{height:26px}}
 </style></head><body>
 <div class="topbar"><a class="back" href="index.html">← 每日看板</a>
-<span class="dateline">2026-10-10</span></div><div class="hero"><h1>✨ 今日份新鲜</h1><p>🧱 瀑布流版 · 随手一滑都是惊喜</p></div><div class="flow"><div class="card"><div class="modname">🧊 冷知识</div><span class="tag">冷知识 1</span><div class="t">你的胃每两周就会换一层内壁，不然会被自己的胃酸消化掉。</div></div><div class="card"><div class="modname">🧊 冷知识</div><span class="tag">冷知识 2</span><div class="t">第一台计算机 bug 真的是虫子：1947 年一只飞蛾飞进了 Harvard Mark II。</div></div><div class="card"><div class="modname">💡 每日一得</div><span class="tag">一句话</span><div class="t">&quot;Stay hungry, stay foolish.&quot; —— Stewart Brand</div></div><div class="card"><div class="modname">🧸 开源小玩具</div><span class="tag">GitHub</span><div class="t">graygnatconsole/mcp-audit-tool</div><div class="b">🛡️ Security audit CLI for Model Context Protocol (MCP) servers — scan AI agent configs for tool poisoning…</div><div style="margin-top:8px;font-size:14px"><a href="https://github.com/graygnatconsole/mcp-audit-tool">去看看 →</a></div></div><div class="card"><div class="modname">🧸 开源小玩具</div><span class="tag">GitHub</span><div class="t">strands-agents/box</div><div class="b">Run AI agents in a sandbox that restricts what they can execute, read, write, and reach on the network. Box…</div><div style="margin-top:8px;font-size:14px"><a href="https://github.com/strands-agents/box">去看看 →</a></div></div></div><footer>✨ 今日份新鲜 · 每天拆开都不一样<br>
+<span class="dateline">2026-10-10</span></div><div class="hero"><div class="k">MIDNIGHT FM</div><h1>今日份新鲜</h1><div class="wave"><span></span><span></span><span></span><span></span><span></span></div><p>🌙 深夜电台版 · 关了灯，听今天的故事</p></div><div class="story"><div class="k">📖 今日生活指南 · 证据A · 普通人容易踩的法律红线 · 性价比极高</div><div class="mid">别伪造事故、别夸大损失骗理赔：这是保险诈骗罪，帮你作证、帮你修车、帮你鉴定的人一起算</div><div class="sub">编造事故、夸大损失去骗理赔，是保险诈骗罪，数额较大的判 5 年以下，再罚 1 万到 10 万元。帮你作证、鉴定、评估财产的人故意出假证明，和你一起按共犯定罪。安徽宣城一起案子里，8 个人被判 2 到 4 年，各罚 1 万元。</div><div class="sub"><a href="https://github.com/eternity4719/HowToLiveBetter/blob/main/book/09-普通人容易踩的法律红线.md">看原文 →</a></div></div><div class="story"><div class="k">📖 今日生活指南 · 证据B · 别把自己搭进去 · 性价比极高</div><div class="mid">别当「挂名法人」，别把身份证借给人注册公司</div><div class="sub">法律预设法定代表人就是那个管事的人，「我只是挂个名、什么都不知道」不是免责的理由。法定代表人执行职务给别人造成损害，公司先赔，赔完可以回头找有过错的你追偿。已经挂了名的，公司法允许你辞掉，公司要在 30 日内定出新的法定代表人。</div><div class="sub"><a href="https://github.com/eternity4719/HowToLiveBetter/blob/main/book/08-别把自己搭进去.md">看原文 →</a></div></div><div class="story"><div class="k">📖 今日生活指南 · 证据A · 出国旅行与境外安全 · 性价比极高</div><div class="mid">境外自驾先确认当地认不认中国驾照，网上卖的「国际驾照」多数是废纸</div><div class="sub">网上代办的「国际驾照」在中国内地不成立。那本证是 1949 年日内瓦公约缔约方之间互认的翻译件，103 个缔约方里没有中国内地。所以国内不管谁给你办，都没有法律效力。能不能用中国驾照开车，看目的地自己的规定，没确认清楚就别开。</div><div class="sub"><a href="https://github.com/eternity4719/HowToLiveBetter/blob/main/book/21-出国旅行与境外安全.md">看原文 →</a></div></div><div class="story"><div class="k">📖 今日生活指南 · 证据A · 十八岁之后有哪几条路 · 性价比极高</div><div class="mid">应征之后拒服兵役，两年内不准出境或升学复学，还进不了公务员和国企</div><div class="sub">报了名又拒绝去当兵，后果是一串。公务员不能录用你，国有企业和事业单位也不能招你。两年内不准出境，不准升学，不准回学校复学。还会被列进履行国防义务严重失信主体名单。所以「先报上再说，不行就退回来」是个很贵的想法。（内容来自《高性价比人生指南》CC-BY-4.0）</div><div class="sub"><a href="https://github.com/eternity4719/HowToLiveBetter/blob/main/book/31-十八岁之后有哪几条路.md">看原文 →</a></div></div><div class="story"><div class="k">📜 历史上的今天 · 1934 年</div><div class="mid">蒋中正開始第五次剿共，中国工农红军开始長征。</div><div class="sub"><a href="https://zh.wikipedia.org/wiki/1934%E5%B9%B4">维基百科 →</a></div></div><div class="story"><div class="k">📜 历史上的今天 · 1925 年</div><div class="mid">故宮博物院於雙十國慶日，在中華民國北平市（今中國北京市）正式開館。</div><div class="sub"><a href="https://zh.wikipedia.org/wiki/1925%E5%B9%B4">维基百科 →</a></div></div><div class="story"><div class="k">📜 历史上的今天 · 1935 年</div><div class="mid">大日本帝國於臺灣臺北市等地舉辦大型博覽會，展示其對臺灣的建設成果。</div><div class="sub"><a href="https://zh.wikipedia.org/wiki/1935%E5%B9%B4">维基百科 →</a></div></div><div class="story"><div class="k">🧊 冷知识 · 冷知识 1</div><div class="mid">扑克牌里的 K 分别代表四位国王：大卫、亚历山大、查理曼、凯撒。</div></div><div class="story"><div class="k">🧊 冷知识 · 冷知识 2</div><div class="mid">第一台计算机 bug 真的是虫子：1947 年一只飞蛾飞进了 Harvard Mark II。</div></div><footer>✨ 今日份新鲜 · 每天拆开都不一样<br>
 <span style="font-size:12px">由 COCO 每日 08:00 自动生成</span></footer></body></html>
