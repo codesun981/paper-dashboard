@@ -1,0 +1,36 @@
+<p><img src="https://images.unsplash.com/photo-1517694712202-14dd9538aa97?w=1600&q=80&fm=jpg&fit=crop" loading="lazy" alt="彩色代码屏"></p><p>客服系统最危险的自动化，不是模型答错一句话，而是把“退款 9999 元”当成真指令一路执行。结构化输出（Structured Outputs）能要求模型按 JSON Schema 返回字段；但它不是业务真相。你还需要第二道本地门：金额、枚举值和缺失字段必须由程序复核。本篇用一个可复制的 Python 骨架完成这件事。</p><p>官方 Responses API 参考说明， 可用于受约束的 JSON 输出，且较旧的 不推荐优先使用。模型、权限与配额以你的账号为准。示例为了可离线验证，先用模拟响应；接入时只替换 ，密钥仅从环境变量读取。<code>json_schema</code><code>json_object</code><code>call_model</code></p><p> <p><img src="https://java4u.cn/wp-content/uploads/2026/10/inline_00-35.png" loading="lazy" alt="mermaid diagram"></p></p><h2>环境准备</h2><p>需要 Python 3.10+。演示没有第三方依赖；真实请求可安装 ，并设置 。不要把密钥写进源码。下面代码的超时参数放在真实调用处，避免网络问题无限等待。<code>pip install openai</code><code>export OPENAI_API_KEY='...'</code></p><pre><code>import json, os
+from decimal import Decimal
+
+ALLOWED = {"refund", "shipping", "other"}
+MAX_REFUND = Decimal("500.00")
+
+SCHEMA = {"type": "object", "properties": {
+    "category": {"type": "string"}, "amount": {"type": "string"},
+    "summary": {"type": "string"}}, "required": ["category", "summary"]}
+
+def call_model(text: str) -> dict:
+    # 真实接入：确认 os.getenv("OPENAI_API_KEY") 非空，
+    # 使用客户端 timeout=20，并传 text.format={type: "json_schema", ...}。
+    if not os.getenv("OPENAI_API_KEY"):
+        return {"category": "refund", "amount": "128.50", "summary": text}
+    raise RuntimeError("示例未在本次任务中实际调用线上 API")
+
+def validate(ticket: dict) -> tuple[bool, str]:
+    if not isinstance(ticket.get("summary"), str) or not ticket["summary"].strip():
+        return False, "缺少摘要"
+    if ticket.get("category") not in ALLOWED:
+        return False, "未知分类"
+    if ticket.get("category") == "refund":
+        try:
+            amount = Decimal(ticket.get("amount", "-1"))
+        except Exception:
+            return False, "金额不是十进制数"
+        if not (Decimal("0") < amount <= MAX_REFUND):
+            return False, "金额超出自动队列范围"
+    return True, "QUEUED_FOR_REVIEW"
+
+if __name__ == "__main__":
+    ticket = call_model("订单 A12 重复扣款，请退 128.50 元")
+    ok, reason = validate(ticket)
+    print(json.dumps({"ticket": ticket, "ok": ok, "reason": reason}, ensure_ascii=False))
+</code></pre><p>运行 ，在未设置密钥时预期看到 和 ；它只进入人工队列，不会退款。关键点是 Schema 解决形状，本地 解决业务边界。常见失败有三类：模型漏字段，要求 Schema 的 required 字段并回问；金额带“元”或逗号，拒绝后让模型只输出数字字符串；网络慢或 429，真实调用设 20 秒超时并指数退避，不要在超时后盲目重试有副作用的动作。<code>python ticket.py</code><code>ok: true</code><code>QUEUED_FOR_REVIEW</code><code>validate</code></p><p>适合把自由文本变成工单、表单和审核草稿；不适合拿模型结果直接放款、删库或处理医疗结论。工程化时，为每条记录保存原文、模型版本、Schema 版本和校验结果；再用脱敏历史样本统计拒绝率。5 分钟实践：新增 枚举，只让 工单走人工复核，写一个断言验证未知优先级会被拒绝。<code>priority</code><code>high</code></p><p>你的工单系统里，哪一个字段绝不能只相信模型输出？</p><p>关注「蜗牛聊AI」，一起看懂技术变化背后的真正机会。</p> .j4u-post { font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",PingFang SC,"Microsoft YaHei",sans-serif; color:#24292e; line-height:1.8; max-width:860px; margin:0 auto; } .j4u-post img.hero { display:block; width:100%; max-width:860px; border-radius:10px; margin:0 0 24px; } .j4u-post h1 { font-size:30px; margin:0 0 16px; } .j4u-post h2 { font-size:24px; margin:32px 0 12px; padding-bottom:8px; border-bottom:2px solid #07c160; } .j4u-post h3 { font-size:20px; margin:24px 0 10px; } .j4u-post p { font-size:16px; margin:0 0 16px; } .j4u-post a { color:#07c160; text-decoration:none; } .j4u-post blockquote { margin:18px 0; padding:12px 16px; background:#f6f8fa; border-left:4px solid #07c160; color:#555; } .j4u-post pre { background:#0d1117; color:#c9d1d9; padding:16px; border-radius:8px; overflow:auto; font-size:14px; line-height:1.6; } .j4u-post code { font-family:Consolas,Menlo,monospace; } .j4u-post pre code { background:none; padding:0; } .j4u-post :not(pre) > code { background:#f6f8fa; padding:2px 6px; border-radius:4px; color:#c7254e; font-size:14px; } .j4u-post ul, .j4u-post ol { padding-left:24px; margin:0 0 16px; } .j4u-post li { font-size:16px; margin:6px 0; } .j4u-post img { max-width:100%; }
