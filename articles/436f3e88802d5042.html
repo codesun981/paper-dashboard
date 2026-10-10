@@ -1,0 +1,39 @@
+<p><img src="https://images.unsplash.com/photo-1451187580459-43490279c0fa?w=1600&q=80&fm=jpg&fit=crop" loading="lazy" alt="地球与网络光带"></p><p>模型决定“建议调用什么函数”，应用决定“是否真的调用”。这句话是 Agent 安全的底线。以“给客户发送回访邮件”为例，模型可能正确识别了意图，也可能被一段网页文本诱导去调用删除工具。解决办法不是写更长的提示词，而是给工具调用加独立的白名单、参数校验、金额/次数预算和人工审批。下面的 Python 程序不依赖真实密钥就能跑通这层门禁。</p><p>Gemini API 的函数调用文档把流程拆成声明函数、模型提出调用、应用执行函数、回传结果四步，并明确工具由应用执行。也正因为如此，函数调用不是授权系统。本文的示例模拟模型输出；接入 API 后只需把模型返回的函数名与参数送入 ，不要跳过它。<code>authorize</code></p><p> <p><img src="https://java4u.cn/wp-content/uploads/2026/10/inline_00-32.png" loading="lazy" alt="mermaid diagram"></p></p><h2>运行前准备</h2><p>Python 3.10+，无第三方依赖。保存为 后运行 。若接入 Gemini，安装 ，并把密钥放在 ；本示例没有调用线上 API，已在本机实际运行并通过三条断言。当前函数调用文档适用于模型把工具建议交给应用处理的流程。<code>tool_gate.py</code><code>python tool_gate.py</code><code>python -m pip install google-genai</code><code>GEMINI_API_KEY</code></p><pre><code>from dataclasses import dataclass
+from typing import Any
+
+@dataclass
+class Decision:
+    allowed: bool
+    reason: str
+
+ALLOWED = {"search_kb", "draft_email"}
+MAX_SEARCHES = 3
+
+def authorize(name: str, args: dict[str, Any], searches: int) -> Decision:
+    if name not in ALLOWED:
+        return Decision(False, "工具不在白名单")
+    if name == "search_kb":
+        query = args.get("query", "")
+        if not isinstance(query, str) or not query.strip() or len(query) > 120:
+            return Decision(False, "查询参数非法")
+        if searches >= MAX_SEARCHES:
+            return Decision(False, "搜索预算已耗尽")
+    if name == "draft_email":
+        if set(args) != {"customer_id", "template"}:
+            return Decision(False, "邮件参数必须精确匹配")
+        if args["template"] not in {"follow_up", "receipt_request"}:
+            return Decision(False, "模板未批准")
+    return Decision(True, "允许；发送前仍需人工确认")
+
+def execute(call: dict, searches: int) -> dict:
+    decision = authorize(call["name"], call["args"], searches)
+    if not decision.allowed:
+        return {"status": "blocked", "reason": decision.reason}
+    return {"status": "needs_approval", "tool": call["name"], "reason": decision.reason}
+
+if __name__ == "__main__":
+    print(execute({"name":"search_kb", "args":{"query":"退款政策"}}, 0))
+    assert execute({"name":"delete_customer", "args":{}}, 0)["status"] == "blocked"
+    assert execute({"name":"search_kb", "args":{"query":"x"}}, 3)["status"] == "blocked"
+    assert execute({"name":"draft_email", "args":{"customer_id":"c1","template":"follow_up"}}, 0)["status"] == "needs_approval"
+</code></pre><p>这段代码的关键是不信任模型： 把可调用范围缩小为两个工具；邮件工具要求参数集合完全匹配，避免多塞一个收件人或“立即发送”开关；搜索有累计上限。 即使允许，也只产生 ，不发送邮件。实际调用 API 时，还应给每个 tool call 关联用户身份、租户、请求ID和幂等键。<code>ALLOWED</code><code>execute</code><code>needs_approval</code></p><p>预期输出第一行是 ；删除客户和超预算搜索均为 。常见错误：把工具描述写得很细就以为安全；只校验函数名不校验参数；重试时重置预算；把模型输出当作可信 JSON。适合知识检索、草稿生成和低风险查询；不适合无审批地付款、删除数据、修改权限或向外部发送不可撤回消息。<code>needs_approval</code><code>blocked</code></p><p>工程化可进一步加入 JSON Schema、审计事件、租户级速率限制、审批时效和回放测试。5分钟实践：新增 ，规定金额超过100元或缺少订单号时必须返回 。<code>create_refund_draft</code><code>needs_approval</code></p><p>在你的业务里，哪一个工具调用必须永远保留人工确认？</p><p>关注「蜗牛聊AI」，一起看懂技术变化背后的真正机会。</p> .j4u-post { font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",PingFang SC,"Microsoft YaHei",sans-serif; color:#24292e; line-height:1.8; max-width:860px; margin:0 auto; } .j4u-post img.hero { display:block; width:100%; max-width:860px; border-radius:10px; margin:0 0 24px; } .j4u-post h1 { font-size:30px; margin:0 0 16px; } .j4u-post h2 { font-size:24px; margin:32px 0 12px; padding-bottom:8px; border-bottom:2px solid #07c160; } .j4u-post h3 { font-size:20px; margin:24px 0 10px; } .j4u-post p { font-size:16px; margin:0 0 16px; } .j4u-post a { color:#07c160; text-decoration:none; } .j4u-post blockquote { margin:18px 0; padding:12px 16px; background:#f6f8fa; border-left:4px solid #07c160; color:#555; } .j4u-post pre { background:#0d1117; color:#c9d1d9; padding:16px; border-radius:8px; overflow:auto; font-size:14px; line-height:1.6; } .j4u-post code { font-family:Consolas,Menlo,monospace; } .j4u-post pre code { background:none; padding:0; } .j4u-post :not(pre) > code { background:#f6f8fa; padding:2px 6px; border-radius:4px; color:#c7254e; font-size:14px; } .j4u-post ul, .j4u-post ol { padding-left:24px; margin:0 0 16px; } .j4u-post li { font-size:16px; margin:6px 0; } .j4u-post img { max-width:100%; }
