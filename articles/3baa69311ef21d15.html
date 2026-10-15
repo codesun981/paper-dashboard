@@ -1,0 +1,12 @@
+<div><div><div class="post_content " id="paragraph">
+            
+            <p data-vmark="260f"><a class="s_tag" href="https://www.ithome.com/" target="_blank" rel="noopener">IT之家</a> 10 月 16 日消息，蚂蚁百灵昨日宣布开源 Ling-3.1-flash 模型，Ling-3.1-flash 总参数约 560B，每个 Token 激活约 25B，最高支持 1M 上下文。</p><p data-vmark="ce91"><img src="https://img.ithome.com/images/v2/t.png" title="蚂蚁百灵开源 Ling-3.1-flash AI 模型，最高支持 1M 上下文" loading="lazy"></p><p data-vmark="4cf2">在 Artificial Analysis 的公开评测中，Ling-3.1-flash 的智能指数为 41、输出速度约为每秒 210 Token。</p><p data-vmark="5855"><img src="https://img.ithome.com/images/v2/t.png" title="蚂蚁百灵开源 Ling-3.1-flash AI 模型，最高支持 1M 上下文" loading="lazy"></p><p data-vmark="1c97"><img src="https://img.ithome.com/images/v2/t.png" title="蚂蚁百灵开源 Ling-3.1-flash AI 模型，最高支持 1M 上下文" loading="lazy"></p><p data-vmark="fcf0">针对本地部署，团队对 routed experts 采用 MXFP4 量化、dense 层保持 block-FP8，权重占用从约 <strong>534GB 降至 292GB</strong>。在对应的 Hopper GPU 测试配置中，服务部署由 <strong>8 卡降至 4 卡</strong>，让具备服务器级 GPU 的团队以更少卡数运行模型；实际需求仍随上下文、并发量和服务配置而变。</p><p data-vmark="95de">针对长资料处理，团队提供长上下文并行推理方案（PCP / DCP）；工具调用也加强了对 JSON Schema 的支持，方便与现有业务接口对接。</p><p data-vmark="c5e7">企业知识问答、办公助手常要先读取较长资料，用户仍希望尽快看到回复。团队通过算子融合与 DSpark 投机解码减少推理开销：在平均输入约 25.47K Token、输出约 224 Token、缓存命中率为 76% 的模拟生产请求中，<strong>8 卡 Hopper </strong>配置下的平均首 Token 时间为<strong> 604 毫秒</strong>，相邻输出 Token 平均间隔为 <strong>3.28 毫秒</strong>。这为长资料输入后的交互响应提供测试参考。</p><p data-vmark="e66d">持续提供服务的业务系统，还需要在固定 GPU 预算内评估单实例能承接多少请求。在平均输入约 8.5K Token、输出约 800 Token 的 <strong>4 卡 Hopper</strong> 吞吐测试中，模型达到约 <strong>1.36 QPS</strong>，同时满足首 Token 时间 P50 小于 3 秒、相邻输出 Token 间隔 P90 小于 70 毫秒的测试约束。这为自有部署的容量规划提供参考。</p><p data-vmark="e3d2">在线体验方面，Ling-3.1-flash 目前提供限时 2.5 折优惠，优惠后价格如下：</p><p data-vmark="506c">IT之家附开源链接：</p><p data-vmark="b8aa"><strong>相关阅读：</strong></p><p class="ad-tips">广告声明：文内含有的对外跳转链接（包括不限于超链接、二维码、口令等形式），用于传递更多信息，节省甄选时间，结果仅供参考，IT之家包含外链的文章均包含本声明。</p>
+        </div>
+
+        
+        
+
+        
+
+
+            </div></div>
