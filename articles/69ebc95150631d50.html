@@ -1,8 +1,0 @@
-<div><div><div class="p_mainnew"><p>
-					Linux 作者 Linus Torvalds 在维护者峰会上透露他在大模型帮助下开发了一系列补丁解决一个长期存在的问题。现在这组 10 个补丁已递交接受审查。这些补丁主要增强 folio 的查找机制：通过识别处于热数据状态的 folio，设置一个“延迟释放该 folio 直至 RCU 周期结束”的标志。随后利用 RCU 延迟在 RCU 保护下进行常规的 folio 查找，同时在 RCU 保护下直接进行实际的 folio 数据访问...补丁在测试中性能实现了数量级的提升，但已发现存在竞态条件，因此需要进一步完善。
-</p><p></p>
-
-<p></p>
-<p>
-https://lwn.net/Articles/1100449/					                </p></div>
-            </div></div>
