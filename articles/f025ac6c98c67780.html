@@ -1,0 +1,119 @@
+<div><div><div class="prose prose-tech markdown-content max-w-none" data-astro-cid-ce2bgkb3>  <blockquote>
+<p>LFM2.5-24B-A2B 部署资料说明（2026-10-18）：本文依据官方来源并附可复核的 Mac 内存容量预检工具，但没有下载或运行 LFM 模型，因此不提供 XBSTACK 推理速度或准确率实测。</p>
+</blockquote>
+<p><strong>直接回答：</strong> LFM2.5-24B-A2B 是 Liquid AI 2026 年 10 月 13 日发布的 24B 总参数、约 2.45B 激活参数的 MoE 模型。能否在 Mac 上运行，不能只看“2B 激活”：它仍需要加载约 24B 参数的模型权重。官方 MLX 4-bit 模型文件约 <strong>13.6GB</strong>，5-bit 约 <strong>16.5GB</strong>，8-bit 约 <strong>25.5GB</strong>。文件大小不是统一内存门槛；上下文缓存、框架开销、macOS 和其他 App 都要占内存。<strong>16GB 统一内存不宜被宣传为稳定可用的配置</strong>；32GB Mac 更值得作为量化版本的测试起点，但具体能否稳定运行仍以设备实测为准。</p>
+<h2 id="先确认是否真的是适合你的模型">先确认是否真的是适合你的模型</h2>
+<p><img alt="MoE 专家稀疏路由概念配图，非真实推理测试截图" loading="lazy" src="https://www.xbstack.com/_astro/moe-routing.DDQaITuL_Z1XncGJ.webp"></p>
+<p>Liquid AI 发布的是 LFM2.5 系列中的大规模 MoE 指令模型，官方描述为 24B 总参数、约 2.45B 激活参数，面向本地 Agent、工具调用与推理任务。它不是仅占 2B 参数内存的小模型。稀疏专家结构主要影响每一步计算量，不会把已加载的全部专家权重自动变成 2B。</p>
+<p>官方发布文章称其在部分 Agent 和 Tool Use 基准上与其他 MoE 模型有竞争力，并报告 Apple M5 Max 上约 184 tokens/s 的特定成绩。这是<strong>厂商公开结果</strong>，不是 XBSTACK 在 Mac 上测出的速度。具体配置、量化、提示长度、并发、预填充速度和生成速度应分别核验。</p>
+<p>官方参考：</p>
+
+<h2 id="mac-的内存怎么估算">Mac 的内存怎么估算</h2>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<table><thead><tr><th>选择</th><th>官方模型仓库展示的文件体积</th><th>对设备的意义</th></tr></thead><tbody><tr><td>MLX 4-bit</td><td>约 13.6 GB</td><td>较低权重占用；需额外留系统与 KV Cache 空间</td></tr><tr><td>MLX 5-bit</td><td>约 16.5 GB</td><td>权重更大；可能减少部分量化损失，但需实际比较</td></tr><tr><td>MLX 8-bit</td><td>约 25.5 GB</td><td>权重占用进一步增加；更不适合紧张的统一内存</td></tr></tbody></table>
+<p>上述数字源自模型托管页，截至 2026-10-18。它们既不是一次任务的总内存峰值，也不是 Apple 官方设备兼容性认证。尤其长上下文、较大批处理与较多并发请求会增加缓存与运行时内存。</p>
+<p><strong>实用判断：</strong> 如果只有 16GB 统一内存，不建议直接下载 13.6GB 权重后假设可以正常运行；可以优先考虑更小的模型。32GB 是量化模型可进行本地验证的合理起点，但不是“保证顺畅”的最低配置。如果你需要长上下文、后台其他进程常驻或稳定 Agent 服务，更大的统一内存更有弹性。不要把这个建议当成已测最低规格表。</p>
+<h2 id="选择-gguf-还是-mlx">选择 GGUF 还是 MLX</h2>
+<p><img alt="GGUF 与 MLX 的英文部署路径示意图" loading="lazy" src="https://www.xbstack.com/_astro/gguf-vs-mlx.Bz3e7mYR_ZDzi4I.webp"></p>
+<p><strong>GGUF + llama.cpp</strong> 适合希望跨 macOS、Linux、Windows 复用同一种部署方式、快速用本地 HTTP 接口连接 Agent 的开发者。Liquid AI 官方 GGUF 仓库给出以下形式的运行入口：</p>
+<pre class="language-bash" data-language="bash"><code is:raw="" class="language-bash"><span class="token comment"># 安装好与你的系统兼容的 llama.cpp / llama CLI 后运行</span>
+llama cli <span class="token parameter variable">-hf</span> ggml-org/LFM2.5-24B-A2B-GGUF:Q4_K_M
+
+<span class="token comment"># 需要本地 OpenAI-compatible 服务时</span>
+llama serve <span class="token parameter variable">-hf</span> ggml-org/LFM2.5-24B-A2B-GGUF:Q4_K_M
+</code></pre>
+<p>命令写法取自官方模型仓库，尚未在 XBSTACK 机器上复核运行；请先确认当前 CLI 子命令与运行时是否支持对应 MoE 模型。首次执行会下载大文件，建议检查磁盘剩余空间、模型校验、进程内存和许可证。</p>
+<p><strong>MLX</strong> 更适合 Apple Silicon 上的原生模型测试，但不是“下载一个 MLX 文件就一定能运行”。应对照发布方 README 采用兼容的 MLX / mlx-lm 版本和加载方法，确保该版本已支持 LFM2 MoE 架构与模型聊天模板。选择 4-bit 起步，完成正确性测试后，再比较 5-bit 和其他精度配置。请注意 MLX 量化模型可能与 GGUF 的量化方法不同，不能仅用体积作质量结论。</p>
+<h2 id="下载可复核的-mac-内存预检工具">下载可复核的 Mac 内存预检工具</h2>
+<p>与未经实测的“16GB 最低配置表”不同，XBSTACK 提供一个原创、可查看源码的 Python 预检脚本：读取 Mac 的真实物理内存（<code>sysctl hw.memsize</code>），再把<strong>官方模型文件体积</strong>和用户自行设定的系统/运行时预留量做预算比较。它不会下载或加载模型。即使显示容量有余量，也<strong>不保证</strong>实际推理框架兼容、模型加载成功或达到指定上下文长度。</p>
+<p><a href="https://www.xbstack.com/tools/lfm25-mac-preflight.py" target="_blank" rel="noopener">下载 Mac 内存预检脚本</a>（仅 Python 标准库，无第三方依赖）。</p>
+<pre class="language-bash" data-language="bash"><code is:raw="" class="language-bash">python3 lfm25-mac-preflight.py <span class="token parameter variable">--variant</span> mlx-4bit
+python3 lfm25-mac-preflight.py --memory-gib <span class="token number">32</span> <span class="token parameter variable">--variant</span> mlx-5bit --reserve-gib <span class="token number">8</span>
+</code></pre>
+<p><strong>本站可复现证据（2026-10-18）：</strong> 已在当前 Mac 上执行预检，系统报告物理内存 16 GiB。按 MLX 4-bit 模型文件约 13.6 GB、另<strong>假设</strong>系统与运行时占用 6 GiB，预算余量为 <strong>-2.67 GiB</strong>。这是容量估算，<strong>不是模型推理失败记录</strong>：没有下载、加载或执行模型。即使在更大内存设备上得到正余量，也不能保证实际模型兼容、性能或可靠性。</p>
+<h2 id="lfm-open-license-v10-的商业使用限制">LFM Open License v1.0 的商业使用限制</h2>
+<p>Liquid AI 的<a href="https://www.liquid.ai/lfm-license" rel="noopener" target="_blank">官方许可证</a>允许在许可条件下使用、修改与再分发模型，也允许符合门槛的商业使用；重新分发时应保留版权和许可证声明。按照第 5 条，实体年营收达到或超过 <strong>1,000 万美元</strong> 时，商业使用需另行取得商业许可。最终应以完整的当前许可文本和具体模型条款为准，本文不是法律意见。</p>
+<h2 id="可复现的最小验收流程">可复现的最小验收流程</h2>
+<p>不要上来就声称测出“最快”或“能跑 128K 上下文”。建议先按下面的标准记录：</p>
+<ol>
+<li><strong>环境快照：</strong> 设备型号、Apple 芯片、统一内存、macOS 版本、推理框架版本、模型仓库及具体 revision、量化类型。</li>
+<li><strong>冷启动：</strong> 模型下载体积、首次加载时间、加载阶段峰值内存、是否触发 swap 或被系统终止。</li>
+<li><strong>单轮推理：</strong> 固定简短提示词，重复 3 次；分别记录首 token 延迟、生成 token/s、实际产生的 token 数。</li>
+<li><strong>长上下文：</strong> 以小步增长方式试 4K、8K、16K；分别记录上下文处理耗时、输出准确性和内存变化。模型支持的理论上下文长度不代表所有量化及硬件组合都能跑满。</li>
+<li><strong>Agent 验证：</strong> 固定工具清单、结构化工具调用参数、错误工具输出与重复调用；检查 JSON Schema、工具选择、失败恢复和结果复核。</li>
+<li><strong>长期运行：</strong> 在相同任务下连续调用并检查是否发生内存增长、超时、崩溃或明显速度衰减。</li>
+</ol>
+<p>如果没有这些数据，最多可称为<strong>部署方法及硬件估算指南</strong>，不能写成 Mac 实测排行榜。</p>
+<h2 id="本地与云端怎样选">本地与云端怎样选</h2>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<table><thead><tr><th>决策因素</th><th>本地部署更可能合适</th><th>云端托管更可能合适</th></tr></thead><tbody><tr><td>数据处理</td><td>敏感资料不宜外传，且本地隔离条件可控</td><td>允许上传、企业已有合规的数据处理协议</td></tr><tr><td>初始成本</td><td>已有可用设备，使用频率足够高</td><td>不想预先采购高内存电脑或 GPU</td></tr><tr><td>稳定服务</td><td>少量个人任务，能够接受本机离线和睡眠</td><td>需要跨设备访问、弹性扩缩和服务监控</td></tr><tr><td>运维能力</td><td>有时间维护模型、量化、补丁和运行时</td><td>希望将可用性与伸缩交给服务商</td></tr><tr><td>模型更新</td><td>接受手动下载、兼容性验证</td><td>接受 API 计费及供应商版本策略</td></tr></tbody></table>
+<p>不要将本地部署简化为“零成本”：设备折旧、电费、持续运行、备份和工程维护都是真实成本。也不要假设“开源权重”等于任何商业用途都无需审查。Hugging Face 模型卡标注 <code>lfm1.0</code>，采用 <strong>LFM Open License v1.0</strong>；在分发产品、提供模型服务或用于商业 App 前，必须逐条阅读完整许可证及附带条款，本稿不提供法律许可结论。</p>
+<h2 id="和较小模型的边界">和较小模型的边界</h2>
+<p>对于手机端、16GB 笔记本和只需做轻量意图分类/格式提取的 Agent，24B 总参数模型可能不是效率最高的部署点。应先问：是不是需要复杂多步工具调用、长推理、多轮规划，还是本来只需小模型做路由？如果只是一个高频、低复杂度分类器，大模型可能在加载和内存成本上得不偿失。</p>
+<p>对于 Personal AI / RAG，本地 LLM 也不是唯一瓶颈。FTS + 向量检索、证据筛选、Token Budget、召回准确率和引用校验通常需要独立评估。不能因为换成 24B 模型就假定检索结果或引用准确率自动提高。</p>
+<h2 id="相关技术实践">相关技术实践</h2>
+<p>如果你正在构建本地知识库，而不是仅运行聊天模型，可参考 <a href="https://www.xbstack.com/ai/embeddinggemma-2-local-retrieval-test/" target="_blank" rel="noopener">EmbeddingGemma 2 Mac 本地检索实测</a> 区分嵌入模型、检索质量和生成模型的职责。若需要决定端侧模型如何接入跨设备 Agent，可进一步阅读 <a href="https://www.xbstack.com/ai/personal-ai-agent-architecture/" target="_blank" rel="noopener">Personal AI Agent 架构设计</a>，理解本地与云端分工、工具权限和记忆生命周期。更多运行时与端侧选型相关内容可从 <a href="https://www.xbstack.com/ai/local-ai/" target="_blank" rel="noopener">Local AI 专题</a> 继续查找。</p>
+<h2 id="关键结论">关键结论</h2>
+<p>LFM2.5-24B-A2B 值得关注的是<strong>以较低每 token 激活计算量承载较大总参数规模</strong>，以及官方同时提供 GGUF 和 MLX 路线。真正的部署判断仍然取决于运行时支持、量化质量、系统总内存、任务可靠性和长期运维成本。</p>
+<p>本稿没有做真实 Mac 测试，因此不提供独立生成速度、最低内存定论、云端 API 成本排名或模型胜负表。正式发布前，应补齐许可证复核、最小成功启动证据、关键版本与中英文搜索竞争审计。</p>
+<h2 id="参考来源与事实边界">参考来源与事实边界</h2>
+
+<p><strong>事实标签：</strong> 上述模型参数、发布日、文件大小与命令为官方公开资料；设备选择为工程判断；运行速度和质量未在 XBSTACK 本地复现。</p>   </div> </div></div>
