@@ -1,0 +1,94 @@
+<div><div><article class="markdown-body entry-content container-lg" itemprop="text">
+<p dir="auto"><em>The LLM is the brain. The harness is the body.</em></p>
+<p dir="auto"><em>Version 1.0 — September 2026.</em></p>
+<p dir="auto">A blog series about building AI agents from first principles, published as a
+book.</p>
+<p dir="auto"><strong>📖 Read it online: <a href="https://isuruwijesiri.com/harness-engineering-101/" rel="noopener" target="_blank">https://isuruwijesiri.com/harness-engineering-101/</a></strong></p>
+<p dir="auto">An LLM API is stateless. Every turn, you send the entire conversation as a JSON
+array and get text back. A <em>harness</em> is the program that builds, maintains, and
+protects that array. Everything the field calls "agents" is a set of patches to
+that one loop, and each patch exists because something concrete broke. This
+series develops that one idea across 16 chapters, growing a ~300-line toy agent
+in plain Python as it goes.</p>
+<p dir="auto">The patterns here are developed in full in
+<a href="https://github.com/IsuruMaduranga/one-code" target="_blank" rel="noopener">One Code</a>, an open-source coding
+agent built on <a href="https://github.com/earendil-works/pi" target="_blank" rel="noopener">pi</a>.</p>
+<p dir="auto">The rendered book reads best online at the link above. If you'd rather read
+the source here on GitHub, follow the chapters in order below. The full
+introduction is on the <a href="https://github.com/IsuruMaduranga/harness-engineering-101/blob/main/src/README.md" target="_blank" rel="noopener">book's landing page</a>.</p>
+
+<p dir="auto">Every chapter has the same shape: the failure, the minimal patch, what the
+patch costs.</p>
+<div class="markdown-heading" dir="auto"><h3 tabindex="-1" class="heading-element" dir="auto">Part I — The Wire (nothing is magic)</h3><a id="user-content-part-i--the-wire-nothing-is-magic" class="anchor" aria-label="Permalink: Part I — The Wire (nothing is magic)" href="https://github.com/IsuruMaduranga/harness-engineering-101#part-i--the-wire-nothing-is-magic" target="_blank" rel="noopener"><svg data-component="Octicon" class="octicon octicon-link" viewbox="0 0 16 16" version="1.1" aria-hidden="true"><path d="m7.775 3.275 1.25-1.25a3.5 3.5 0 1 1 4.95 4.95l-2.5 2.5a3.5 3.5 0 0 1-4.95 0 .751.751 0 0 1 .018-1.042.751.751 0 0 1 1.042-.018 1.998 1.998 0 0 0 2.83 0l2.5-2.5a2.002 2.002 0 0 0-2.83-2.83l-1.25 1.25a.751.751 0 0 1-1.042-.018.751.751 0 0 1-.018-1.042Zm-4.69 9.64a1.998 1.998 0 0 0 2.83 0l1.25-1.25a.751.751 0 0 1 1.042.018.751.751 0 0 1 .018 1.042l-1.25 1.25a3.5 3.5 0 1 1-4.95-4.95l2.5-2.5a3.5 3.5 0 0 1 4.95 0 .751.751 0 0 1-.018 1.042.751.751 0 0 1-1.042.018 1.998 1.998 0 0 0-2.83 0l-2.5 2.5a1.998 1.998 0 0 0 0 2.83Z"></path></svg></a></div>
+<markdown-accessiblity-table></markdown-accessiblity-table>
+<div class="markdown-heading" dir="auto"><h3 tabindex="-1" class="heading-element" dir="auto">Part II — Running Long (the array under pressure)</h3><a id="user-content-part-ii--running-long-the-array-under-pressure" class="anchor" aria-label="Permalink: Part II — Running Long (the array under pressure)" href="https://github.com/IsuruMaduranga/harness-engineering-101#part-ii--running-long-the-array-under-pressure" target="_blank" rel="noopener"><svg data-component="Octicon" class="octicon octicon-link" viewbox="0 0 16 16" version="1.1" aria-hidden="true"><path d="m7.775 3.275 1.25-1.25a3.5 3.5 0 1 1 4.95 4.95l-2.5 2.5a3.5 3.5 0 0 1-4.95 0 .751.751 0 0 1 .018-1.042.751.751 0 0 1 1.042-.018 1.998 1.998 0 0 0 2.83 0l2.5-2.5a2.002 2.002 0 0 0-2.83-2.83l-1.25 1.25a.751.751 0 0 1-1.042-.018.751.751 0 0 1-.018-1.042Zm-4.69 9.64a1.998 1.998 0 0 0 2.83 0l1.25-1.25a.751.751 0 0 1 1.042.018.751.751 0 0 1 .018 1.042l-1.25 1.25a3.5 3.5 0 1 1-4.95-4.95l2.5-2.5a3.5 3.5 0 0 1 4.95 0 .751.751 0 0 1-.018 1.042.751.751 0 0 1-1.042.018 1.998 1.998 0 0 0-2.83 0l-2.5 2.5a1.998 1.998 0 0 0 0 2.83Z"></path></svg></a></div>
+<markdown-accessiblity-table></markdown-accessiblity-table>
+<div class="markdown-heading" dir="auto"><h3 tabindex="-1" class="heading-element" dir="auto">Part III — The Ecosystem (naming what you already understand)</h3><a id="user-content-part-iii--the-ecosystem-naming-what-you-already-understand" class="anchor" aria-label="Permalink: Part III — The Ecosystem (naming what you already understand)" href="https://github.com/IsuruMaduranga/harness-engineering-101#part-iii--the-ecosystem-naming-what-you-already-understand" target="_blank" rel="noopener"><svg data-component="Octicon" class="octicon octicon-link" viewbox="0 0 16 16" version="1.1" aria-hidden="true"><path d="m7.775 3.275 1.25-1.25a3.5 3.5 0 1 1 4.95 4.95l-2.5 2.5a3.5 3.5 0 0 1-4.95 0 .751.751 0 0 1 .018-1.042.751.751 0 0 1 1.042-.018 1.998 1.998 0 0 0 2.83 0l2.5-2.5a2.002 2.002 0 0 0-2.83-2.83l-1.25 1.25a.751.751 0 0 1-1.042-.018.751.751 0 0 1-.018-1.042Zm-4.69 9.64a1.998 1.998 0 0 0 2.83 0l1.25-1.25a.751.751 0 0 1 1.042.018.751.751 0 0 1 .018 1.042l-1.25 1.25a3.5 3.5 0 1 1-4.95-4.95l2.5-2.5a3.5 3.5 0 0 1 4.95 0 .751.751 0 0 1-.018 1.042.751.751 0 0 1-1.042.018 1.998 1.998 0 0 0-2.83 0l-2.5 2.5a1.998 1.998 0 0 0 0 2.83Z"></path></svg></a></div>
+<markdown-accessiblity-table></markdown-accessiblity-table>
+<div class="markdown-heading" dir="auto"><h3 tabindex="-1" class="heading-element" dir="auto">Part IV — Trust, Domains, and Data</h3><a id="user-content-part-iv--trust-domains-and-data" class="anchor" aria-label="Permalink: Part IV — Trust, Domains, and Data" href="https://github.com/IsuruMaduranga/harness-engineering-101#part-iv--trust-domains-and-data" target="_blank" rel="noopener"><svg data-component="Octicon" class="octicon octicon-link" viewbox="0 0 16 16" version="1.1" aria-hidden="true"><path d="m7.775 3.275 1.25-1.25a3.5 3.5 0 1 1 4.95 4.95l-2.5 2.5a3.5 3.5 0 0 1-4.95 0 .751.751 0 0 1 .018-1.042.751.751 0 0 1 1.042-.018 1.998 1.998 0 0 0 2.83 0l2.5-2.5a2.002 2.002 0 0 0-2.83-2.83l-1.25 1.25a.751.751 0 0 1-1.042-.018.751.751 0 0 1-.018-1.042Zm-4.69 9.64a1.998 1.998 0 0 0 2.83 0l1.25-1.25a.751.751 0 0 1 1.042.018.751.751 0 0 1 .018 1.042l-1.25 1.25a3.5 3.5 0 1 1-4.95-4.95l2.5-2.5a3.5 3.5 0 0 1 4.95 0 .751.751 0 0 1-.018 1.042.751.751 0 0 1-1.042.018 1.998 1.998 0 0 0-2.83 0l-2.5 2.5a1.998 1.998 0 0 0 0 2.83Z"></path></svg></a></div>
+<markdown-accessiblity-table></markdown-accessiblity-table>
+
+
+<div class="markdown-heading" dir="auto"><h3 tabindex="-1" class="heading-element" dir="auto">Appendix — Advanced Topics</h3><a id="user-content-appendix--advanced-topics" class="anchor" aria-label="Permalink: Appendix — Advanced Topics" href="https://github.com/IsuruMaduranga/harness-engineering-101#appendix--advanced-topics" target="_blank" rel="noopener"><svg data-component="Octicon" class="octicon octicon-link" viewbox="0 0 16 16" version="1.1" aria-hidden="true"><path d="m7.775 3.275 1.25-1.25a3.5 3.5 0 1 1 4.95 4.95l-2.5 2.5a3.5 3.5 0 0 1-4.95 0 .751.751 0 0 1 .018-1.042.751.751 0 0 1 1.042-.018 1.998 1.998 0 0 0 2.83 0l2.5-2.5a2.002 2.002 0 0 0-2.83-2.83l-1.25 1.25a.751.751 0 0 1-1.042-.018.751.751 0 0 1-.018-1.042Zm-4.69 9.64a1.998 1.998 0 0 0 2.83 0l1.25-1.25a.751.751 0 0 1 1.042.018.751.751 0 0 1 .018 1.042l-1.25 1.25a3.5 3.5 0 1 1-4.95-4.95l2.5-2.5a3.5 3.5 0 0 1 4.95 0 .751.751 0 0 1-.018 1.042.751.751 0 0 1-1.042.018 1.998 1.998 0 0 0-2.83 0l-2.5 2.5a1.998 1.998 0 0 0 0 2.83Z"></path></svg></a></div>
+<p dir="auto">Standalone pieces. Read them when you need them.</p>
+
+
+<markdown-accessiblity-table><table>
+<thead>
+<tr>
+<th>Path</th>
+<th>What it holds</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>src/*.md</code></td>
+<td>The chapters and appendices (the book source)</td>
+</tr>
+<tr>
+<td><code>src/SUMMARY.md</code></td>
+<td>The book's table of contents</td>
+</tr>
+<tr>
+<td><code>src/harness/</code></td>
+<td>The runnable toy harness — one file per stage</td>
+</tr>
+<tr>
+<td><code>src/diagrams/</code></td>
+<td>Diagram generators and their generated PNGs</td>
+</tr>
+<tr>
+<td><code>book.toml</code></td>
+<td>mdBook configuration</td>
+</tr>
+<tr>
+<td><code>scripts/sync-to-blog.sh</code></td>
+<td>Builds the book and mounts it into the blog for serving</td>
+</tr>
+</tbody>
+</table></markdown-accessiblity-table>
+<div class="markdown-heading" dir="auto"><h2 tabindex="-1" class="heading-element" dir="auto">Building the book locally</h2><a id="user-content-building-the-book-locally" class="anchor" aria-label="Permalink: Building the book locally" href="https://github.com/IsuruMaduranga/harness-engineering-101#building-the-book-locally" target="_blank" rel="noopener"><svg data-component="Octicon" class="octicon octicon-link" viewbox="0 0 16 16" version="1.1" aria-hidden="true"><path d="m7.775 3.275 1.25-1.25a3.5 3.5 0 1 1 4.95 4.95l-2.5 2.5a3.5 3.5 0 0 1-4.95 0 .751.751 0 0 1 .018-1.042.751.751 0 0 1 1.042-.018 1.998 1.998 0 0 0 2.83 0l2.5-2.5a2.002 2.002 0 0 0-2.83-2.83l-1.25 1.25a.751.751 0 0 1-1.042-.018.751.751 0 0 1-.018-1.042Zm-4.69 9.64a1.998 1.998 0 0 0 2.83 0l1.25-1.25a.751.751 0 0 1 1.042.018.751.751 0 0 1 .018 1.042l-1.25 1.25a3.5 3.5 0 1 1-4.95-4.95l2.5-2.5a3.5 3.5 0 0 1 4.95 0 .751.751 0 0 1-.018 1.042.751.751 0 0 1-1.042.018 1.998 1.998 0 0 0-2.83 0l-2.5 2.5a1.998 1.998 0 0 0 0 2.83Z"></path></svg></a></div>
+<div class="highlight highlight-source-shell notranslate position-relative overflow-auto" dir="auto" data-snippet-clipboard-copy-content="cargo install mdbook mdbook-mermaid   # or: brew install mdbook (+ mdbook-mermaid binary)
+mdbook serve --open                    # live-reloading preview at http://localhost:3000
+mdbook build                           # static site into ./book"><pre>cargo install mdbook mdbook-mermaid   <span class="pl-c"><span class="pl-c">#</span> or: brew install mdbook (+ mdbook-mermaid binary)</span>
+mdbook serve --open                    <span class="pl-c"><span class="pl-c">#</span> live-reloading preview at http://localhost:3000</span>
+mdbook build                           <span class="pl-c"><span class="pl-c">#</span> static site into ./book</span></pre></div>
+<p dir="auto"><code>mdbook-mermaid</code> renders the inline mermaid diagrams; without it those blocks
+show as raw code.</p>
+<div class="markdown-heading" dir="auto"><h2 tabindex="-1" class="heading-element" dir="auto">Regenerating the quantitative diagrams</h2><a id="user-content-regenerating-the-quantitative-diagrams" class="anchor" aria-label="Permalink: Regenerating the quantitative diagrams" href="https://github.com/IsuruMaduranga/harness-engineering-101#regenerating-the-quantitative-diagrams" target="_blank" rel="noopener"><svg data-component="Octicon" class="octicon octicon-link" viewbox="0 0 16 16" version="1.1" aria-hidden="true"><path d="m7.775 3.275 1.25-1.25a3.5 3.5 0 1 1 4.95 4.95l-2.5 2.5a3.5 3.5 0 0 1-4.95 0 .751.751 0 0 1 .018-1.042.751.751 0 0 1 1.042-.018 1.998 1.998 0 0 0 2.83 0l2.5-2.5a2.002 2.002 0 0 0-2.83-2.83l-1.25 1.25a.751.751 0 0 1-1.042-.018.751.751 0 0 1-.018-1.042Zm-4.69 9.64a1.998 1.998 0 0 0 2.83 0l1.25-1.25a.751.751 0 0 1 1.042.018.751.751 0 0 1 .018 1.042l-1.25 1.25a3.5 3.5 0 1 1-4.95-4.95l2.5-2.5a3.5 3.5 0 0 1 4.95 0 .751.751 0 0 1-.018 1.042.751.751 0 0 1-1.042.018 1.998 1.998 0 0 0-2.83 0l-2.5 2.5a1.998 1.998 0 0 0 0 2.83Z"></path></svg></a></div>
+<div class="highlight highlight-source-shell notranslate position-relative overflow-auto" dir="auto" data-snippet-clipboard-copy-content="cd src/diagrams &amp;&amp; python3 gen_all.py   # Python 3.10+, matplotlib"><pre><span class="pl-c1">cd</span> src/diagrams <span class="pl-k">&amp;&amp;</span> python3 gen_all.py   <span class="pl-c"><span class="pl-c">#</span> Python 3.10+, matplotlib</span></pre></div>
+
+<p dir="auto">This repository is dual-licensed:</p>
+<ul dir="auto">
+<li><strong>The prose</strong> — every chapter and appendix (the <code>.md</code> files under <code>src/</code>) —
+is licensed under
+<a href="https://creativecommons.org/licenses/by-nc-nd/4.0/" rel="noopener" target="_blank">Creative Commons Attribution-NonCommercial-NoDerivatives 4.0 International
+(CC BY-NC-ND 4.0)</a>. You
+may share it with credit, but not use it commercially or publish modified
+versions. Full text in <a href="https://github.com/IsuruMaduranga/harness-engineering-101/blob/main/LICENSE" target="_blank" rel="noopener"><code>LICENSE</code></a>.</li>
+<li><strong>The code</strong> — the <code>.py</code> files under <code>src/harness/</code> and <code>src/diagrams/</code>, and
+code snippets reproduced from them in the chapters — is licensed under the
+<a href="https://github.com/IsuruMaduranga/harness-engineering-101/blob/main/LICENSE-CODE" target="_blank" rel="noopener">MIT License</a>. Use it freely, with attribution.</li>
+</ul>
+<p dir="auto">© 2026 Isuru Wijesiri.</p>
+</article></div></div>
