@@ -621,7 +621,8 @@ function renderGhTrending(){
     + (r.lang ? '<span class="badge cat">' + esc(r.lang) + '</span>' : '')
     + '</div>'
     + '<h3><a href="' + esc(r.url) + '" target="_blank" rel="noopener">' + esc(r.name) + '</a></h3>'
-    + (r.desc ? '<div class="one">' + esc(r.desc) + '</div>' : '')
+    + (r.intro ? '<div class="one">' + esc(r.intro) + '</div>'
+      : (r.desc ? '<div class="one">' + esc(r.desc) + '</div>' : ''))
     + '</div>').join('')
     : '<div class="empty">今日暂无 GitHub 热榜数据。</div>';
   document.getElementById('ghtrList').innerHTML = html;
