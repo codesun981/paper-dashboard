@@ -1,0 +1,396 @@
+<div><div><article class="markdown-body entry-content container-lg" itemprop="text"><p align="center" dir="auto">
+  <a target="_blank" rel="noopener" href="https://github.com/Tencent-Hunyuan/Hy-Memory/blob/main/docs/images/hunyuanlogo.png"><img src="https://github.com/Tencent-Hunyuan/Hy-Memory/raw/main/docs/images/hunyuanlogo.png" alt="Tencent Hunyuan" loading="lazy"></a>
+</p>
+
+<p align="center" dir="auto">Production-grade dual-system cognitive memory for LLM agents.</p>
+<p align="center" dir="auto">
+  <a href="https://github.com/Tencent-Hunyuan/Hy-Memory#latest-news" target="_blank" rel="noopener"><img src="https://camo.githubusercontent.com/f572540ee38e3bf04671539403a1bb462f373d86e32f2ef23808b386109780c2/68747470733a2f2f696d672e736869656c64732e696f2f62616467652f6e6577732d6c61746573742d6536353130303f7374796c653d666c61742d737175617265" alt="Latest News" loading="lazy"></a>
+  <a href="https://github.com/Tencent-Hunyuan/Hy-Memory#papers" target="_blank" rel="noopener"><img src="https://camo.githubusercontent.com/d53619e355ae99d7a8bd709ce5aba9138157a0e3fa11743cff7880af62670eec/68747470733a2f2f696d672e736869656c64732e696f2f62616467652f7061706572732d72657365617263682d3638343438623f7374796c653d666c61742d737175617265" alt="Papers" loading="lazy"></a>
+  <a href="https://github.com/Tencent-Hunyuan/Hy-Memory#quick-start" target="_blank" rel="noopener"><img src="https://camo.githubusercontent.com/68c0e4a21b5847460f9c1ae7fbe6faac99f714a8c017182d35223cbca4968d3b/68747470733a2f2f696d672e736869656c64732e696f2f62616467652f6765745f737461727465642d717569636b73746172742d3134393935343f7374796c653d666c61742d737175617265" alt="Get Started" loading="lazy"></a>
+  <a href="https://github.com/Tencent-Hunyuan/Hy-Memory#system-architecture" target="_blank" rel="noopener"><img src="https://camo.githubusercontent.com/d32f9cb2db667c53fd85b4c51cf733751edbf5e0f16f4a4b222402c0108d3303/68747470733a2f2f696d672e736869656c64732e696f2f62616467652f6172636869746563747572652d6f766572766965772d3030376563363f7374796c653d666c61742d737175617265" alt="System Architecture" loading="lazy"></a>
+  <a href="https://github.com/Tencent-Hunyuan/Hy-Memory#support" target="_blank" rel="noopener"><img src="https://camo.githubusercontent.com/c991779337cd546460706441c1267d868189486aa3948e0f75b602944f04e7ce/68747470733a2f2f696d672e736869656c64732e696f2f62616467652f737570706f72742d646f63732d3030383937623f7374796c653d666c61742d737175617265" alt="Support" loading="lazy"></a>
+  <a href="https://huggingface.co/tencent/Hy-Memory-30B-A3B" rel="noopener" target="_blank"><img src="https://camo.githubusercontent.com/6ea3c9fd88ae95f75d9500d3059dc5f5e6935f0a613e212db0909b2013a8b14b/68747470733a2f2f696d672e736869656c64732e696f2f62616467652f6d6f64656c2d48756767696e67253230466163652d6666643231653f7374796c653d666c61742d737175617265" alt="Hugging Face Model" loading="lazy"></a>
+  <a href="https://github.com/Tencent-Hunyuan/Hy-Memory/blob/main/memhub/README.md" target="_blank" rel="noopener"><img src="https://camo.githubusercontent.com/290eef38fbcfe18ab4a81cc538a8af0a401cf857710a9704cae35d0b6c349b08/68747470733a2f2f696d672e736869656c64732e696f2f62616467652f4d656d4875622d524541444d452d6632386334353f7374796c653d666c61742d737175617265" alt="MemHub" loading="lazy"></a>
+  <a href="https://memory.hunyuan.tencent.com/" rel="noopener" target="_blank"><img src="https://camo.githubusercontent.com/593d35139adae9e71fe027996d8099306027ce6c835a061be941cf4f010c423f/68747470733a2f2f696d672e736869656c64732e696f2f62616467652f776562736974652d48792532304d656d6f72792d3030353264393f7374796c653d666c61742d737175617265" alt="Website" loading="lazy"></a>
+  <a href="https://discord.gg/x56wEb2PX" rel="noopener" target="_blank"><img src="https://camo.githubusercontent.com/99d8364cade9599bcaf78770ca026b01ec7fc3ea21d927b8b245bf0d874cdc83/68747470733a2f2f696d672e736869656c64732e696f2f62616467652f446973636f72642d6d656d6f72792532306368616e6e656c2d3538363566323f7374796c653d666c61742d737175617265266c6f676f3d646973636f7264266c6f676f436f6c6f723d7768697465" alt="Discord" loading="lazy"></a>
+  <a href="https://github.com/Tencent-Hunyuan/Hy-Memory/blob/main/LICENSE" target="_blank" rel="noopener"><img src="https://camo.githubusercontent.com/20938680fa7f46e4456e321a2f95e9eaccd0866432d2874813222ab9910c1014/68747470733a2f2f696d672e736869656c64732e696f2f62616467652f6c6963656e73652d4170616368652d2d322e302d3463366566353f7374796c653d666c61742d737175617265" alt="Apache-2.0 License" loading="lazy"></a>
+</p>
+<p dir="auto">English | <a href="https://github.com/Tencent-Hunyuan/Hy-Memory/blob/main/README.zh.md" target="_blank" rel="noopener">中文</a></p>
+<p dir="auto"><strong><a href="https://memory.hunyuan.tencent.com/" rel="noopener" target="_blank">Hy Memory</a></strong> (<a href="https://memory.hunyuan.tencent.com/" rel="noopener" target="_blank">Official Website</a>) is a production-grade dual-system cognitive memory engine and Python SDK (<code>hy-memory</code>) for self-evolving LLM agents, providing specialized memory pipelines across three task scenes: hierarchical long-term cognitive memory for <strong>Chat</strong>, two-layer fact and reusable-experience memory for <strong>Working</strong>, and version-evolution diff-chain tracking for <strong>Coding</strong>. Built on top of Hy Memory, <strong><a href="https://github.com/Tencent-Hunyuan/Hy-Memory/blob/main/memhub/README.md" target="_blank" rel="noopener">MemHub</a></strong> is a local-first desktop and CLI product that unifies conversation history and coding traces from user-authorized AI applications (such as Claude Code, Cursor, Codex, OpenCode, and Qwen Code) into a single managed runtime and local data directory, enabling governed cross-application memory recall.</p>
+<div align="center" dir="auto">
+  <details open="" class="details-reset border rounded-2">
+  <summary class="tmp-px-3 py-2">
+    <svg aria-hidden="true" data-component="Octicon" viewbox="0 0 16 16" version="1.1" data-view-component="true" class="octicon octicon-device-camera-video">
+    <path d="M16 3.75v8.5a.75.75 0 0 1-1.136.643L11 10.575v.675A1.75 1.75 0 0 1 9.25 13h-7.5A1.75 1.75 0 0 1 0 11.25v-6.5C0 3.784.784 3 1.75 3h7.5c.966 0 1.75.784 1.75 1.75v.675l3.864-2.318A.75.75 0 0 1 16 3.75Zm-6.5 1a.25.25 0 0 0-.25-.25h-7.5a.25.25 0 0 0-.25.25v6.5c0 .138.112.25.25.25h7.5a.25.25 0 0 0 .25-.25v-6.5ZM11 8.825l3.5 2.1v-5.85l-3.5 2.1Z"></path>
+</svg>
+    <span class="m-1">memhub_h265_10mb.mp4</span>
+    <span class="dropdown-caret"></span>
+  </summary>
+
+  <video src="https://private-user-images.githubusercontent.com/16222087/675465645-94405890-8429-47c2-9084-38f7ed9f126f.mp4?jwt=eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJnaXRodWIuY29tIiwiYXVkIjoicmF3LmdpdGh1YnVzZXJjb250ZW50LmNvbSIsImtleSI6ImtleTUiLCJleHAiOjE3OTIzNzUyMjYsIm5iZiI6MTc5MjM3NDkyNiwicGF0aCI6Ii8xNjIyMjA4Ny82NzU0NjU2NDUtOTQ0MDU4OTAtODQyOS00N2MyLTkwODQtMzhmN2VkOWYxMjZmLm1wND9YLUFtei1BbGdvcml0aG09QVdTNC1ITUFDLVNIQTI1NiZYLUFtei1DcmVkZW50aWFsPUFLSUFWQ09EWUxTQTUzUFFLNFpBJTJGMjAyNjEwMTklMkZ1cy1lYXN0LTElMkZzMyUyRmF3czRfcmVxdWVzdCZYLUFtei1EYXRlPTIwMjYxMDE5VDAxNTUyNlomWC1BbXotRXhwaXJlcz0zMDAmWC1BbXotU2lnbmF0dXJlPTI3ZjE0YmM4ZDZiYjExZTk1YWYyMDAyOTZlZTUzYmRjZDc0NGJmNjVhY2VlMDgwYTc4NTU3MmU3MzUxYmNmMWYmWC1BbXotU2lnbmVkSGVhZGVycz1ob3N0JnJlc3BvbnNlLWNvbnRlbnQtdHlwZT12aWRlbyUyRm1wNCJ9.Swz0hU6Cr87Qo9mo3Z1RU4lvFkkGGkdD9e_X1OD_WbQ" data-canonical-src="https://private-user-images.githubusercontent.com/16222087/675465645-94405890-8429-47c2-9084-38f7ed9f126f.mp4?jwt=eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJnaXRodWIuY29tIiwiYXVkIjoicmF3LmdpdGh1YnVzZXJjb250ZW50LmNvbSIsImtleSI6ImtleTUiLCJleHAiOjE3OTIzNzUyMjYsIm5iZiI6MTc5MjM3NDkyNiwicGF0aCI6Ii8xNjIyMjA4Ny82NzU0NjU2NDUtOTQ0MDU4OTAtODQyOS00N2MyLTkwODQtMzhmN2VkOWYxMjZmLm1wND9YLUFtei1BbGdvcml0aG09QVdTNC1ITUFDLVNIQTI1NiZYLUFtei1DcmVkZW50aWFsPUFLSUFWQ09EWUxTQTUzUFFLNFpBJTJGMjAyNjEwMTklMkZ1cy1lYXN0LTElMkZzMyUyRmF3czRfcmVxdWVzdCZYLUFtei1EYXRlPTIwMjYxMDE5VDAxNTUyNlomWC1BbXotRXhwaXJlcz0zMDAmWC1BbXotU2lnbmF0dXJlPTI3ZjE0YmM4ZDZiYjExZTk1YWYyMDAyOTZlZTUzYmRjZDc0NGJmNjVhY2VlMDgwYTc4NTU3MmU3MzUxYmNmMWYmWC1BbXotU2lnbmVkSGVhZGVycz1ob3N0JnJlc3BvbnNlLWNvbnRlbnQtdHlwZT12aWRlbyUyRm1wNCJ9.Swz0hU6Cr87Qo9mo3Z1RU4lvFkkGGkdD9e_X1OD_WbQ" controls="controls" muted="muted" class="d-block rounded-bottom-2 border-top width-fit">
+
+  </video>
+</details>
+
+  <p dir="auto"><b>MemHub Demo Video</b></p>
+</div>
+<hr>
+
+
+<hr>
+
+<p dir="auto">Welcome to the <strong>Hy Memory Research Family</strong>, covering cognitive chat memory, long-horizon coding memory, and RL-trained memory writing models:</p>
+<blockquote>
+<p dir="auto"><a href="https://arxiv.org/abs/2606.09483" rel="noopener" target="_blank"><strong>Memory Beyond Recall: A Dual-Process Cognitive Memory System for Self-Evolving LLM Agents</strong></a> <em>(Accepted at <strong>EMNLP 2026</strong>)</em><br>
+<strong>TL;DR:</strong> Proposes the dual-process (System 1 + System 2) cognitive memory architecture for <strong>Chat</strong>, organizing personal memory into an 8-layer hierarchy (raw dialogues, atomic facts, summaries, schemas, and prospective intentions) with conflict reconciliation and cross-domain schema induction.<br>
+📄 Paper: <a href="https://arxiv.org/abs/2606.09483" rel="noopener" target="_blank">https://arxiv.org/abs/2606.09483</a></p>
+</blockquote>
+<blockquote>
+<p dir="auto"><a href="https://github.com/Tencent-Hunyuan/Hy-Memory/blob/main/docs/papers/CMB_A_Coding_Memory_Benchmark_for_Long_Horizon_and_Interleaved_Coding_Agents.pdf" target="_blank" rel="noopener"><strong>CMB: A Coding Memory Benchmark for Long-Horizon and Interleaved Coding Agents</strong></a> <em>(Submitted to <strong>ICLR 2027</strong>)</em><br>
+<strong>TL;DR:</strong> Introduces a benchmark and two-layer + version-evolution diff-chain memory method for long-horizon <strong>Coding</strong> agents, preserving both reusable engineering experiences and exact code revision trajectories across interleaved tasks.<br>
+📄 Paper: <a href="https://github.com/Tencent-Hunyuan/Hy-Memory/blob/main/docs/papers/CMB_A_Coding_Memory_Benchmark_for_Long_Horizon_and_Interleaved_Coding_Agents.pdf" target="_blank" rel="noopener">docs/papers/CMB_A_Coding_Memory_Benchmark_for_Long_Horizon_and_Interleaved_Coding_Agents.pdf</a></p>
+</blockquote>
+<blockquote>
+<p dir="auto"><a href="https://arxiv.org/abs/2610.22196" rel="noopener" target="_blank"><strong>Hy-Memory-30B-A3B: Attributed Reinforcement Learning for Long-Term Memory Writing</strong></a> <em>(Open Model Technical Report)</em><br>
+<strong>TL;DR:</strong> Trains a 30B-A3B MoE model via attributed reinforcement learning specifically for high-precision long-term memory extraction and conflict reconciliation.<br>
+📄 Paper: <a href="https://arxiv.org/abs/2610.22196" rel="noopener" target="_blank">https://arxiv.org/abs/2610.22196</a> · Model: <a href="https://huggingface.co/tencent/Hy-Memory-30B-A3B" rel="noopener" target="_blank">https://huggingface.co/tencent/Hy-Memory-30B-A3B</a></p>
+</blockquote>
+<hr>
+
+
+<div class="highlight highlight-source-shell notranslate position-relative overflow-auto" dir="auto" data-snippet-clipboard-copy-content='pip install hy-memory==2.0.3              # core (includes ChromaDB and Kuzu)
+pip install "hy-memory[qdrant]==2.0.3"    # + Qdrant
+pip install "hy-memory[faiss]==2.0.3"     # + FAISS
+pip install "hy-memory[graph]==2.0.3"     # + Neo4j
+pip install "hy-memory[mysql]==2.0.3"     # + MySQL cache
+pip install "hy-memory[rerank]==2.0.3"    # + local multilingual cross-encoder rerank
+pip install "hy-memory[all]==2.0.3"       # everything'><pre>pip install hy-memory==2.0.3              <span class="pl-c"><span class="pl-c">#</span> core (includes ChromaDB and Kuzu)</span>
+pip install <span class="pl-s"><span class="pl-pds">"</span>hy-memory[qdrant]==2.0.3<span class="pl-pds">"</span></span>    <span class="pl-c"><span class="pl-c">#</span> + Qdrant</span>
+pip install <span class="pl-s"><span class="pl-pds">"</span>hy-memory[faiss]==2.0.3<span class="pl-pds">"</span></span>     <span class="pl-c"><span class="pl-c">#</span> + FAISS</span>
+pip install <span class="pl-s"><span class="pl-pds">"</span>hy-memory[graph]==2.0.3<span class="pl-pds">"</span></span>     <span class="pl-c"><span class="pl-c">#</span> + Neo4j</span>
+pip install <span class="pl-s"><span class="pl-pds">"</span>hy-memory[mysql]==2.0.3<span class="pl-pds">"</span></span>     <span class="pl-c"><span class="pl-c">#</span> + MySQL cache</span>
+pip install <span class="pl-s"><span class="pl-pds">"</span>hy-memory[rerank]==2.0.3<span class="pl-pds">"</span></span>    <span class="pl-c"><span class="pl-c">#</span> + local multilingual cross-encoder rerank</span>
+pip install <span class="pl-s"><span class="pl-pds">"</span>hy-memory[all]==2.0.3<span class="pl-pds">"</span></span>       <span class="pl-c"><span class="pl-c">#</span> everything</span></pre></div>
+
+<p dir="auto">Only an LLM and an embedding endpoint are needed; any OpenAI-compatible service works:</p>
+<div class="highlight highlight-source-shell notranslate position-relative overflow-auto" dir="auto" data-snippet-clipboard-copy-content='export MEMORY_LLM_API_KEY="sk-your-key"
+export MEMORY_LLM_BASE_URL="https://api.deepseek.com"
+export MEMORY_LLM_MODEL="deepseek-chat"
+
+export MEMORY_EMBEDDER_API_KEY="sk-your-key"
+export MEMORY_EMBEDDER_BASE_URL="https://dashscope.aliyuncs.com/compatible-mode/v1"
+export MEMORY_EMBEDDER_MODEL="text-embedding-v3"
+export MEMORY_EMBEDDING_DIMS=1024'><pre><span class="pl-k">export</span> MEMORY_LLM_API_KEY=<span class="pl-s"><span class="pl-pds">"</span>sk-your-key<span class="pl-pds">"</span></span>
+<span class="pl-k">export</span> MEMORY_LLM_BASE_URL=<span class="pl-s"><span class="pl-pds">"</span>https://api.deepseek.com<span class="pl-pds">"</span></span>
+<span class="pl-k">export</span> MEMORY_LLM_MODEL=<span class="pl-s"><span class="pl-pds">"</span>deepseek-chat<span class="pl-pds">"</span></span>
+
+<span class="pl-k">export</span> MEMORY_EMBEDDER_API_KEY=<span class="pl-s"><span class="pl-pds">"</span>sk-your-key<span class="pl-pds">"</span></span>
+<span class="pl-k">export</span> MEMORY_EMBEDDER_BASE_URL=<span class="pl-s"><span class="pl-pds">"</span>https://dashscope.aliyuncs.com/compatible-mode/v1<span class="pl-pds">"</span></span>
+<span class="pl-k">export</span> MEMORY_EMBEDDER_MODEL=<span class="pl-s"><span class="pl-pds">"</span>text-embedding-v3<span class="pl-pds">"</span></span>
+<span class="pl-k">export</span> MEMORY_EMBEDDING_DIMS=1024</pre></div>
+<p dir="auto">Or use the OpenAI defaults with a single key:</p>
+<div class="highlight highlight-source-shell notranslate position-relative overflow-auto" dir="auto" data-snippet-clipboard-copy-content='export OPENAI_API_KEY="sk-your-key"'><pre><span class="pl-k">export</span> OPENAI_API_KEY=<span class="pl-s"><span class="pl-pds">"</span>sk-your-key<span class="pl-pds">"</span></span></pre></div>
+<p dir="auto">See the <a href="https://github.com/Tencent-Hunyuan/Hy-Memory/blob/main/docs/env_reference.md" target="_blank" rel="noopener">Environment Variable Reference</a> for the full list.</p>
+
+<div class="highlight highlight-source-python notranslate position-relative overflow-auto" dir="auto" data-snippet-clipboard-copy-content="from hy_memory import HyMemoryClient
+
+client = HyMemoryClient(mode=&quot;pro&quot;)
+
+# Write: plain text or OpenAI-format messages
+client.add(&quot;I love sci-fi movies, especially Interstellar&quot;, user_id=&quot;user_1&quot;)
+client.add([
+    {&quot;role&quot;: &quot;user&quot;, &quot;content&quot;: &quot;Recommend a movie&quot;},
+    {&quot;role&quot;: &quot;assistant&quot;, &quot;content&quot;: &quot;Try Interstellar — a sci-fi masterpiece by Nolan&quot;},
+], user_id=&quot;user_1&quot;)
+
+# Search: returns the profile / normal / proactive channels
+results = client.search(&quot;What movies does the user like?&quot;, user_ids=[&quot;user_1&quot;], limit=10)
+for mem in results[&quot;memories&quot;][&quot;normal&quot;]:
+    print(f&quot;  [{mem['score']:.2f}] {mem['content']}&quot;)
+
+client.close()"><pre><span class="pl-k">from</span> <span class="pl-s1">hy_memory</span> <span class="pl-k">import</span> <span class="pl-v">HyMemoryClient</span>
+
+<span class="pl-s1">client</span> <span class="pl-c1">=</span> <span class="pl-en">HyMemoryClient</span>(<span class="pl-s1">mode</span><span class="pl-c1">=</span><span class="pl-s">"pro"</span>)
+
+<span class="pl-c"># Write: plain text or OpenAI-format messages</span>
+<span class="pl-s1">client</span>.<span class="pl-c1">add</span>(<span class="pl-s">"I love sci-fi movies, especially Interstellar"</span>, <span class="pl-s1">user_id</span><span class="pl-c1">=</span><span class="pl-s">"user_1"</span>)
+<span class="pl-s1">client</span>.<span class="pl-c1">add</span>([
+    {<span class="pl-s">"role"</span>: <span class="pl-s">"user"</span>, <span class="pl-s">"content"</span>: <span class="pl-s">"Recommend a movie"</span>},
+    {<span class="pl-s">"role"</span>: <span class="pl-s">"assistant"</span>, <span class="pl-s">"content"</span>: <span class="pl-s">"Try Interstellar — a sci-fi masterpiece by Nolan"</span>},
+], <span class="pl-s1">user_id</span><span class="pl-c1">=</span><span class="pl-s">"user_1"</span>)
+
+<span class="pl-c"># Search: returns the profile / normal / proactive channels</span>
+<span class="pl-s1">results</span> <span class="pl-c1">=</span> <span class="pl-s1">client</span>.<span class="pl-c1">search</span>(<span class="pl-s">"What movies does the user like?"</span>, <span class="pl-s1">user_ids</span><span class="pl-c1">=</span>[<span class="pl-s">"user_1"</span>], <span class="pl-s1">limit</span><span class="pl-c1">=</span><span class="pl-c1">10</span>)
+<span class="pl-k">for</span> <span class="pl-s1">mem</span> <span class="pl-c1">in</span> <span class="pl-s1">results</span>[<span class="pl-s">"memories"</span>][<span class="pl-s">"normal"</span>]:
+    <span class="pl-en">print</span>(<span class="pl-s">f"  [<span class="pl-s1"><span class="pl-kos">{</span><span class="pl-s1">mem</span>[<span class="pl-s">'score'</span>]:.2f<span class="pl-kos">}</span></span>] <span class="pl-s1"><span class="pl-kos">{</span><span class="pl-s1">mem</span>[<span class="pl-s">'content'</span>]<span class="pl-kos">}</span></span>"</span>)
+
+<span class="pl-s1">client</span>.<span class="pl-c1">close</span>()</pre></div>
+<div class="markdown-heading" dir="auto"><h3 tabindex="-1" class="heading-element" dir="auto">4. Working &amp; Coding Memory</h3><a id="user-content-4-working--coding-memory" class="anchor" aria-label="Permalink: 4. Working &amp; Coding Memory" href="https://github.com/Tencent-Hunyuan/Hy-Memory#4-working--coding-memory" target="_blank" rel="noopener"><svg data-component="Octicon" class="octicon octicon-link" viewbox="0 0 16 16" version="1.1" aria-hidden="true"><path d="m7.775 3.275 1.25-1.25a3.5 3.5 0 1 1 4.95 4.95l-2.5 2.5a3.5 3.5 0 0 1-4.95 0 .751.751 0 0 1 .018-1.042.751.751 0 0 1 1.042-.018 1.998 1.998 0 0 0 2.83 0l2.5-2.5a2.002 2.002 0 0 0-2.83-2.83l-1.25 1.25a.751.751 0 0 1-1.042-.018.751.751 0 0 1-.018-1.042Zm-4.69 9.64a1.998 1.998 0 0 0 2.83 0l1.25-1.25a.751.751 0 0 1 1.042.018.751.751 0 0 1 .018 1.042l-1.25 1.25a3.5 3.5 0 1 1-4.95-4.95l2.5-2.5a3.5 3.5 0 0 1 4.95 0 .751.751 0 0 1-.018 1.042.751.751 0 0 1-1.042.018 1.998 1.998 0 0 0-2.83 0l-2.5 2.5a1.998 1.998 0 0 0 0 2.83Z"></path></svg></a></div>
+<p dir="auto">Writes must include a tool-call trace (<code>tool_calls</code> or <code>role="tool"</code> messages) and take effect in <code>pro</code> / <code>ultra</code> mode only (<code>lite</code> ignores <code>scene</code> and stores everything as raw memory):</p>
+<div class="highlight highlight-source-python notranslate position-relative overflow-auto" dir="auto" data-snippet-clipboard-copy-content="messages = [
+    {&quot;role&quot;: &quot;user&quot;, &quot;content&quot;: &quot;Fix the timeout in the search client.&quot;},
+    {&quot;role&quot;: &quot;assistant&quot;, &quot;content&quot;: &quot;&quot;, &quot;tool_calls&quot;: [{
+        &quot;id&quot;: &quot;call_1&quot;, &quot;type&quot;: &quot;function&quot;,
+        &quot;function&quot;: {&quot;name&quot;: &quot;apply_patch&quot;, &quot;arguments&quot;: '{&quot;path&quot;:&quot;src/search.py&quot;}'},
+    }]},
+    {&quot;role&quot;: &quot;tool&quot;, &quot;tool_call_id&quot;: &quot;call_1&quot;, &quot;name&quot;: &quot;apply_patch&quot;,
+     &quot;content&quot;: &quot;Patch applied successfully&quot;},
+]
+
+client.add(
+    messages,
+    scene=&quot;coding&quot;,                              # or &quot;working&quot;
+    user_id=&quot;user_123&quot;,
+    workspace_id=&quot;github.com/example/service&quot;,   # optional: isolate by repository / project
+    branch=&quot;fix/search-timeout&quot;,                 # optional: requires workspace_id
+)
+
+result = client.search(
+    &quot;Which timeout implementation was finally kept?&quot;,
+    scene=&quot;coding&quot;,
+    user_ids=[&quot;user_123&quot;],
+    workspace_id=&quot;github.com/example/service&quot;,
+    branch=&quot;fix/search-timeout&quot;,
+    limit=5,
+)
+
+result[&quot;facts&quot;]          # fact layer
+result[&quot;experiences&quot;]    # experience layer
+result[&quot;chain_block&quot;]    # coding only: version-evolution context"><pre><span class="pl-s1">messages</span> <span class="pl-c1">=</span> [
+    {<span class="pl-s">"role"</span>: <span class="pl-s">"user"</span>, <span class="pl-s">"content"</span>: <span class="pl-s">"Fix the timeout in the search client."</span>},
+    {<span class="pl-s">"role"</span>: <span class="pl-s">"assistant"</span>, <span class="pl-s">"content"</span>: <span class="pl-s">""</span>, <span class="pl-s">"tool_calls"</span>: [{
+        <span class="pl-s">"id"</span>: <span class="pl-s">"call_1"</span>, <span class="pl-s">"type"</span>: <span class="pl-s">"function"</span>,
+        <span class="pl-s">"function"</span>: {<span class="pl-s">"name"</span>: <span class="pl-s">"apply_patch"</span>, <span class="pl-s">"arguments"</span>: <span class="pl-s">'{"path":"src/search.py"}'</span>},
+    }]},
+    {<span class="pl-s">"role"</span>: <span class="pl-s">"tool"</span>, <span class="pl-s">"tool_call_id"</span>: <span class="pl-s">"call_1"</span>, <span class="pl-s">"name"</span>: <span class="pl-s">"apply_patch"</span>,
+     <span class="pl-s">"content"</span>: <span class="pl-s">"Patch applied successfully"</span>},
+]
+
+<span class="pl-s1">client</span>.<span class="pl-c1">add</span>(
+    <span class="pl-s1">messages</span>,
+    <span class="pl-s1">scene</span><span class="pl-c1">=</span><span class="pl-s">"coding"</span>,                              <span class="pl-c"># or "working"</span>
+    <span class="pl-s1">user_id</span><span class="pl-c1">=</span><span class="pl-s">"user_123"</span>,
+    <span class="pl-s1">workspace_id</span><span class="pl-c1">=</span><span class="pl-s">"github.com/example/service"</span>,   <span class="pl-c"># optional: isolate by repository / project</span>
+    <span class="pl-s1">branch</span><span class="pl-c1">=</span><span class="pl-s">"fix/search-timeout"</span>,                 <span class="pl-c"># optional: requires workspace_id</span>
+)
+
+<span class="pl-s1">result</span> <span class="pl-c1">=</span> <span class="pl-s1">client</span>.<span class="pl-c1">search</span>(
+    <span class="pl-s">"Which timeout implementation was finally kept?"</span>,
+    <span class="pl-s1">scene</span><span class="pl-c1">=</span><span class="pl-s">"coding"</span>,
+    <span class="pl-s1">user_ids</span><span class="pl-c1">=</span>[<span class="pl-s">"user_123"</span>],
+    <span class="pl-s1">workspace_id</span><span class="pl-c1">=</span><span class="pl-s">"github.com/example/service"</span>,
+    <span class="pl-s1">branch</span><span class="pl-c1">=</span><span class="pl-s">"fix/search-timeout"</span>,
+    <span class="pl-s1">limit</span><span class="pl-c1">=</span><span class="pl-c1">5</span>,
+)
+
+<span class="pl-s1">result</span>[<span class="pl-s">"facts"</span>]          <span class="pl-c"># fact layer</span>
+<span class="pl-s1">result</span>[<span class="pl-s">"experiences"</span>]    <span class="pl-c"># experience layer</span>
+<span class="pl-s1">result</span>[<span class="pl-s">"chain_block"</span>]    <span class="pl-c"># coding only: version-evolution context</span></pre></div>
+<div class="markdown-heading" dir="auto"><h3 tabindex="-1" class="heading-element" dir="auto">5. Routing, Source Isolation &amp; Advanced APIs</h3><a id="user-content-5-routing-source-isolation--advanced-apis" class="anchor" aria-label="Permalink: 5. Routing, Source Isolation &amp; Advanced APIs" href="https://github.com/Tencent-Hunyuan/Hy-Memory#5-routing-source-isolation--advanced-apis" target="_blank" rel="noopener"><svg data-component="Octicon" class="octicon octicon-link" viewbox="0 0 16 16" version="1.1" aria-hidden="true"><path d="m7.775 3.275 1.25-1.25a3.5 3.5 0 1 1 4.95 4.95l-2.5 2.5a3.5 3.5 0 0 1-4.95 0 .751.751 0 0 1 .018-1.042.751.751 0 0 1 1.042-.018 1.998 1.998 0 0 0 2.83 0l2.5-2.5a2.002 2.002 0 0 0-2.83-2.83l-1.25 1.25a.751.751 0 0 1-1.042-.018.751.751 0 0 1-.018-1.042Zm-4.69 9.64a1.998 1.998 0 0 0 2.83 0l1.25-1.25a.751.751 0 0 1 1.042.018.751.751 0 0 1 .018 1.042l-1.25 1.25a3.5 3.5 0 1 1-4.95-4.95l2.5-2.5a3.5 3.5 0 0 1 4.95 0 .751.751 0 0 1-.018 1.042.751.751 0 0 1-1.042.018 1.998 1.998 0 0 0-2.83 0l-2.5 2.5a1.998 1.998 0 0 0 0 2.83Z"></path></svg></a></div>
+<ul dir="auto">
+<li><strong>Automatic scene routing</strong>: When <code>scene</code> is omitted, writes without tool calls go straight to <code>chat</code> (zero LLM calls), and writes with tool calls are classified once into <code>chat</code> / <code>working</code> / <code>coding</code>. For searches, <code>search_mode="default"</code> goes to <code>chat</code> with zero LLM calls, while <code>search_mode="agentic"</code> performs scene classification, query rewriting, and time-range parsing. See <a href="https://github.com/Tencent-Hunyuan/Hy-Memory/blob/main/docs/scene_coding_usage.md" target="_blank" rel="noopener">Working/Coding Scenes</a>.</li>
+<li><strong>Separate memories by source</strong>: Pass <code>source="openclaw" | "cursor" | "codex"</code> on <code>add()</code> and filter with <code>include_sources</code> / <code>exclude_sources</code> on <code>search()</code> to isolate caller applications independently of <code>agent_id</code>.</li>
+<li><strong>CRUD &amp; System 2 evolution</strong>: <code>client.get(id)</code>, <code>client.update(id, text)</code>, <code>client.delete(id)</code>, <code>client.list_memories(user_id=...)</code>, and <code>client.evolve(user_id=...)</code> (triggers System 2 in <code>ultra</code> mode).</li>
+<li><strong>Per-call embedding endpoint override</strong>: Pass <code>embed_override={"base_url": ..., "api_key": ...}</code> to <code>add()</code> / <code>search()</code> or use <code>with embed_endpoint_override(...):</code> for concurrency-safe endpoint switching.</li>
+</ul>
+<p dir="auto">For provider configuration, storage backends, scenes, and the complete API, see the <a href="https://github.com/Tencent-Hunyuan/Hy-Memory/blob/main/docs/usage.md" target="_blank" rel="noopener">Usage Guide</a>.</p>
+<hr>
+
+
+<p dir="auto">Hy Memory provides three memory scenes (<code>scene</code>), one per kind of task. <code>add()</code> / <code>search()</code> go through the scene router first, then into the Chat or the Working / Coding pipeline (orange parts in the diagram are coding-only; without them the pipeline is Working):</p>
+<markdown-accessiblity-table><table>
+<thead>
+<tr>
+<th><code>scene</code></th>
+<th>Tasks</th>
+<th>Memory shape</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>chat</code></td>
+<td>Small talk, personal information, preferences, general Q&amp;A</td>
+<td>Hierarchical memory (L0–L7)</td>
+</tr>
+<tr>
+<td><code>working</code></td>
+<td>Productivity work: documents, spreadsheets, research, financial analysis, content creation, computer operation</td>
+<td>Two-layer memory: session facts + reusable experiences</td>
+</tr>
+<tr>
+<td><code>coding</code></td>
+<td>Software engineering: coding, debugging, testing, builds, APIs/SDKs, scripts, SQL</td>
+<td>The same two-layer memory as <code>working</code>, plus a code version-evolution chain (diff chain)</td>
+</tr>
+</tbody>
+</table></markdown-accessiblity-table>
+<div class="markdown-heading" dir="auto"><h3 tabindex="-1" class="heading-element" dir="auto">1. Chat: Memory Hierarchy</h3><a id="user-content-1-chat-memory-hierarchy" class="anchor" aria-label="Permalink: 1. Chat: Memory Hierarchy" href="https://github.com/Tencent-Hunyuan/Hy-Memory#1-chat-memory-hierarchy" target="_blank" rel="noopener"><svg data-component="Octicon" class="octicon octicon-link" viewbox="0 0 16 16" version="1.1" aria-hidden="true"><path d="m7.775 3.275 1.25-1.25a3.5 3.5 0 1 1 4.95 4.95l-2.5 2.5a3.5 3.5 0 0 1-4.95 0 .751.751 0 0 1 .018-1.042.751.751 0 0 1 1.042-.018 1.998 1.998 0 0 0 2.83 0l2.5-2.5a2.002 2.002 0 0 0-2.83-2.83l-1.25 1.25a.751.751 0 0 1-1.042-.018.751.751 0 0 1-.018-1.042Zm-4.69 9.64a1.998 1.998 0 0 0 2.83 0l1.25-1.25a.751.751 0 0 1 1.042.018.751.751 0 0 1 .018 1.042l-1.25 1.25a3.5 3.5 0 1 1-4.95-4.95l2.5-2.5a3.5 3.5 0 0 1 4.95 0 .751.751 0 0 1-.018 1.042.751.751 0 0 1-1.042.018 1.998 1.998 0 0 0-2.83 0l-2.5 2.5a1.998 1.998 0 0 0 0 2.83Z"></path></svg></a></div>
+<p dir="auto">For long-term personal memory. Raw conversations are abstracted layer by layer into facts, summaries, a profile, and higher-level cognitive structures:</p>
+<markdown-accessiblity-table><table>
+<thead>
+<tr>
+<th>Layer</th>
+<th>Name</th>
+<th>Content</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>L0</td>
+<td><code>BASIC_INFO</code></td>
+<td>Basic information</td>
+</tr>
+<tr>
+<td>L1</td>
+<td><code>RAW</code></td>
+<td>Raw conversation (append-only)</td>
+</tr>
+<tr>
+<td>L2</td>
+<td><code>FACT</code></td>
+<td>Atomic facts (versioned, immutable records)</td>
+</tr>
+<tr>
+<td>L3</td>
+<td><code>SUMMARY</code></td>
+<td>Session summaries</td>
+</tr>
+<tr>
+<td>L4</td>
+<td><code>IDENTITY</code></td>
+<td>Reserved</td>
+</tr>
+<tr>
+<td>L5</td>
+<td><code>KNOWLEDGE</code></td>
+<td>Reserved</td>
+</tr>
+<tr>
+<td>L6</td>
+<td><code>SCHEMA</code></td>
+<td>Mental models (abstract narrative templates, graph layer)</td>
+</tr>
+<tr>
+<td>L7</td>
+<td><code>INTENTION</code></td>
+<td>Prospective intentions (with an expiry; demoted to ordinary facts once expired)</td>
+</tr>
+</tbody>
+</table></markdown-accessiblity-table>
+<p dir="auto"><strong>Modes</strong></p>
+<markdown-accessiblity-table><table>
+<thead>
+<tr>
+<th>Mode</th>
+<th>What it does</th>
+<th>Graph DB</th>
+<th>Use case</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>lite</code></td>
+<td>Raw-only embedding writes and searches, no LLM calls; <code>scene</code> and <code>layers</code> are ignored</td>
+<td>No</td>
+<td>Vanilla vector RAG, fast ingestion, zero LLM cost</td>
+</tr>
+<tr>
+<td><code>pro</code></td>
+<td>+ LLM extraction + reconcile</td>
+<td>Optional (<code>MEMORY_ENABLE_GRAPH</code>, off by default)</td>
+<td>Standard workloads</td>
+</tr>
+<tr>
+<td><code>ultra</code></td>
+<td>+ System 2 schema induction + cross-domain sweeper (triggered by <code>evolve()</code>)</td>
+<td>Yes (always on)</td>
+<td>Full cognitive architecture</td>
+</tr>
+</tbody>
+</table></markdown-accessiblity-table>
+<div class="markdown-heading" dir="auto"><h3 tabindex="-1" class="heading-element" dir="auto">2. Working: Two-Layer Productivity Memory</h3><a id="user-content-2-working-two-layer-productivity-memory" class="anchor" aria-label="Permalink: 2. Working: Two-Layer Productivity Memory" href="https://github.com/Tencent-Hunyuan/Hy-Memory#2-working-two-layer-productivity-memory" target="_blank" rel="noopener"><svg data-component="Octicon" class="octicon octicon-link" viewbox="0 0 16 16" version="1.1" aria-hidden="true"><path d="m7.775 3.275 1.25-1.25a3.5 3.5 0 1 1 4.95 4.95l-2.5 2.5a3.5 3.5 0 0 1-4.95 0 .751.751 0 0 1 .018-1.042.751.751 0 0 1 1.042-.018 1.998 1.998 0 0 0 2.83 0l2.5-2.5a2.002 2.002 0 0 0-2.83-2.83l-1.25 1.25a.751.751 0 0 1-1.042-.018.751.751 0 0 1-.018-1.042Zm-4.69 9.64a1.998 1.998 0 0 0 2.83 0l1.25-1.25a.751.751 0 0 1 1.042.018.751.751 0 0 1 .018 1.042l-1.25 1.25a3.5 3.5 0 1 1-4.95-4.95l2.5-2.5a3.5 3.5 0 0 1 4.95 0 .751.751 0 0 1-.018 1.042.751.751 0 0 1-1.042.018 1.998 1.998 0 0 0-2.83 0l-2.5 2.5a1.998 1.998 0 0 0 0 2.83Z"></path></svg></a></div>
+<p dir="auto">For getting things done. One session with tool calls (a trace) produces both layers at once:</p>
+<markdown-accessiblity-table><table>
+<thead>
+<tr>
+<th>Layer</th>
+<th>What it records</th>
+<th>Per session</th>
+<th>Structure</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Facts</strong> (<code>WorkingFact</code>)</td>
+<td>What this session did: the task, the approach, the result</td>
+<td>Exactly 1, no threshold</td>
+<td><code>statement</code>, <code>subject</code>, <code>files</code>, <code>details</code> (verbatim source)</td>
+</tr>
+<tr>
+<td><strong>Experiences</strong></td>
+<td>Approaches that can be reused next time a similar task comes up</td>
+<td>0–N, must pass a value threshold</td>
+<td><code>task</code>, <code>search_keys</code>, <code>solution</code>, <code>boundary_envs</code>, <code>confidence</code></td>
+</tr>
+</tbody>
+</table></markdown-accessiblity-table>
+<p dir="auto">The fact layer guarantees that work which was done is remembered; the experience layer makes what was learned reusable. The two layers link to each other (<code>fact.derived_experience_ids</code> ↔ <code>experience.source_fact_ids</code>), and superseded facts stay traceable through a task-progress chain (<code>fact_chain_summary</code>).</p>
+<div class="markdown-heading" dir="auto"><h3 tabindex="-1" class="heading-element" dir="auto">3. Coding: Two-Layer Memory + Version-Evolution Chain</h3><a id="user-content-3-coding-two-layer-memory--version-evolution-chain" class="anchor" aria-label="Permalink: 3. Coding: Two-Layer Memory + Version-Evolution Chain" href="https://github.com/Tencent-Hunyuan/Hy-Memory#3-coding-two-layer-memory--version-evolution-chain" target="_blank" rel="noopener"><svg data-component="Octicon" class="octicon octicon-link" viewbox="0 0 16 16" version="1.1" aria-hidden="true"><path d="m7.775 3.275 1.25-1.25a3.5 3.5 0 1 1 4.95 4.95l-2.5 2.5a3.5 3.5 0 0 1-4.95 0 .751.751 0 0 1 .018-1.042.751.751 0 0 1 1.042-.018 1.998 1.998 0 0 0 2.83 0l2.5-2.5a2.002 2.002 0 0 0-2.83-2.83l-1.25 1.25a.751.751 0 0 1-1.042-.018.751.751 0 0 1-.018-1.042Zm-4.69 9.64a1.998 1.998 0 0 0 2.83 0l1.25-1.25a.751.751 0 0 1 1.042.018.751.751 0 0 1 .018 1.042l-1.25 1.25a3.5 3.5 0 1 1-4.95-4.95l2.5-2.5a3.5 3.5 0 0 1 4.95 0 .751.751 0 0 1-.018 1.042.751.751 0 0 1-1.042.018 1.998 1.998 0 0 0-2.83 0l-2.5 2.5a1.998 1.998 0 0 0 0 2.83Z"></path></svg></a></div>
+<p dir="auto">Coding <strong>reuses the same two-layer pipeline and data schema</strong> as Working. It differs in three ways:</p>
+<markdown-accessiblity-table><table>
+<thead>
+<tr>
+<th></th>
+<th>Working</th>
+<th>Coding</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Extraction spec</strong></td>
+<td>Productivity-task spec</td>
+<td>Software-engineering spec: the subject must be code or a decision; record exact coordinates (file / function / branch) instead of pasting code</td>
+</tr>
+<tr>
+<td><strong>Storage</strong></td>
+<td><code>coding_memory.db</code> + <code>*_coding_keys</code> / <code>*_working_facts</code> collections</td>
+<td><code>coding_memory_cv.db</code> + <code>*_cv</code> collections, fully isolated from working</td>
+</tr>
+<tr>
+<td><strong>Version-evolution chain</strong></td>
+<td>None</td>
+<td><strong>Yes</strong>: how many times the same code was changed, and what each change was</td>
+</tr>
+</tbody>
+</table></markdown-accessiblity-table>
+<p dir="auto"><strong>Why a version-evolution chain</strong>: fact extraction deliberately avoids pasting code (the budget goes to more informative coordinates), so a version that was later reverted never appears in a fact.
+That version is usually not in the working tree or at HEAD either, so it cannot be read back afterwards. The chain stores the real diff of every version with zero LLM calls, filling in exactly the information a summary inevitably drops.</p>
+<p dir="auto"><strong>Design highlights</strong> (<code>hy_memory/coding/chain_store.py</code>):</p>
+<ul dir="auto">
+<li><strong>A decorator, not a retriever</strong>: the vector layer decides which facts are returned; the chain only attaches, under each fact, every revision of the code it touches (the user's words for that revision + the real diff).</li>
+<li><strong>Change sources</strong>: local Git diffs (set <code>MEMORY_CODING_CHAIN_REPO_ROOT</code>), or deterministic replace actions with <code>path</code> / <code>old</code> / <code>new</code> in the tool trace.</li>
+<li><strong>Chain granularity &amp; isolation</strong>: one thread corresponds to one block of one function in one file on one branch, isolated by <code>user_id</code> + <code>workspace_id</code>.</li>
+</ul>
+<hr>
+
+
+<ul dir="auto">
+<li>Vector stores: ChromaDB (default), Qdrant, FAISS</li>
+<li>Graph stores (ultra mode): Kuzu (default), Neo4j</li>
+<li>Working / Coding metadata: local SQLite</li>
+</ul>
+
+<ul dir="auto">
+<li><a href="https://github.com/Tencent-Hunyuan/Hy-Memory/blob/main/docs/usage.md" target="_blank" rel="noopener">Usage guide</a> — full configuration reference, API details, deployment modes</li>
+<li><a href="https://github.com/Tencent-Hunyuan/Hy-Memory/blob/main/docs/env_reference.md" target="_blank" rel="noopener">Environment variables</a> — settings and defaults</li>
+<li><a href="https://github.com/Tencent-Hunyuan/Hy-Memory/blob/main/docs/hy_memory_search_skill.md" target="_blank" rel="noopener">Search and Reader guide</a> — reader selection, schema quotas, rerank, and return channels</li>
+<li><a href="https://github.com/Tencent-Hunyuan/Hy-Memory/blob/main/docs/scene_coding_usage.md" target="_blank" rel="noopener">Working/Coding Scenes</a> — productivity-memory routing, response shapes, and coding chain behavior</li>
+<li><a href="https://github.com/Tencent-Hunyuan/Hy-Memory/blob/main/docs/pro_graph_design.md" target="_blank" rel="noopener">Graph memory design</a> — graph projection, rerank, relation paths, and deployment limits</li>
+<li><a href="https://github.com/Tencent-Hunyuan/Hy-Memory/blob/main/.env.example" target="_blank" rel="noopener">Environment template</a> — a copy-ready configuration template</li>
+<li><a href="https://github.com/Tencent-Hunyuan/Hy-Memory/blob/main/memhub/README.md" target="_blank" rel="noopener">MemHub README</a> — local-first desktop &amp; CLI product overview, runtime commands, and privacy boundaries</li>
+<li><a href="https://github.com/Tencent-Hunyuan/Hy-Memory/blob/main/plugins/openclaw/README.md" target="_blank" rel="noopener">OpenClaw plugin</a> — agent integrations live under <code>plugins/</code> (overview: <a href="https://github.com/Tencent-Hunyuan/Hy-Memory/blob/main/plugins/README.md" target="_blank" rel="noopener">plugins/README.md</a>)</li>
+</ul>
+
+<p dir="auto">Hy-Memory is licensed under Apache-2.0. See <a href="https://github.com/Tencent-Hunyuan/Hy-Memory/blob/main/LICENSE" target="_blank" rel="noopener">LICENSE</a>; third-party
+components remain subject to their respective licenses and notices.</p>
+</article></div></div>
