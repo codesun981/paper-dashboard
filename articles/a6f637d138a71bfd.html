@@ -1,0 +1,224 @@
+<div><div><article class="markdown-body entry-content container-lg" itemprop="text"><div class="markdown-heading" dir="auto"><h3 align="center" tabindex="-1" class="heading-element" dir="auto">
+  <a target="_blank" rel="noopener" href="https://github.com/google-research/harness2/blob/main/assets/Harness2-wordmark.png"><img src="https://github.com/google-research/harness2/raw/main/assets/Harness2-wordmark.png" alt="Harness²" loading="lazy"></a><br>
+  Recursive Agent Harnessing for an Open World
+</h3><a id="user-content-----recursive-agent-harnessing-for-an-open-world" class="anchor" aria-label="Permalink: 
+  Recursive Agent Harnessing for an Open World
+" href="https://github.com/google-research/harness2#----recursive-agent-harnessing-for-an-open-world" target="_blank" rel="noopener"><svg data-component="Octicon" class="octicon octicon-link" viewbox="0 0 16 16" version="1.1" aria-hidden="true"><path d="m7.775 3.275 1.25-1.25a3.5 3.5 0 1 1 4.95 4.95l-2.5 2.5a3.5 3.5 0 0 1-4.95 0 .751.751 0 0 1 .018-1.042.751.751 0 0 1 1.042-.018 1.998 1.998 0 0 0 2.83 0l2.5-2.5a2.002 2.002 0 0 0-2.83-2.83l-1.25 1.25a.751.751 0 0 1-1.042-.018.751.751 0 0 1-.018-1.042Zm-4.69 9.64a1.998 1.998 0 0 0 2.83 0l1.25-1.25a.751.751 0 0 1 1.042.018.751.751 0 0 1 .018 1.042l-1.25 1.25a3.5 3.5 0 1 1-4.95-4.95l2.5-2.5a3.5 3.5 0 0 1 4.95 0 .751.751 0 0 1-.018 1.042.751.751 0 0 1-1.042.018 1.998 1.998 0 0 0-2.83 0l-2.5 2.5a1.998 1.998 0 0 0 0 2.83Z"></path></svg></a></div>
+<p align="center" dir="auto">
+  <a href="https://arxiv.org/pdf/2610.14224" rel="noopener" target="_blank"><img src="https://camo.githubusercontent.com/7c3b852da96a84347c73a3c750918bff5e8dadbda901570676b34d47e8c4219f/68747470733a2f2f696d672e736869656c64732e696f2f62616467652f50617065722d61725869762d4541343333353f6c6f676f3d6172786976266c6f676f436f6c6f723d7768697465" alt="Paper" loading="lazy"></a>
+  <a href="https://harness2.github.io" rel="noopener" target="_blank"><img src="https://camo.githubusercontent.com/acdb42e32d126f3c3f3ca51e0cde3851fa71ee689b66b2174a9f57674bf3b404/68747470733a2f2f696d672e736869656c64732e696f2f62616467652f576562736974652d6861726e657373322e6769746875622e696f2d3432383546343f6c6f676f3d676f6f676c656368726f6d65266c6f676f436f6c6f723d7768697465" alt="Website" loading="lazy"></a>
+  <a href="https://github.com/google-research/harness2/blob/main/docs/BENCHMARKS.md" target="_blank" rel="noopener"><img src="https://camo.githubusercontent.com/aa5839f0b4446acc25c139ad60945bc46d8830ab16e09e4ff048ffa8bc07c1c5/68747470733a2f2f696d672e736869656c64732e696f2f62616467652f446f63732d42656e63686d61726b2532306775696465732d464242433034" alt="Benchmark guides" loading="lazy"></a>
+  <a href="https://github.com/google-research/harness2/blob/main/LICENSE" target="_blank" rel="noopener"><img src="https://camo.githubusercontent.com/85290ad5095410a2382190dcba74633fe0b35a5cede547d6a90e69cb80498c5e/68747470733a2f2f696d672e736869656c64732e696f2f62616467652f4c6963656e73652d417061636865253230322e302d333441383533" alt="License" loading="lazy"></a>
+</p>
+<p align="center" dir="auto">
+  <a href="https://github.com/google-research/harness2/blob/main/docs/BENCHMARKS.md#jobbench" target="_blank" rel="noopener">
+    <img src="https://github.com/google-research/harness2/raw/main/assets/harness2-setup.gif" alt="Install, set up, and run JobBench: uv pip install -e '.[render]', harness2-setup jb, then harness2 --bench jb --k 1 --mode parallel. Click for prerequisites and commands." loading="lazy">
+  </a>
+</p>
+<p dir="auto">A <strong>harness</strong> is the system around a model that enables it to act as an agent:
+prompts, tools, memory, skills, orchestration, and more. <strong>Harnessing</strong> is the
+process of optimizing that system.</p>
+<p dir="auto">Harness² is a plug-and-play framework for <strong>recursive agent harnessing</strong> in an
+open world, where agents encounter tasks unseen during harness design. It
+connects two levels of recursion while keeping model weights fixed:</p>
+<ul dir="auto">
+<li><strong>Task-level recursion</strong> refines the execution harness for the current task
+through a contrastive <strong>Propose–Probe–Compose</strong> step: propose edits, probe
+their effects on the same task, and compose a refined harness from behavioral
+contrasts between executions, without ground-truth feedback.</li>
+<li><strong>Harnessing-level recursion</strong> updates a persistent <em>improvement harness</em>
+with adopted harnesses and evidence-supported lessons from each task to guide
+future refinement.</li>
+</ul>
+<p align="center" dir="auto">
+  <a href="https://github.com/google-research/harness2/blob/main/assets/harness2_pipeline.png" target="_blank" rel="noopener">
+    <img src="https://github.com/google-research/harness2/raw/main/assets/harness2_pipeline.png" alt="Harness² pipeline. Task-level recursion: an agent executor runs the initial harness, a harness editor proposes invariant and domain edits, candidate probes execute them, and a harness composer combines them into the final harness. Harnessing-level recursion: an experience reflector reflects on the step and updates the improvement harness used for the next task." loading="lazy">
+  </a>
+</p>
+<p dir="auto">Across three professional benchmarks and four model–harness configurations, a
+single Harness² step improves GLM-5 and Gemini 3.5 Flash over their base
+harnesses, with gains of up to 11.5 points on WorkBuddy-Bench, 4.5 points on
+JobBench, and 11.8 percentage points on LAB's partial pass rate. Increasing the
+task-level recursion budget brings further gains.</p>
+<p dir="auto">The release supports <strong>parallel and sequential recursion</strong>, <strong>OpenCode and
+Codex executors</strong>, and <strong>JobBench, LAB, and WorkBuddy-Bench</strong>.</p>
+
+<details open="" class="details-reset border rounded-2">
+  <summary class="tmp-px-3 py-2">
+    <svg aria-hidden="true" data-component="Octicon" viewbox="0 0 16 16" version="1.1" data-view-component="true" class="octicon octicon-device-camera-video">
+    <path d="M16 3.75v8.5a.75.75 0 0 1-1.136.643L11 10.575v.675A1.75 1.75 0 0 1 9.25 13h-7.5A1.75 1.75 0 0 1 0 11.25v-6.5C0 3.784.784 3 1.75 3h7.5c.966 0 1.75.784 1.75 1.75v.675l3.864-2.318A.75.75 0 0 1 16 3.75Zm-6.5 1a.25.25 0 0 0-.25-.25h-7.5a.25.25 0 0 0-.25.25v6.5c0 .138.112.25.25.25h7.5a.25.25 0 0 0 .25-.25v-6.5ZM11 8.825l3.5 2.1v-5.85l-3.5 2.1Z"></path>
+</svg>
+    <span class="m-1">harness2-video.mp4</span>
+    <span class="dropdown-caret"></span>
+  </summary>
+
+  <video src="https://private-user-images.githubusercontent.com/63894509/669252828-76b10548-b14b-4c8f-9aa5-a93662df4d56.mp4?jwt=eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJnaXRodWIuY29tIiwiYXVkIjoicmF3LmdpdGh1YnVzZXJjb250ZW50LmNvbSIsImtleSI6ImtleTUiLCJleHAiOjE3OTI0MTkwNTMsIm5iZiI6MTc5MjQxODc1MywicGF0aCI6Ii82Mzg5NDUwOS82NjkyNTI4MjgtNzZiMTA1NDgtYjE0Yi00YzhmLTlhYTUtYTkzNjYyZGY0ZDU2Lm1wND9YLUFtei1BbGdvcml0aG09QVdTNC1ITUFDLVNIQTI1NiZYLUFtei1DcmVkZW50aWFsPUFLSUFWQ09EWUxTQTUzUFFLNFpBJTJGMjAyNjEwMTklMkZ1cy1lYXN0LTElMkZzMyUyRmF3czRfcmVxdWVzdCZYLUFtei1EYXRlPTIwMjYxMDE5VDE0MDU1M1omWC1BbXotRXhwaXJlcz0zMDAmWC1BbXotU2lnbmF0dXJlPWQ3ZGUxNGZhNjViMTIxNTkxZDE1MjAzZWZjZGI0ZTQxYWJmOTdhNDk4YWYwZTc2NjBkM2RjMzFlMDk1MDQ2MzcmWC1BbXotU2lnbmVkSGVhZGVycz1ob3N0JnJlc3BvbnNlLWNvbnRlbnQtdHlwZT12aWRlbyUyRm1wNCJ9.1lJbQHaVYZ1Atfevm5DNRibAJk6SF_QxjKNsGPEOY_A" data-canonical-src="https://private-user-images.githubusercontent.com/63894509/669252828-76b10548-b14b-4c8f-9aa5-a93662df4d56.mp4?jwt=eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJnaXRodWIuY29tIiwiYXVkIjoicmF3LmdpdGh1YnVzZXJjb250ZW50LmNvbSIsImtleSI6ImtleTUiLCJleHAiOjE3OTI0MTkwNTMsIm5iZiI6MTc5MjQxODc1MywicGF0aCI6Ii82Mzg5NDUwOS82NjkyNTI4MjgtNzZiMTA1NDgtYjE0Yi00YzhmLTlhYTUtYTkzNjYyZGY0ZDU2Lm1wND9YLUFtei1BbGdvcml0aG09QVdTNC1ITUFDLVNIQTI1NiZYLUFtei1DcmVkZW50aWFsPUFLSUFWQ09EWUxTQTUzUFFLNFpBJTJGMjAyNjEwMTklMkZ1cy1lYXN0LTElMkZzMyUyRmF3czRfcmVxdWVzdCZYLUFtei1EYXRlPTIwMjYxMDE5VDE0MDU1M1omWC1BbXotRXhwaXJlcz0zMDAmWC1BbXotU2lnbmF0dXJlPWQ3ZGUxNGZhNjViMTIxNTkxZDE1MjAzZWZjZGI0ZTQxYWJmOTdhNDk4YWYwZTc2NjBkM2RjMzFlMDk1MDQ2MzcmWC1BbXotU2lnbmVkSGVhZGVycz1ob3N0JnJlc3BvbnNlLWNvbnRlbnQtdHlwZT12aWRlbyUyRm1wNCJ9.1lJbQHaVYZ1Atfevm5DNRibAJk6SF_QxjKNsGPEOY_A" controls="controls" muted="muted" class="d-block rounded-bottom-2 border-top width-fit">
+
+  </video>
+</details>
+
+
+
+
+<p dir="auto">Harness² exposes eight editable components around the model: <strong>system prompt,
+guardrails, memory, tool guidance, subagents, skills, scripts, and plugins</strong>.
+They control context construction, the tool interface, delegation, and behavior
+inside the tool loop.</p>
+<p align="center" dir="auto">
+  <a href="https://github.com/google-research/harness2/blob/main/assets/components.png" target="_blank" rel="noopener">
+    <img src="https://github.com/google-research/harness2/raw/main/assets/components.png" alt="Eight harness components grouped by runtime role: system prompt, guardrails, memory, and skills construct context; tool guidance and scripts define the tool interface; subagents orchestrate delegated work; plugins control middleware." loading="lazy">
+  </a>
+</p>
+
+<p dir="auto">Use <strong>Linux, Python 3.12, and <a href="https://docs.astral.sh/uv/getting-started/installation/" rel="noopener" target="_blank">uv</a></strong>.
+From the repository root:</p>
+<div class="highlight highlight-source-shell notranslate position-relative overflow-auto" dir="auto" data-snippet-clipboard-copy-content="uv venv --python 3.12 .venv
+source .venv/bin/activate
+uv pip install -e '.[render]'
+harness2-demo --output runs/demo --k 2"><pre>uv venv --python 3.12 .venv
+<span class="pl-c1">source</span> .venv/bin/activate
+uv pip install -e <span class="pl-s"><span class="pl-pds">'</span>.[render]<span class="pl-pds">'</span></span>
+harness2-demo --output runs/demo --k 2</pre></div>
+<p dir="auto">The local demo runs both recursion modes with deterministic editors and real
+Python executions. It requires no model credentials.</p>
+<p dir="auto">For model-backed benchmarks, install <strong>Node.js 20+, the Google Cloud CLI</strong>, and
+the <a href="https://github.com/google-research/harness2/blob/main/docs/SETUP.md#requirements" target="_blank" rel="noopener">benchmark dependencies</a>. LAB needs Pandoc and
+Poppler; WorkBuddy-Bench needs Docker. Then configure your models:</p>
+<div class="highlight highlight-source-shell notranslate position-relative overflow-auto" dir="auto" data-snippet-clipboard-copy-content="cp .env.example .env
+# Edit .env with your Vertex AI project and model IDs.
+gcloud auth application-default login"><pre>cp .env.example .env
+<span class="pl-c"><span class="pl-c">#</span> Edit .env with your Vertex AI project and model IDs.</span>
+gcloud auth application-default login</pre></div>
+<p dir="auto">See the <a href="https://github.com/google-research/harness2/blob/main/docs/SETUP.md" target="_blank" rel="noopener">setup guide</a> for model settings, authentication
+alternatives, and the <a href="https://github.com/google-research/harness2/blob/main/docs/SETUP.md#codex-executor" target="_blank" rel="noopener">Codex executor</a>.</p>
+
+<p dir="auto">The following example installs LAB and runs one task, then evaluates and reports
+its result. Model-backed runs incur API costs; start with a small task selection.</p>
+<div class="highlight highlight-source-shell notranslate position-relative overflow-auto" dir="auto" data-snippet-clipboard-copy-content="harness2-setup lab
+harness2-check --bench lab
+harness2 --bench lab --k 1 --mode parallel \
+  --only-domains antitrust-competition --max-tasks 1
+harness2-judge --bench lab --k 1 --mode parallel
+harness2-report --bench lab --k 1 --mode parallel"><pre>harness2-setup lab
+harness2-check --bench lab
+harness2 --bench lab --k 1 --mode parallel \
+  --only-domains antitrust-competition --max-tasks 1
+harness2-judge --bench lab --k 1 --mode parallel
+harness2-report --bench lab --k 1 --mode parallel</pre></div>
+<p dir="auto">Sequential recursion runs the same commands with <code>--mode sequential</code>. <code>--k</code> is
+the task-level recursion budget; see <a href="https://github.com/google-research/harness2#experiments" target="_blank" rel="noopener">Experiments</a>. Judging and
+reporting must use the same benchmark, executor, subset, <code>--k</code>, <code>--mode</code>, and
+seed as the refinement run. Add <code>--dry-run</code> to <code>harness2</code> to preview task
+selection without model calls.</p>
+<markdown-accessiblity-table><table>
+<thead>
+<tr>
+<th>Benchmark</th>
+<th>Tasks</th>
+<th>Install</th>
+<th>Guide</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>JobBench</td>
+<td>Professional work</td>
+<td><code>harness2-setup jb</code></td>
+<td><a href="https://github.com/google-research/harness2/blob/main/docs/BENCHMARKS.md#jobbench" target="_blank" rel="noopener">JobBench</a></td>
+</tr>
+<tr>
+<td>LAB</td>
+<td>Legal work</td>
+<td><code>harness2-setup lab</code></td>
+<td><a href="https://github.com/google-research/harness2/blob/main/docs/BENCHMARKS.md#lab" target="_blank" rel="noopener">LAB</a></td>
+</tr>
+<tr>
+<td>WorkBuddy-Bench</td>
+<td>Office, web, and code</td>
+<td><code>harness2-setup wb</code></td>
+<td><a href="https://github.com/google-research/harness2/blob/main/docs/BENCHMARKS.md#workbuddy-bench" target="_blank" rel="noopener">WorkBuddy</a></td>
+</tr>
+</tbody>
+</table></markdown-accessiblity-table>
+<p dir="auto">Choose one benchmark per command. WorkBuddy also takes <code>--subset office</code>,
+<code>--subset web</code>, or <code>--subset code</code> on every command after setup. The
+<a href="https://github.com/google-research/harness2/blob/main/docs/BENCHMARKS.md" target="_blank" rel="noopener">benchmark guides</a> cover each one's data, domains, and
+grading.</p>
+
+<p dir="auto">Scale task-level recursion in two ways: <strong>parallel recursion</strong> explores multiple
+candidate harnesses and composes refinements from their execution evidence;
+<strong>sequential recursion</strong> carries the refined harness and accumulated evidence
+through successive Propose–Probe–Compose steps.</p>
+<p align="center" dir="auto">
+  <a href="https://github.com/google-research/harness2/blob/main/assets/harness2_recursion_modes.png" target="_blank" rel="noopener">
+    <img src="https://github.com/google-research/harness2/raw/main/assets/harness2_recursion_modes.png" alt="Two ways to scale task-level recursion. Parallel: probe k general and k domain-specific candidate harnesses, then produce k compositions from the shared evidence. Sequential: carry the refined harness and accumulated evidence through k Propose–Probe–Compose steps." loading="lazy">
+  </a>
+</p>
+<p align="center" dir="auto"><em>Parallel recursion explores wider; sequential recursion refines deeper.</em></p>
+<markdown-accessiblity-table><table>
+<thead>
+<tr>
+<th>Option</th>
+<th>Behavior</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>--k 1</code></td>
+<td>One Propose–Probe–Compose step</td>
+</tr>
+<tr>
+<td><code>--k K --mode parallel</code></td>
+<td>Probe <code>K</code> general and <code>K</code> domain-specific candidates, then produce <code>K</code> compositions</td>
+</tr>
+<tr>
+<td><code>--k K --mode sequential</code></td>
+<td>Refine the harness through <code>K</code> successive steps</td>
+</tr>
+<tr>
+<td><code>--substrate cx</code></td>
+<td>Use Codex instead of the default OpenCode executor</td>
+</tr>
+</tbody>
+</table></markdown-accessiblity-table>
+<p dir="auto">After each task, harnessing-level recursion retains the adopted harness and
+evidence-supported lessons to guide future refinement. See the
+<a href="https://github.com/google-research/harness2/blob/main/docs/EXPERIMENTS.md" target="_blank" rel="noopener">experiment guide</a> for task selection, concurrency,
+reproducibility, and baseline comparisons.</p>
+
+<p dir="auto">Executor network access is unrestricted, and Codex runs with its sandbox
+disabled. Public benchmark rubrics may be accessible online. Before evaluation,
+configure <a href="https://github.com/google-research/harness2/blob/main/docs/EXPERIMENTS.md#web-access" target="_blank" rel="noopener">network restrictions</a> to prevent
+access to benchmark answers and grading criteria.</p>
+
+<p dir="auto">Results are saved under <code>runs/</code>, organized by benchmark and subset where
+applicable. They include task summaries, deliverables, adopted harnesses,
+reflection notes, and evaluation results.</p>
+<p dir="auto">Repeat the same command to resume. Use a new <code>HARNESS2_RUNS_DIR</code> when changing
+models or task selection. See <a href="https://github.com/google-research/harness2/blob/main/docs/EXPERIMENTS.md#results-and-resume" target="_blank" rel="noopener">results and resume</a>
+for details; each command also supports <code>--help</code>.</p>
+
+<div class="highlight highlight-text-bibtex notranslate position-relative overflow-auto" dir="auto" data-snippet-clipboard-copy-content="@article{xu2026harness2,
+  title   = {Harness$^2$: Recursive Agent Harnessing for an Open World},
+  author  = {Xu, Ruiyao and Chen, Yanfei and CuiZhu, Zhongying and Dalvi Mishra, Bhavana and Ming, Yifei and Yu, Han and Han, Rujun and Lee, Chen-Yu and Pfister, Tomas},
+  journal = {arXiv preprint arXiv:2610.14224},
+  year    = {2026},
+  url     = {https://arxiv.org/abs/2610.14224}
+}"><pre><span class="pl-k">@article</span>{<span class="pl-en">xu2026harness2</span>,
+  <span class="pl-s">title</span>   = <span class="pl-s"><span class="pl-pds">{</span>Harness$^2$: Recursive Agent Harnessing for an Open World<span class="pl-pds">}</span></span>,
+  <span class="pl-s">author</span>  = <span class="pl-s"><span class="pl-pds">{</span>Xu, Ruiyao and Chen, Yanfei and CuiZhu, Zhongying and Dalvi Mishra, Bhavana and Ming, Yifei and Yu, Han and Han, Rujun and Lee, Chen-Yu and Pfister, Tomas<span class="pl-pds">}</span></span>,
+  <span class="pl-s">journal</span> = <span class="pl-s"><span class="pl-pds">{</span>arXiv preprint arXiv:2610.14224<span class="pl-pds">}</span></span>,
+  <span class="pl-s">year</span>    = <span class="pl-s"><span class="pl-pds">{</span>2026<span class="pl-pds">}</span></span>,
+  <span class="pl-s">url</span>     = <span class="pl-s"><span class="pl-pds">{</span>https://arxiv.org/abs/2610.14224<span class="pl-pds">}</span></span>
+}</pre></div>
+
+<p dir="auto">See <a href="https://github.com/google-research/harness2/blob/main/CONTRIBUTING.md" target="_blank" rel="noopener">CONTRIBUTING.md</a>.</p>
+
+<p dir="auto">Harness² is licensed under <a href="https://github.com/google-research/harness2/blob/main/LICENSE" target="_blank" rel="noopener">Apache 2.0</a>. Third-party code under
+<a href="https://github.com/google-research/harness2/blob/main/third_party/README.md" target="_blank" rel="noopener"><code>third_party/</code></a>, benchmarks, and datasets retain their
+upstream licenses; see
+<a href="https://github.com/google-research/harness2/blob/main/dependencies/README.md" target="_blank" rel="noopener">third-party notices</a>.</p>
+
+<p dir="auto">This is not an officially supported Google product. This project is not eligible
+for the <a href="https://bughunters.google.com/open-source-security" rel="noopener" target="_blank">Google Open Source Software Vulnerability Rewards Program</a>.</p>
+</article></div></div>
