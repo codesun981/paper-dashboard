@@ -1,0 +1,197 @@
+<div><div><main id="main-container-c46168f603" class="cmp-container" tabindex="-1">
+    <div class="aem-Grid aem-Grid--12 aem-Grid--default--12 ">
+     <div id="container-e3b479b18a" class="cmp-container">
+      <div data-custom-params="{}" data-trk-params="{}">
+       <div data-eb-slot="awsm-d20f83af-347f-4af4-af20-b9883b0d2713" data-eb-slot-meta="{'version':'1.0','slotId':'awsm-d20f83af-347f-4af4-af20-b9883b0d2713','slotName':'awsm-sname-7a00af14-8d08-4e0a-8c85-986f4fd45cfc','experienceId':'2f149a0a-a5aa-4c6e-89e4-d1f964ea245f','allowBlank':false,'hasAltExp':false,'isRTR':false,'dataKey':'null','filters':{'limit':1}}">
+        <div data-eb-tpl-n="awsm-rt/rt-rich-text" data-eb-tpl-v="1.0.0" data-eb-ce="" data-eb-c-scope="d20f83af-347f-4af4-af20-b9883b0d2713" data-eb-d-scope="INLINE" data-eb-locale="en-US" data-eb-5bb0bb6e="" data-eb-ssr-ce="" data-eb-tpl-ns="awsmRT" data-eb-hydrated="pending">
+         
+         <div data-eb-tpl-root="" data-reactroot="">
+          <div data-rg-lang="en" data-rg-locale="en-US" lang="en-US" dir="ltr">
+           <div data-rg-theme="teal" data-rg-mode="light" data-rg-style-count="0">
+            <div id="php-web-runtimes-cve-2026-109618-and-cve-2026-109619" class="rgrt_70747978 rgrt_ddb4146d" data-rg-n="JumpLinkContainer">
+             <div data-rg-n="GridStack" class="rgrt_e4e38483 rgrt_92ef7532">
+              <div data-rg-n="GridStack" class="rgrt_92ef7532">
+               <div class="rgrt_12ed26d7 rgrt_3cb3cd74 rgrt_85859631 rgrt_f56407eb" data-rg-n="Grid">
+                <div data-rg-n="Col" data-eb-item-id="ams#c1" class="rgrt_7ca45506 rgrt_f6ca794c rgrt_a838c95e">
+                 <h3 data-rg-n="TitleText" class="rgrt_8711ccd9 rgrt_7047aa37 rgrt_5cec080d">PHP web runtimes (CVE-2026-109618 and CVE-2026-109619)</h3>
+                 <div data-rg-n="BodyText" class="rgrt_8711ccd9 rgrt_98b54368 rgrt_007aef8b">
+                  <p><b>Bulletin ID:</b> 2026-143-AWS<br><b>Scope:</b> AWS<br><b>Content Type:</b> Important (requires attention)<br><b>Publication Date:</b> 10/21/2026 14:30 PM PDT</p>
+                  <p><b>Summary:</b></p>
+                  <p>Two critical issues have been identified in PHP web runtimes (<a href="https://nvd.nist.gov/vuln/detail/CVE-2026-109618" target="_blank" rel="noopener">CVE-2026-109618</a> and <a href="https://nvd.nist.gov/vuln/detail/CVE-2026-109619" target="_blank" rel="noopener">CVE-2026-109619</a>) that can allow an unauthenticated actor to run code on affected systems. A remote caller can send crafted web requests to affected PHP workers and execute arbitrary code, read process-accessible data, or cause denial of service.</p>
+                  <p>AWS services are not impacted by these issues. Customers using the affected versions of PHP within the services listed below could be impacted and should review the guidance provided.</p>
+                  <p><b>Affected versions:</b></p>
+                  <ul>
+                   <li><b>PHP 8.5:</b> Affected versions 8.5.0–8.5.11 · First fixed version: 8.5.12</li>
+                   <li><b>PHP 8.4:</b> Affected versions 8.4.0–8.4.26 · First fixed version: 8.4.27</li>
+                   <li><b>PHP 8.3:</b> Affected versions 8.3.0–8.3.35 · First fixed version: 8.3.36</li>
+                   <li><b>PHP 8.2:</b> Affected versions 8.2.0–8.2.34 · First fixed version: 8.2.35</li>
+                   <li><b>PHP 5.4–8.1:</b> No upstream fix released. End-of-life and have no planned fix. Migration to a supported branch is required.</li>
+                  </ul>
+                  <p><b>Impact:</b></p>
+                  <p>This issue is accessible remotely by an actor without authentication over the internet-to-customer-application boundary, which can result in code execution, unintended access to process-accessible data, or denial of service on the targeted PHP worker. The issue is bounded to the affected worker and its application-level permissions; no cross-customer propagation has been established to date.</p>
+                  <p><b>Current Mitigation Status:</b></p>
+                  <ul>
+                   <li><b>Amazon WorkMail:</b> AWS has applied configuration-level controls that limit the conditions under which these issues can be reached. The upgrade to PHP 8.3.36 is targeted for 2026-10-22. No customer action is required.<br><br></li>
+                   <li><b>AWS Elastic Beanstalk:</b> AWS released updated PHP platform versions (v4.13.12) on 2026-10-21 that address both CVEs. A follow-on platform release containing the upstream PHP fix is targeted for 2026-10-22. Customers with Managed Platform Updates enabled will receive the update automatically during their next maintenance window. Customers who have not enabled Managed Platform Updates should update their environment's platform version by <a href="https://docs.aws.amazon.com/elasticbeanstalk/latest/dg/using-features.platform.upgrade.html" target="_blank" rel="noopener">following the documentation</a>.<br><br></li>
+                   <li><b>Amazon Linux:</b> Updated PHP packages are targeted for 2026-10-22. Customers running PHP on Amazon Linux should apply the updated packages as soon as they are available. Please follow <a href="https://explore.alas.aws.amazon.com/CVE-2026-109618.html" target="_blank" rel="noopener">CVE-2026-109618</a> and <a href="https://explore.alas.aws.amazon.com/CVE-2026-109619.html" target="_blank" rel="noopener">CVE-2026-109619</a> in the Amazon Linux Security Center for details.<br><br></li>
+                   <li><b>Amazon Lightsail:</b> Updated Lightsail blueprints are expected on 2026-10-21. AWS cannot update running Lightsail instances in place. Customers running PHP workloads on Lightsail should create new instances from the updated blueprints and migrate their applications <a href="https://docs.aws.amazon.com/lightsail/latest/userguide/amazon-lightsail-update-php-security-vulnerabilities.html" target="_blank" rel="noopener">following the documentation</a>.</li>
+                  </ul>
+                  <p><b>Mitigation Guidance:</b></p>
+                  <ul>
+                   <li><b>Upgrading immediately</b> to a patched PHP release is the only complete fix: 8.5.12, 8.4.27, 8.3.36, or 8.2.35. The configuration changes below may reduce impact for customers who cannot update immediately, but none is a complete mitigation.<br><br></li>
+                   <li>Refer to <b><a href="https://www.php.net/archive/2026.php#2026-10-21-5" target="_blank" rel="noopener">Security advisory: Critical remote code execution vulnerabilities, update now</a></b> for additional mitigations.<br><br></li>
+                   <li><b>End-of-life runtimes 5.4–8.1:</b> Apply interim configuration controls for CVE-2026-109619 where effective, restart PHP workers, and begin migration to a supported, fixed PHP branch immediately. No fix is available for CVE-2026-109618 on end-of-life branches.<br><br></li>
+                   <li><b>Compensating controls if using AWS WAF:<br></b>- For <b>CVE-2026-109618</b> Use the SizeRestrictions_BODY rule in the <a href="https://docs.aws.amazon.com/waf/latest/developerguide/aws-managed-rule-groups-baseline.html" target="_blank" rel="noopener">AWS WAF Core rule set</a> (CRS) managed rule group that blocks request bodies that are over 8 KB (8,192 bytes).<br>
+                    - <b>For CVE-2026-109619</b> Add the following custom rule to your <a href="https://docs.aws.amazon.com/waf/latest/developerguide/web-acl-editing.html" target="_blank" rel="noopener">WebACL</a> to protect your application against the leverage attempts until your application is patched. The rule matches on POST requests that contain the PHP_SESSION_UPLOAD_PROGRESS in the body, and PHPSESSID in either the body or cookie. We will be updating the <a href="https://docs.aws.amazon.com/waf/latest/developerguide/aws-managed-rule-groups-use-case.html#aws-managed-rule-groups-use-case-php-app" target="_blank" rel="noopener">AWS WAF PHP Managed Rule Group</a> shortly.</li>
+                  </ul>
+                 </div>
+                </div>
+               </div>
+              </div>
+             </div>
+            </div>
+           </div>
+          </div>
+         </div>
+        </div>
+       </div>
+      </div>
+      <div data-custom-params="{}" data-trk-params="{}">
+       <div data-eb-slot="awsm-e08b497c-e8f9-45eb-8d1a-19e84e02ca84" data-eb-slot-meta="{'version':'1.0','slotId':'awsm-e08b497c-e8f9-45eb-8d1a-19e84e02ca84','slotName':'awsm-sname-63b7965c-093b-4440-a56e-be4745e24ecd','experienceId':'62033434-4b21-47f7-95d4-9f72170a9589','allowBlank':false,'hasAltExp':false,'isRTR':false,'dataKey':'null','filters':{'limit':1}}">
+        <div data-eb-tpl-n="awsm-rt/rt-code-window" data-eb-tpl-v="1.0.0" data-eb-ce="" data-eb-c-scope="e08b497c-e8f9-45eb-8d1a-19e84e02ca84" data-eb-d-scope="INLINE" data-eb-locale="en-US" data-eb-92021c00="" data-eb-ssr-ce="" data-eb-tpl-ns="awsmRT" data-eb-hydrated="pending">
+         
+         <div data-eb-tpl-root="" data-reactroot="">
+          <span data-eb-item-id=""><span data-rigel-portal-reference="true"></span>
+           <div>
+            <div data-rg-lang="en" data-rg-locale="en-US" lang="en-US" dir="ltr">
+             <div data-rg-theme="teal" data-rg-mode="light" data-rg-style-count="0">
+              <div id="custom-rule-for-cve-2026-109619" class="rgcw_70747978 rgcw_ddb4146d" data-rg-n="JumpLinkContainer">
+               <div id="" class="rgcw_70747978 rgcw_ddb4146d" data-rg-n="JumpLinkContainer">
+                <div data-rg-n="GridStack" class="rgcw_0e42dbc6 rgcw_92ef7532">
+                 <div class="rgcw_12ed26d7 rgcw_85859631 rgcw_f56407eb" data-rg-n="Grid">
+                  <div data-rg-n="Col" class="rgcw_7ca45506 rgcw_f6ca794c">
+                   <div class="rgcw_21f15a5f" data-rg-n="TemplateHeader">
+                    <div class="rgcw_12ed26d7 rgcw_85859631" data-rg-n="Grid">
+                     <p data-rg-n="Col" class="rgcw_7ca45506 rgcw_2f390d15 rgcw_b17ba09f rgcw_67470d0b rgcw_f962cbf7 rgcw_f72cb091 rgcw_62f5ad9c">
+                      </p><h2 data-rg-n="HeadingText" class="rgcw_8711ccd9 rgcw_5d220f64 rgcw_26b3f3ee">Custom rule for CVE-2026-109619</h2>
+                     
+                    </div>
+                   </div>
+                  </div>
+                 </div>
+                 <div class="rgcw_12ed26d7 rgcw_f56407eb" data-rg-n="Container">
+                  <div class="rgcw_0b01c595 rgcw_cd4f696e" data-rg-theme="teal" data-rg-mode="light" data-rg-n="CodeBlock">
+                   
+                   <div>
+                    <pre><code>{
+  "Name": "PHP2Shell",
+  "Priority": 0,
+  "Statement": {
+    "AndStatement": {
+      "Statements": [
+        {
+          "ByteMatchStatement": {
+            "SearchString": "POST",
+            "FieldToMatch": {
+              "Method": {}
+            },
+            "TextTransformations": [
+              {
+                "Priority": 0,
+                "Type": "NONE"
+              }
+            ],
+            "PositionalConstraint": "EXACTLY"
+          }
+        },
+        {
+          "OrStatement": {
+            "Statements": [
+              {
+                "ByteMatchStatement": {
+                  "SearchString": "PHPSESSID",
+                  "FieldToMatch": {
+                    "Cookies": {
+                      "MatchPattern": {
+                        "All": {}
+                      },
+                      "MatchScope": "KEY",
+                      "OversizeHandling": "CONTINUE"
+                    }
+                  },
+                  "TextTransformations": [
+                    {
+                      "Priority": 0,
+                      "Type": "NONE"
+                    }
+                  ],
+                  "PositionalConstraint": "EXACTLY"
+                }
+              },
+              {
+                "ByteMatchStatement": {
+                  "SearchString": "PHPSESSID",
+                  "FieldToMatch": {
+                    "Body": {
+                      "OversizeHandling": "CONTINUE"
+                    }
+                  },
+                  "TextTransformations": [
+                    {
+                      "Priority": 0,
+                      "Type": "NONE"
+                    }
+                  ],
+                  "PositionalConstraint": "CONTAINS"
+                }
+              }
+            ]
+          }
+        },
+        {
+          "ByteMatchStatement": {
+            "SearchString": "PHP_SESSION_UPLOAD_PROGRESS",
+            "FieldToMatch": {
+              "Body": {
+                "OversizeHandling": "CONTINUE"
+              }
+            },
+            "TextTransformations": [
+              {
+                "Priority": 0,
+                "Type": "NONE"
+              }
+            ],
+            "PositionalConstraint": "CONTAINS"
+          }
+        }
+      ]
+    }
+  },
+  "Action": {
+    "Block": {}
+  },
+  "VisibilityConfig": {
+    "SampledRequestsEnabled": true,
+    "CloudWatchMetricsEnabled": true,
+    "MetricName": "PHP2Shell"
+  }
+}</code></pre>
+                   </div>
+                  </div>
+                 </div>
+                </div>
+               </div>
+              </div>
+             </div>
+            </div>
+           </div></span>
+         </div>
+        </div>
+       </div>
+      </div>
+      
+     </div>
+    </div>
+   </main>
+  </div></div>
