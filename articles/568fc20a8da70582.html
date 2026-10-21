@@ -1,0 +1,193 @@
+<div><div><section data-astro-transition-scope="astro-gigrg2cg-12" class="s3k s47" data-stalux-motion-content data-pagefind-body data-stalux-post-id="php2shell-datasha" data-pagefind-filter="post[data-stalux-post-id]"><p><strong>AI 辅助说明</strong>：版本数据、仓库清单、npm 元数据由 AI 协助查询和整理，查询时间都标在正文里。分析判断和行文由本人完成。</p>
+<hr>
+<blockquote>
+<p>本文写于 2026 年 10 月 21 日 19:50（北京时间），补丁发布前两个多小时。文中版本号、仓库、时间戳都是写作时查的，会过期。</p>
+</blockquote>
+<p>2026 年 10 月 20 日，php.net 挂出一则预告，标题是《Upcoming Critical PHP Security Release》，<a href="https://www.php.net/archive/2026.php#2026-10-20-1" target="_blank" rel="noopener">正文一共六句话</a>：</p>
+<blockquote>
+<p>The PHP security team would like to give advance notice of an <strong>upcoming security release</strong>.</p>
+<p><strong>It is scheduled for Wednesday, 21 October 2026 at 14:00 UTC.</strong></p>
+<p>It addresses two critical vulnerabilities, both rated CVSS v4.0 9.2.</p>
+<p>All PHP users are encouraged to prepare now so they can upgrade as soon as the release is available.</p>
+<p>We reserve the right to release earlier should details of either vulnerability become public, or should evidence of active exploitation appear in the wild.</p>
+<p>Full details, affected versions, and the fixed versions will be published with the release.</p>
+</blockquote>
+<p>没说漏洞在哪个文件，没说影响哪些版本，也没给缓解办法。厂商公告通常会把受影响范围和缓解手段写清，这次只有时间和评分。</p>
+<p>原因在第五句：细节被公开、或者出现野外利用的证据，可以提前发布。原定解禁窗口是周四，已经挪到周三。对应北京时间今晚 22:00，四条维护中的分支同时出补丁。</p>
+<h2 id="补丁还没发">补丁还没发</h2>
+<p>npm 上今天出现了一个包，叫 <a href="https://www.npmjs.com/package/php2shell-repo-audit" target="_blank" rel="noopener"><code>php2shell-repo-audit</code></a>，作者 Ahmed Sozzer，首次发布 <code>2026-10-21T10:21:18Z</code>，北京时间 18:21。它扫仓库里的 Dockerfile、compose、K8s manifest、CI 配置和 composer.json，列出声明的 PHP 版本，标出哪些需要修复。</p>
+<p>它维护一份修复版本表，下面是 19:30 拉到的原文：</p>
+<div class="expressive-code"><figure class="frame"><pre data-language="json"><code data-stalux-offscreen-code=""><div class="ec-line"><p class="code"><span class="indent">  </span><span>"cves"</span><span>: [</span><span>"CVE-2026-109618"</span><span>, </span><span>"CVE-2026-109619"</span><span>],</span></p></div><div class="ec-line"><p class="code"><span class="indent">  </span><span>"source"</span><span>: </span><span>"https://www.php.net/archive/2026.php"</span><span>,</span></p></div><div class="ec-line"><p class="code"><span class="indent">    </span><span>"8.5"</span><span>: { </span><span>"fixed"</span><span>: </span><span>null</span><span> },</span></p></div><div class="ec-line"><p class="code"><span class="indent">    </span><span>"8.4"</span><span>: { </span><span>"fixed"</span><span>: </span><span>null</span><span> },</span></p></div><div class="ec-line"><p class="code"><span class="indent">    </span><span>"8.3"</span><span>: { </span><span>"fixed"</span><span>: </span><span>null</span><span> },</span></p></div><div class="ec-line"><p class="code"><span class="indent">  </span><span>"eol"</span><span>: [</span><span>"5"</span><span>, </span><span>"7"</span><span>, </span><span>"8.0"</span><span>, </span><span>"8.1"</span><span>]</span></p></div></code></pre></figure></div>
+<p><code>status</code> 是 <code>pending</code>，<code>publishedAt</code> 是 <code>null</code>，四个分支的 <code>fixed</code> 全是 <code>null</code>。README 解释了原因：</p>
+<blockquote>
+<p>0.1.0 is published after php.net’s advisory at 14:00 UTC. Until then, <code>npx php2shell-repo-audit</code> runs the release candidate, whose fix table has no fixed versions yet, so nothing is marked fixed.</p>
+</blockquote>
+<p>补丁发布之前，这个工具跑出来一项都标不出来，因为没有版本能被称作已修复。</p>
+<p>源码那边也一样。19:36 查 <code>php/php-src</code> 的发布列表：</p>
+<div class="expressive-code"><figure class="frame is-terminal"><pre data-language="bash"><code data-stalux-offscreen-code=""><div class="ec-line"><p class="code"><span>gh</span><span> </span><span>api</span><span> </span><span>"repos/php/php-src/releases?per_page=4"</span><span> </span><span>\</span></p></div><div class="ec-line"><p class="code"><span class="indent">  </span><span>--jq</span><span> </span><span>'.[] | "\(.tag_name) | \(.published_at)"'</span></p></div></code></pre></figure></div>
+<div class="expressive-code"><figure class="frame"><pre data-language="text"><code data-stalux-offscreen-code=""><div class="ec-line"><p class="code"><span>php-8.5.11 | 2026-09-24T13:57:18Z</span></p></div><div class="ec-line"><p class="code"><span>php-8.4.26 | 2026-09-24T18:42:14Z</span></p></div><div class="ec-line"><p class="code"><span>php-8.3.35 | 2026-09-24T13:56:47Z</span></p></div><div class="ec-line"><p class="code"><span>php-8.2.34 | 2026-09-24T14:07:21Z</span></p></div></code></pre></figure></div>
+<p>最新还停在 9 月 24 日。这段输出两个小时后就会作废，也是这篇得赶在这个点写的原因之一。</p>
+<p>缓解措施这块，官方公告里一条都没有。这两天传得最广的是关掉 <code>session.upload_progress.enabled</code>，但这不是官方给的；有安全厂商明确说改配置挡不住这两个漏洞，第三方方案之间也互相矛盾，有说要收紧 session 模式的，有说限制 multipart 的。我倾向于认为它只能降低被扫到的概率，挡不住真打算打的人。</p>
+<h2 id="泄露与提前发布">泄露与提前发布</h2>
+<p>原本的安排是周四上午 11 点（美东）统一解禁，大家假装都是同一秒看到的。</p>
+<p>10 月 20 日 15:20 UTC，Hacker News 上出现一个 Tell HN 帖，说有两个 PHP RCE 即将披露，CVSS 10.0，影响 PHP 5 以上所有版本。帖子后来被删，截图已经在 X 和 Mastodon 传开。watchTowr 随后确认漏洞真实存在，声明里有一句：</p>
+<blockquote>
+<p>We were all supposed to wait until Thursday at 11am ET. Information has leaked wrt zero-day embargoed RCE vulns in PHP. We can confirm that they’re real. CVE-2026-109618/619. We cannot share further information right now. Take this seriously and apply patches when available.</p>
+</blockquote>
+<p>四个小时后的 19:33 UTC，PHP 官方发出了开头那六句公告，日期从周四改到周三。协调披露的前提是防守方比攻击方先拿到细节，这次前提没了，剩下的部分就变成了比谁手快。</p>
+<p>漏洞本身是什么，目前只有泄露的说法：指向 <code>session.upload_progress</code> 处理中的堆 use-after-free，有第三方实验室写了复现文章，称普通 multipart POST 带上 <code>PHP_SESSION_UPLOAD_PROGRESS</code> 字段就能往 session 存储里写入一条攻击者可控的记录。</p>
+<p>这部分没有 PHP 官方确认，官方说技术细节和受影响版本随补丁一起发。所以外面关于漏洞位置的讨论都算泄露情报。能确认的只有评分和等级，以及今晚 22:00 这个时间。</p>
+<p>有个说法今天传得很广，说 PHP 8.2 及以下拿不到补丁。这条不对。按 <a href="https://www.php.net/supported-versions.php" target="_blank" rel="noopener">PHP 支持版本页</a>，8.2 目前还在安全支持期内，截止 2026-12-31，今晚有补丁；没有补丁的是 8.1 及更早。对还挂在 8.2 上的项目来说，这个区别挺要命。</p>
+<h2 id="cloudflare-的说法">Cloudflare 的说法</h2>
+<p>Cloudflare 的 CTO Dane Knecht 在 X 上发了这样一句：</p>
+<blockquote>
+<p>We are seeing early attacks emerging and are updating mitigations as new vectors show up. <strong>This is a STOPGAP only.</strong> Patch as soon as PHP releases the update.</p>
+</blockquote>
+<p>已经在观察到早期攻击，在边更新缓解措施，但自己定性为权宜之计，让补丁一发就打上。</p>
+<p>边缘 WAF 在这里能起的作用有限。规则是按已知利用特征写的，攻击者换一种触发时序或者分段方式，签名就失效了。</p>
+<p>Sansec 给出的时间估计是补丁发布后 15 分钟内出现大规模攻击。补丁是源码 diff，diff 能反推出触发条件，这个速度在自动化工具链下并不夸张。CVE-2024-4577 当时从披露到自动化扫描加勒索投递用了几天，僵尸网络 24 小时内开始喷洒。</p>
+<h2 id="github-上的一天">GitHub 上的一天</h2>
+<p>搜 <code>php2shell</code>，30 条结果里除了一个 2013 年的 PHP 终端模拟器，其余都在 24 小时内建立：</p>
+<table>
+<thead>
+<tr>
+<th>创建时间 (UTC)</th>
+<th>仓库</th>
+<th>Star</th>
+<th>用途</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>10-20 23:26</td>
+<td><code>Icex0/php2shell-poc</code></td>
+<td>2</td>
+<td>最早的 PoC 仓之一</td>
+</tr>
+<tr>
+<td>10-21 00:52</td>
+<td><code>ovtechnology/php2shell-check</code></td>
+<td>7</td>
+<td>暴露面检查</td>
+</tr>
+<tr>
+<td>10-21 03:36</td>
+<td><code>mikensec/php2shell-lab</code></td>
+<td>12</td>
+<td>离线复现环境，用来分析不可信 PoC</td>
+</tr>
+<tr>
+<td>10-21 04:01</td>
+<td><code>syhunt/php2shell-protection</code></td>
+<td>30</td>
+<td>Apache 应急缓解与测试工具</td>
+</tr>
+<tr>
+<td>10-21 07:55</td>
+<td><code>ikow/php2shell-poc</code></td>
+<td>166</td>
+<td>session.upload_progress 利用 PoC</td>
+</tr>
+<tr>
+<td>10-21 08:31</td>
+<td><code>eness/php2shell-...-PoC</code></td>
+<td>53</td>
+<td>另一个 PoC</td>
+</tr>
+<tr>
+<td>10-21 10:21</td>
+<td><code>NCSC-NL/php2shell</code></td>
+<td>0</td>
+<td>荷兰国家网络安全中心的运营信息仓</td>
+</tr>
+<tr>
+<td>10-21 10:43</td>
+<td><code>codewizdevs/php2shell-watcher</code></td>
+<td>0</td>
+<td>Cloudflare Worker 边缘检测</td>
+</tr>
+<tr>
+<td>10-21 10:44</td>
+<td><code>Tosborne94/php2shell-IoCs</code></td>
+<td>1</td>
+<td>披露前整理的潜在 IoC</td>
+</tr>
+<tr>
+<td>10-21 10:53</td>
+<td><code>mothproof3512/php2shell-scan</code></td>
+<td>0</td>
+<td>描述写的是 “No warranties vibecoded scanner”</td>
+</tr>
+</tbody>
+</table>
+<p>仓库名基本围绕几个动作展开：<code>-poc</code>、<code>-check</code>、<code>-guard</code>、<code>-hardening</code>、<code>-watcher</code>、<code>-IoCs</code>、<code>-mitigation</code>、<code>-remediation</code>。像在接龙，每个后缀对应防守方的一个动作。</p>
+<p>荷兰国家网络安全中心 10:21 就建了仓，比不少商业厂商早。<code>mikensec/php2shell-lab</code> 的做法是对的，把不可信的 PoC 放进离线容器跑，不在本机直接双击。</p>
+<p>Star 数挺说明问题的。两个 PoC 仓 166 和 53，防御类大多个位数，NCSC-NL 的官方仓到现在还是 0。</p>
+<h2 id="有多少站在射程内">有多少站在射程内</h2>
+<p><a href="https://w3techs.com/technologies/details/pl-php" target="_blank" rel="noopener">W3Techs 今天（10-21）的数据</a>：PHP 占所有已知服务端语言网站的 69.3%。版本分布是 8.x 65.2%、7.x 27.0%、5.x 7.7%、4.x 0.1%。</p>
+<p>7.x 加 5.x 是 34.7%。用 PHP 的网站里三分之一以上跑在官方早就不管的版本上，今晚之后拿不到补丁，明年也不会突然有。</p>
+<p>4.x 那 0.1% 我一直没想明白是哪些站。2026 年了，还有人在跑一个 2008 年停止维护的解释器，而且这些站今晚连“要不要升级”这个选项都不存在。</p>
+<h2 id="版本对照">版本对照</h2>
+<p>现在还在维护的四条分支，按官方支持页：</p>
+<table>
+<thead>
+<tr>
+<th>分支</th>
+<th>最新发布（9-24）</th>
+<th>安全支持截止</th>
+<th>今晚有无补丁</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>8.5</td>
+<td>8.5.11</td>
+<td>2029-12-31</td>
+<td>有</td>
+</tr>
+<tr>
+<td>8.4</td>
+<td>8.4.26</td>
+<td>2028-12-31</td>
+<td>有</td>
+</tr>
+<tr>
+<td>8.3</td>
+<td>8.3.35</td>
+<td>2027-12-31</td>
+<td>有</td>
+</tr>
+<tr>
+<td>8.2</td>
+<td>8.2.34</td>
+<td>2026-12-31</td>
+<td>有</td>
+</tr>
+<tr>
+<td>8.1 及更早</td>
+<td>—</td>
+<td>已 EOL</td>
+<td>没有，也不会有</td>
+</tr>
+</tbody>
+</table>
+<p>8.2 这次能拿到补丁，但两个月后就到期了，修完这一次，明年一月还得再来一轮。7.x 和 5.x 只有三条路：迁到 8.2 以上、看发行版有没有 backport、或者断网。</p>
+<h2 id="自己怎么查">自己怎么查</h2>
+<div class="expressive-code"><figure class="frame is-terminal"><pre data-language="bash"><code data-stalux-offscreen-code=""><div class="ec-line"><p class="code"><span>php</span><span> </span><span>-r</span><span> </span><span>'echo PHP_VERSION, PHP_EOL;'</span></p></div><div class="ec-line"><p class="code"><span>php</span><span> </span><span>-i</span><span> | </span><span>grep</span><span> </span><span>-i</span><span> </span><span>'upload_progress.enabled'</span><span>   </span><span># On 表示特性开着，但关掉不等于修好</span></p></div><div class="ec-line"><p class="code"><span>dpkg</span><span> </span><span>-l</span><span> </span><span>'php*'</span><span> 2&gt;</span><span>/dev/null</span><span> | </span><span>grep</span><span> </span><span>^ii</span><span>         </span><span># Debian/Ubuntu 可能 backport 而不改版本号</span></p></div><div class="ec-line"><p class="code"><span>apk</span><span> </span><span>info</span><span> </span><span>-v</span><span> 2&gt;</span><span>/dev/null</span><span> | </span><span>grep</span><span> </span><span>^php</span><span>           </span><span># Alpine</span></p></div><div class="ec-line"><p class="code"><span>docker</span><span> </span><span>run</span><span> </span><span>--rm</span><span> </span><span>--entrypoint</span><span> </span><span>php</span><span> </span><span>&lt;image&gt;</span><span> </span><span>-r</span><span> </span><span>'echo PHP_VERSION, PHP_EOL;'</span></p></div><div class="ec-line"><p class="code"><span>docker</span><span> </span><span>build</span><span> </span><span>--pull</span><span> </span><span>.</span><span>                         </span><span># 浮动 tag 必须重建才会拿到修复</span></p></div></code></pre></figure></div>
+<p>最后两条容易漏。<code>php:8.3-fpm</code> 这类浮动 tag，<code>docker pull</code> 之后不重建镜像，跑的还是旧解释器。Debian 的 backport 反过来会让你看到版本号没变、实际已经修了。所以拿版本号判断有没有打上补丁，两个方向都可能错。</p>
+<p>怀疑已经被打过的话，看这个：</p>
+<div class="expressive-code"><figure class="frame is-terminal"><pre data-language="bash"><code data-stalux-offscreen-code=""><div class="ec-line"><p class="code"><span>pstree</span><span> </span><span>-p</span><span> | </span><span>grep</span><span> </span><span>-A2</span><span> </span><span>php-fpm</span></p></div></code></pre></figure></div>
+<p>Web 服务器 worker 下面挂出 <code>sh</code>、<code>bash</code>、<code>nc</code>、<code>curl</code> 这类子进程，基本可以按入侵处理了。</p>
+<h2 id="我这边">我这边</h2>
+<p>这个博客是 Astro 静态站，build 出来是 HTML、CSS、JS，跑在边缘节点上。刚才翻了一下仓库，一个 <code>&lt;?php</code> 都搜不到。</p>
+<p>所以今晚这场考试我没有准考证。全世界在准备 22:00 打补丁，我在准备 22:00 关电脑。</p>
+<p>唯一让我觉得荒诞的是修法本身：近七成网站靠同一个解释器撑着，修补方式是各自下载压缩包、<code>apt upgrade</code>、重启进程，一台一台来。没有热更新，没有灰度，也没人知道隔壁那台到底打没打上。也正因为这样，才有我这种闲人在旁边看热闹的余地。</p>
+<h2 id="明天再看">明天再看</h2>
+<p>明天学校那边有东北五校的双选会，我打算去溜达一圈看看。所以今晚不熬了，22:00 开场的时候我大概已经睡着，属于还没开赛就退赛的那种选手。</p>
+<p>大逃杀嘛，站到最后的才算赢，我选先睡个好觉。</p>
+<p>醒过来的时候事情应该都结束了：<code>fixes.json</code> 里的 <code>status</code> 换了值，<code>php-src</code> 多出四个 tag，GitHub 上再冒出一批仓库，Sansec 那 15 分钟早跑完了。我一样都没赶上。</p>
+<p>也没关系，明天补看现场记录就行。祝值班的朋友今晚别被叫起来。</p>
+<hr>
+<p><strong>参考链接</strong></p>
+
+<nav class="s38" aria-label="文章导航"></nav></section></div></div>
