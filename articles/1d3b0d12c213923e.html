@@ -1,0 +1,23 @@
+<div><div><article data-astro-transition-scope="astro-3vju5jlz-8" class="sz" data-stalux-gallery="true"><aside data-astro-transition-scope="astro-ssjsyowq-19" class="s10" data-stalux-motion-content aria-label="本文摘要" data-astro-cid-h3kwndyg><p class="s11" data-astro-cid-h3kwndyg>本文摘要</p><p class="s12" data-astro-cid-h3kwndyg>十月的最后十天里，PHP 核心出了两个 9.2 的未认证 RCE，印度 CA eMudhra 的八把中间证书私钥被证明可以直接算出来。前者有补丁但没有热更新，后者连补丁这个概念都不适用。当修复速度取决于几百万个独立部署者的手速时，真正的临界点不是"互联网崩了"，是"修补追不上失效"。</p></aside><section data-astro-transition-scope="astro-gigrg2cg-12" class="s3k s47" data-stalux-motion-content data-pagefind-body data-stalux-post-id="internet-doomsday-singularity" data-pagefind-filter="post[data-stalux-post-id]"><blockquote>
+<p>这篇文章写于 2026 年 10 月 22 日。文章时间是东八区，文内的所有时间戳都是 UTC，除了明确标注“北京时间”的地方。漏洞公告和补丁状态变化极快，你读到的时候数据大概已经过期了。</p>
+</blockquote>
+<figure data-stalux-image=""><a href="https://xingwangzhe.fun/images/internet-doomsday-singularity/cover.webp" class="pswp-gallery-item" aria-label="城市废墟上方的碎裂地球，屏幕上滚动着 RCE 利用代码、被划掉的 CA 证书和卡在 32% 的进度条" target="_blank" rel="noopener"><img src="https://xingwangzhe.fun/images/internet-doomsday-singularity/cover.webp" alt="城市废墟上方的碎裂地球，屏幕上滚动着 RCE 利用代码、被划掉的 CA 证书和卡在 32% 的进度条" loading="lazy"></a><figcaption>城市废墟上方的碎裂地球，屏幕上滚动着 RCE 利用代码、被划掉的 CA 证书和卡在 32% 的进度条</figcaption></figure>
+<p>10 月 21 日这一天，四件事挤在一起。</p>
+<p>PHP 发了两个 CVSS 9.2 的未认证远程代码执行补丁。同一批修复里，Go、Rust、Python、Node.js 各自在处理另一件事：一家印度 CA 的八张中间证书私钥，被人证明可以直接从公开证书里算出来。</p>
+<p>前一件事的问题是补丁太多人来不及打。后一件事的问题是根本没有补丁可打。</p>
+<blockquote>
+<p>想象一下你的架构是 <strong>nginx</strong> 反向代理，后面挂着 <strong>PHP 8.1</strong> 主站、<strong>Node.js 24.x Brotli</strong> 网关、<strong>Go</strong> 微服务、<strong>Java GraalVM</strong> 中台、<strong>Ruby</strong> 工具链、<strong>Perl</strong> 遗留脚本、<strong>Rust TLS</strong> 校验层、<strong>Python + LiteLLM 1.107.0</strong> AI 中台跑在 <strong>virtualenv</strong> 里，<strong>Vyper</strong> 智能合约部署在 <strong>Docker 29 + Kubernetes + Traefik Ingress</strong> 上开着 <strong>mTLS fail-open</strong>，宿主机还跑着 <strong>ASP.NET Core</strong> 面板和 <strong>.NET</strong> 本地服务，全部跑在 <strong>Linux 内核 c6e50df8</strong> 之前，HTTPS 证书由 <strong>eMudhra</strong> 签发并通过 <strong>emSign</strong> 交叉认证，根证书库用 <strong>Go crypto/x509 + Rust webpki-roots + Python certifi</strong>，<strong>CI</strong> 昨晚刚从 <strong>PyPI</strong> 拉了新包</p>
+</blockquote>
+<h2 id="互联网从来没有这么脆弱过">互联网从来没有这么脆弱过</h2>
+<p>我至今还记得 CCTV 说网安缺口 <strong>300 万</strong>。但好巧不巧，AI 时代来了，缺口没见少，安全公司倒先亏了一批。逆向这事也从来没有这么简单过，找漏洞、把几个洞串成一条链，以前得靠年头堆，现在一个人加一个模型就能干，还有好多以前想都不敢想的玩法。</p>
+<p>说起来挺讽刺的，自由软件运动和开源运动搞了几十年，不就是想让足够多的人看代码、把 bug 都翻出来吗：</p>
+<blockquote>
+<p>足够多的眼睛，所有 bug 都无处藏身。</p>
+</blockquote>
+<p>只是没想到，这个目的最后是让 AI 给实现了…</p>
+<p>我以前钻研过一些预言书，国外的预言里说未来<strong>金融系统会在一小时之内归零</strong>。当时我就当故事看。可要是哪天真有人在数学算法上搞出大发现，<strong>大整数分解、椭圆曲线离散对数</strong>这些东西能轻松算开（不是拿算力硬堆，是找到捷径），那这个预言就不用预言了。RSA、ECC 撑着的 TLS、签名、链上地址会一起完蛋，web3 也保不住谁，它踩的是同一块地板。</p>
+<p>这就是我自己的感觉，不是什么预测，我也没证据说它什么时候来。但攻击成本一直在往下掉，把机枪塞到猴子手里的成本也在往下掉，这挺危险的。我感觉 <strong>2027 年底</strong>之前，互联网总会在某种意义上实质性地崩一次，不一定是全网断线，更可能是<strong>证书和补丁都不再有人信</strong>。</p>
+<hr>
+<p><strong>参考链接</strong></p>
+
+<nav class="s38" aria-label="文章导航"></nav></section></article></div></div>
