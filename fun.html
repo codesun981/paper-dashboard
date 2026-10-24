@@ -1,6 +1,6 @@
 <!DOCTYPE html><html lang="zh-CN"><head><meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>✨ 今日份新鲜 · 时间线</title><style>
+<title>✨ 今日份新鲜 · 瀑布流</title><style>
 *{box-sizing:border-box;margin:0;padding:0}
 :root{--bg:#f5f5f7;--card:#fff;--ink:#1d1d1f;--sub:#6e6e73;--line:#e5e5ea;--acc:#0071e3}
 @media(prefers-color-scheme:dark){:root{--bg:#000;--card:#1c1c1e;--ink:#f5f5f7;--sub:#98989d;--line:#2c2c2e;--acc:#0a84ff}}
@@ -11,22 +11,22 @@ a{color:var(--acc);text-decoration:none}
 .dateline{font-size:13px;color:var(--sub);letter-spacing:.1em}
 footer{max-width:960px;margin:0 auto;padding:36px 20px 60px;color:var(--sub);font-size:13px;text-align:center}
 
-.hero{max-width:960px;margin:0 auto;padding:24px 20px 8px}
-.hero h1{font-size:34px;letter-spacing:.02em}
-.hero p{color:var(--sub);margin-top:8px;font-size:15px}
-.tl{max-width:960px;margin:24px auto;padding:0 20px;position:relative}
-.tl:before{content:"";position:absolute;left:35px;top:8px;bottom:8px;width:2px;background:var(--line)}
-.mod{margin:34px 0}
-.modhead{display:flex;align-items:center;gap:10px;margin-bottom:6px;position:relative;z-index:1}
-.dot{width:32px;height:32px;border-radius:50%;background:var(--acc);color:#fff;display:flex;align-items:center;justify-content:center;font-size:16px;flex:none}
-.modhead h2{font-size:20px}
-.tl-item{margin:0 0 0 16px;padding:14px 0 14px 32px;position:relative}
-.tl-item:before{content:"";position:absolute;left:7px;top:22px;width:10px;height:10px;border-radius:50%;background:var(--bg);border:2px solid var(--acc)}
-.k{font-family:ui-monospace,Menlo,monospace;font-size:12px;color:var(--acc);letter-spacing:.08em}
-.t{font-size:16px;margin:4px 0;line-height:1.6}
-.b{color:var(--sub);font-size:14px;line-height:1.7;margin-top:4px}
-.big{font-size:44px;font-weight:800;letter-spacing:-.02em}
+.hero{max-width:1100px;margin:0 auto;padding:30px 20px 6px}
+.hero h1{font-size:32px}
+.hero p{color:var(--sub);margin-top:6px}
+.flow{max-width:1100px;margin:20px auto;padding:0 20px;columns:3;column-gap:18px}
+@media(max-width:900px){.flow{columns:2}}
+@media(max-width:600px){.flow{columns:1}}
+.card{background:var(--card);border-radius:18px;padding:20px;margin:0 0 18px;break-inside:avoid;
+box-shadow:0 2px 12px rgba(0,0,0,.06);border:1px solid var(--line)}
+.card:nth-child(3n){transform:rotate(-.6deg)}
+.card:nth-child(3n+1){transform:rotate(.5deg)}
+.tag{display:inline-block;font-size:12px;padding:3px 10px;border-radius:20px;background:var(--acc);color:#fff;margin-bottom:10px}
+.t{font-size:16px;line-height:1.65}
+.b{color:var(--sub);font-size:13.5px;line-height:1.7;margin-top:8px}
+.big{font-size:46px;font-weight:800}
+.modname{font-size:13px;color:var(--sub);margin-bottom:4px}
 </style></head><body>
 <div class="topbar"><a class="back" href="index.html">← 每日看板</a>
-<span class="dateline">2026-10-23</span></div><div class="hero"><h1>✨ 今日份新鲜</h1><p>🕰️ 时间线版 · 把今天折成一条时间轴</p></div><div class="tl"><div class="mod"><div class="modhead"><span class="dot">📖</span><h2>今日生活指南</h2></div><div class="tl-item"><div class="k">证据A · 别把自己搭进去 · 性价比极高</div><div class="t">维权有期限：民事诉讼时效 3 年，劳动仲裁 1 年，过了对方一句「超过时效」就够</div><div class="b">民事诉讼时效 3 年，从你知道权利受损那天算起。过了期，法院不会主动管，可对方在法庭上说一句「超过时效」就够了，钱还在，只是要不回来。在 3 年到期之前，一条留了痕迹的催款消息，就能让这 3 年从头重算。劳动争议是另一套，仲裁时效 1 年。</div><div style="margin-top:6px"><a href="https://github.com/eternity4719/HowToLiveBetter/blob/main/book/08-别把自己搭进去.md">看原文 →</a></div></div><div class="tl-item"><div class="k">证据A · 看病 · 性价比极高</div><div class="t">医院说国家医保谈判药没货、不进院的，让医生开处方，去医保「双通道」定点药店买，照样按规定报销</div><div class="b">医院说某种国家谈判药没货、不进院，不等于这个药报不了。这个药进了本省「双通道」的，让医生照常开处方，拿到「双通道」定点药店去买，报销政策和在医院买一样。按国家文件，医院也不能拿医保总额、药占比当理由拖着不配。</div><div style="margin-top:6px"><a href="https://github.com/eternity4719/HowToLiveBetter/blob/main/book/24-看病.md">看原文 →</a></div></div><div class="tl-item"><div class="k">证据B · 反面清单 · 性价比极高</div><div class="t">不要花钱做「性取向矫正」「同性恋治疗」，也不要把家里人送去</div><div class="b">美国心理学会的专家组看完研究后说，这类矫正改不了性取向，还可能伤人。美国一项调查里，做过矫正的人有过自杀念头的多了近九成。国内有精神病院以「性偏好障碍」为名强制收治一名男子，被法院判侵权、赔 5000 元。</div><div style="margin-top:6px"><a href="https://github.com/eternity4719/HowToLiveBetter/blob/main/book/06-反面清单.md">看原文 →</a></div></div><div class="tl-item"><div class="k">证据A · 紧急情况 · 性价比极高</div><div class="t">烫伤后立刻用凉的流动水冲 20 分钟，别抹牙膏酱油</div><div class="b">受伤 3 小时内用凉的流动水冲够 20 分钟的孩子，后来需要植皮的可能较低。是凉水不是冰水，冰敷会加重损伤。衣服粘在伤口上别硬撕，冲完拿干净布盖住去医院，牙膏、酱油、香油、面粉都不要抹。隔了一会儿才想起来，三小时内补冲仍然有用。（内容来自《高性价比人生指南》CC-BY-4.0）</div><div style="margin-top:6px"><a href="https://github.com/eternity4719/HowToLiveBetter/blob/main/book/13-紧急情况.md">看原文 →</a></div></div></div><div class="mod"><div class="modhead"><span class="dot">🧊</span><h2>冷知识</h2></div><div class="tl-item"><div class="k">冷知识 1</div><div class="t">你的指甲生长速度：中指最快，小指最慢。</div></div><div class="tl-item"><div class="k">冷知识 2</div><div class="t">香蕉是浆果，草莓不是——植物学上草莓是&quot;聚合果&quot;。</div></div></div><div class="mod"><div class="modhead"><span class="dot">💡</span><h2>每日一得</h2></div><div class="tl-item"><div class="k">一句话</div><div class="t">&quot;我们塑造工具，工具反过来塑造我们。&quot; —— Marshall McLuhan</div></div></div></div><footer>✨ 今日份新鲜 · 每天拆开都不一样<br>
+<span class="dateline">2026-10-24</span></div><div class="hero"><h1>✨ 今日份新鲜</h1><p>🧱 瀑布流版 · 随手一滑都是惊喜</p></div><div class="flow"><div class="card"><div class="modname">📖 今日生活指南</div><span class="tag">证据C · 账号与信息安全 · 性价比极高</span><div class="t">手机设锁屏密码，SIM 卡设 PIN 码</div><div class="b">SIM 卡就是手机里那张小卡片，短信验证码靠它来收。手机丢了，捡到的人可能把这张卡拔下来，插进别的手机收验证码，再挨个重置你的账号。给卡设一个 PIN 码，卡换到别的手机上，一开机就要先输这个码，这条路就断了。</div><div style="margin-top:8px;font-size:14px"><a href="https://github.com/eternity4719/HowToLiveBetter/blob/main/book/14-账号与信息安全.md">看原文 →</a></div></div><div class="card"><div class="modname">📖 今日生活指南</div><span class="tag">证据A · 反面清单 · 性价比极高</span><div class="t">不要为了防肾结石把钙戒掉</div><div class="b">长过草酸钙结石的人常被劝少吃钙，试验的结果正好反过来。反复长结石的男性正常吃钙、同时少吃动物蛋白和盐，五年里复发的人只有吃低钙饮食的一半。英国的指南也写明不要限制钙。</div><div style="margin-top:8px;font-size:14px"><a href="https://github.com/eternity4719/HowToLiveBetter/blob/main/book/06-反面清单.md">看原文 →</a></div></div><div class="card"><div class="modname">📖 今日生活指南</div><span class="tag">证据A · 人走了以后要办什么 · 性价比极高</span><div class="t">亲人去世留下欠债，继承人只用继承到的遗产去还；不想担就在分遗产前书面声明放弃继承</div><div class="b">人走了，欠的债不会跟着没了。但子女、配偶这些继承人，只用继承到的那份遗产去还，不够的部分不用自己掏。不想沾这笔债，就在分遗产之前写书面声明放弃继承，遗产也就一起不要了。不吭声就算接受继承。</div><div style="margin-top:8px;font-size:14px"><a href="https://github.com/eternity4719/HowToLiveBetter/blob/main/book/25-人走了以后要办什么.md">看原文 →</a></div></div><div class="card"><div class="modname">📖 今日生活指南</div><span class="tag">证据A · 不要浪费时间 · 性价比极高</span><div class="t">把「打算做」写成「几点、在哪、遇到什么就做什么」</div><div class="b">把「我要做这件事」改写成「周二早 8 点坐到书桌前就先写引言」。94 项检验合起来算，这么写的人把目标做成的比例明显更高，属于中到大的效果。改的只是一句话的写法，不花钱，也不费力气。（内容来自《高性价比人生指南》CC-BY-4.0）</div><div style="margin-top:8px;font-size:14px"><a href="https://github.com/eternity4719/HowToLiveBetter/blob/main/book/04-不要浪费时间.md">看原文 →</a></div></div><div class="card"><div class="modname">🧊 冷知识</div><span class="tag">冷知识 1</span><div class="t">猫的呼噜声频率在 25-150Hz 之间，这个频段被认为有助于骨骼愈合。</div></div><div class="card"><div class="modname">🧊 冷知识</div><span class="tag">冷知识 2</span><div class="t">南极洲是世界上最大的沙漠——沙漠按降水量定义，不是按温度。</div></div><div class="card"><div class="modname">📜 历史上的今天</div><span class="tag">2018 年</span><div class="t">連接香港大嶼山、澳門澳門半島和廣東省珠海市的大型跨海通道港珠澳大橋正式通車。</div><div style="margin-top:8px;font-size:14px"><a href="https://zh.wikipedia.org/wiki/2018%E5%B9%B4">维基百科 →</a></div></div><div class="card"><div class="modname">📜 历史上的今天</div><span class="tag">1795 年</span><div class="t">在哈布斯堡、俄羅斯、普魯士瓜分領土後，波蘭立陶宛宣告滅亡。</div><div style="margin-top:8px;font-size:14px"><a href="https://zh.wikipedia.org/wiki/1795%E5%B9%B4">维基百科 →</a></div></div><div class="card"><div class="modname">📜 历史上的今天</div><span class="tag">2015 年</span><div class="t">香港銅鑼灣書店老闆林榮基以出版中國大陸禁售的政治書籍聞名，遭中國當局綁架。</div><div style="margin-top:8px;font-size:14px"><a href="https://zh.wikipedia.org/wiki/2015%E5%B9%B4">维基百科 →</a></div></div></div><footer>✨ 今日份新鲜 · 每天拆开都不一样<br>
 <span style="font-size:12px">由 COCO 每日 08:00 自动生成</span></footer></body></html>
