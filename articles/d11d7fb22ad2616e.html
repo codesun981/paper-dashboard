@@ -1,0 +1,335 @@
+<div><div><main><div class="legacy-html">
+<section class="page-hero">
+  <div class="container">
+    <p class="page-hero-top">
+      <span class="tag sage-tag"><span class="tag-dot"></span>Open Source</span>
+      <span class="tag">Free · MIT Licensed</span>
+      <span class="tag">Self-Hosted</span>
+    </p>
+    <h1>Attackers have AI agents now. So do you.</h1>
+    <p class="page-hero-lede">
+      Argus is a free, open-source security operations platform that watches your cloud, logins, code and devices around the clock, catches machine-speed attacks the moment they start, and shuts them down in seconds. AI does the legwork. Guardrails you control decide what it's allowed to touch.
+    </p>
+    
+    <figure class="ar-shot ar-shot-hero reveal">
+      <img src="https://thomasunise.com/argus/overview.png" alt="The Argus security overview: open findings, assets, events, posture score and pending action requests for one tenant" loading="lazy">
+    </figure>
+    <div class="page-hero-meta">
+      <p class="page-hero-meta-item">
+        <span class="page-hero-meta-num">Seconds, not hours</span>
+        <span class="page-hero-meta-label">From detection to a blocked attacker, with autonomous response on</span>
+      </p>
+      <p class="page-hero-meta-item">
+        <span class="page-hero-meta-num">27 one-click fixes</span>
+        <span class="page-hero-meta-label">Across AWS, Azure, GCP, Kubernetes, Okta, Entra, CrowdStrike and more</span>
+      </p>
+      <p class="page-hero-meta-item">
+        <span class="page-hero-meta-num">$0 license</span>
+        <span class="page-hero-meta-label">No seats, no usage fees, no lock-in. You own all of it</span>
+      </p>
+    </div>
+  </div>
+</section>
+
+
+<section class="prose-section">
+  <div class="container">
+    <div class="prose-grid">
+      
+      <div class="prose-body reveal" data-d="1">
+        <p>A stolen key handed to an AI agent can fire sixty probing calls across twenty of your cloud services in less time than it takes to read this sentence. Swarms of fake identities can spray passwords at your admin accounts from a hundred places at once. By the time a person reads the first alert, the attacker has already moved on to the next system.</p>
+        <p>Most security tools were built for attackers who sleep. <span class="em">Argus was built for the ones that don't.</span> It watches at machine speed, investigates at machine speed, and when you let it, responds at machine speed. It does all of that through one broker with approvals, dry runs, automatic rollback and a kill switch, so speed never turns into a new risk.</p>
+        <blockquote>
+          Fast enough to stop an AI attacker. Disciplined enough to trust with your production systems.
+        </blockquote>
+      </div>
+    </div>
+  </div>
+</section>
+
+
+<section class="prose-section">
+  <div class="container">
+    
+    <div class="pillars cols-3">
+      <div class="pillar reveal">
+        <p class="pillar-num">01 / See it all</p>
+        <p class="pillar-title">Every asset, every login, one map</p>
+        <p class="pillar-body">Argus pulls in your AWS, Azure, GCP, Kubernetes, GitHub, Okta, Entra, devices and network traffic and links them into one evidence graph. You see the attack paths before an attacker does.</p>
+      </div>
+      <div class="pillar reveal" data-d="1">
+        <p class="pillar-num">02 / Catch it early</p>
+        <p class="pillar-title">Built to spot AI-driven attacks</p>
+        <p class="pillar-body">Detections for agent swarms, machine-speed recon, privilege escalation, public exposure, leaked secrets and rogue workloads. Tripwires bait attackers' AI agents into revealing themselves.</p>
+      </div>
+      <div class="pillar reveal" data-d="2">
+        <p class="pillar-num">03 / Shut it down</p>
+        <p class="pillar-title">Respond in seconds, from Slack</p>
+        <p class="pillar-body">Block an IP, contain a laptop through CrowdStrike or SentinelOne, disable a user, lock down a public bucket. Approve, deny or roll back with one tap in Slack, or let a playbook do it for you.</p>
+      </div>
+      <div class="pillar reveal">
+        <p class="pillar-num">04 / Rein in AI</p>
+        <p class="pillar-title">Stop shadow AI and data leaks</p>
+        <p class="pillar-body">Find every AI tool your team is quietly using. Route your apps' and team's OpenAI and Anthropic calls through one gateway with approved models, data-loss rules, budgets and a full usage log.</p>
+      </div>
+      <div class="pillar reveal" data-d="1">
+        <p class="pillar-num">05 / Know you're covered</p>
+        <p class="pillar-title">Test your defenses on demand</p>
+        <p class="pillar-body">Replay eight AI-agent attacks in a sealed sandbox and get a report of exactly what you'd catch and what would slip through. Let autonomous pentesting probe your own systems, inside the scope you set.</p>
+      </div>
+      <div class="pillar reveal" data-d="2">
+        <p class="pillar-num">06 / Prove it</p>
+        <p class="pillar-title">Audit-ready from day one</p>
+        <p class="pillar-body">Every action is signed into a tamper-evident audit trail stored in write-once storage. Control mapping for SOC 2, NIST 800-171 and ISO 27001 is built in.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+
+<section class="prose-section">
+  <div class="container">
+    
+    <ol class="ar-log reveal">
+      <li>
+        <span class="ar-time">02:14:07</span>
+        <span class="ar-chan">Attacker</span>
+        <span class="ar-what">An attacker's AI agent finds what looks like an LLM API key in your code and tries to use it.<span>The key is a canary that Argus planted. Nothing real was exposed.</span></span>
+        <span class="ar-out">Tripwire</span>
+      </li>
+      <li>
+        <span class="ar-time">02:14:08</span>
+        <span class="ar-chan">Detect</span>
+        <span class="ar-what">Argus raises a high-severity detection with the attacker's source address and the full evidence trail.</span>
+        <span class="ar-out">Caught</span>
+      </li>
+      <li>
+        <span class="ar-time">02:14:09</span>
+        <span class="ar-chan">Respond</span>
+        <span class="ar-what">Your playbook blocks the source at your Cloudflare firewall, within the hourly cap you set.<span>Policy, deny-lists and the kill switch are checked first, every time.</span></span>
+        <span class="ar-out">Blocked</span>
+      </li>
+      <li>
+        <span class="ar-time">02:14:10</span>
+        <span class="ar-chan">Notify</span>
+        <span class="ar-what">Slack lights up with what happened, why, and a one-tap Roll back button.</span>
+        <span class="ar-out">Slack</span>
+      </li>
+      <li>
+        <span class="ar-time">07:30:00</span>
+        <span class="ar-chan">Review</span>
+        <span class="ar-what">Your team starts the day with a closed incident, a signed audit record and a choice: keep the block, or let it expire.<span>If nobody keeps it, Argus rolls the block back automatically when its timer runs out.</span></span>
+        <span class="ar-out">Done</span>
+      </li>
+    </ol>
+  </div>
+</section>
+
+
+<section class="prose-section">
+  <div class="container">
+    <div class="prose-grid">
+      <aside class="prose-aside reveal">
+        <span class="mono">Autonomy, on a leash</span>
+        <h2>All the speed of autonomous AI. None of the "what did it just do?"</h2>
+      </aside>
+      <div class="prose-body reveal" data-d="1">
+        <p>Letting software act on its own in production is a big decision, so Argus makes it a small, reversible one. <span class="em">The AI agents never touch your systems directly.</span> They investigate with read-only access and can only propose. Every change, whether a person asks for it, an agent suggests it or a playbook fires, passes through the same broker.</p>
+        <dl class="ar-defs">
+          <p></p><dt>Off until you say so</dt><dd>Autonomous response and autonomous pentesting ship switched off, and each needs both a deployment switch and a per-tenant opt-in.</dd>
+          <p></p><dt>Shadow mode first</dt><dd>Playbooks start by logging what they would have done, so you see their judgment before you give them the keys.</dd>
+          <p></p><dt>Reversible only</dt><dd>Autonomous playbooks run reversible actions, and each one rolls back automatically unless someone decides to keep it.</dd>
+          <p></p><dt>Capped</dt><dd>Hourly limits per tenant and per playbook, a blast-radius limit, and two human approvals for high-risk actions.</dd>
+          <p></p><dt>One switch</dt><dd>The kill switch stops every action in a tenant or across the whole deployment instantly.</dd>
+          <p></p><dt>Hard to fool</dt><dd>Everything the AI reads is treated as untrusted, and the agents are tested against prompt-injection attacks.</dd>
+        </dl>
+      </div>
+    </div>
+  </div>
+</section>
+
+
+<section class="prose-section">
+  <div class="container">
+    
+    <div class="ar-new">
+      <div class="ar-new-item reveal">
+        <p><span class="mono">Autonomous response</span>
+        </p><h3>Threats handled while you sleep</h3>
+        <p>Playbooks turn a detection into a fix with no human in the loop, then undo it on a timer unless you keep it. Approve, deny and roll back from Slack buttons.</p>
+      </div>
+      <div class="ar-new-item reveal" data-d="1">
+        <p><span class="mono">AI gateway</span>
+        </p><h3>One front door for every AI call</h3>
+        <p>Your team uses OpenAI and Anthropic with company-held keys, approved models, data-loss rules, budgets and prompt-injection flags. Staff get Argus keys; your real provider keys stay locked inside Argus.</p>
+      </div>
+      <div class="ar-new-item reveal">
+        <p><span class="mono">Shadow-AI discovery</span>
+        </p><h3>See which AI tools your staff really use</h3>
+        <p>Argus spots AI services in your network traffic, cloud accounts and SSO grants, keeps an inventory, and raises an alert for anything unreviewed or blocked.</p>
+      </div>
+      <div class="ar-new-item reveal" data-d="1">
+        <p><span class="mono">Attack simulator</span>
+        </p><h3>A fire drill for AI-driven attacks</h3>
+        <p>Eight realistic agent attacks, from credential-spray swarms to a rogue Kubernetes agent, replayed in a sealed sandbox. Add "slow and low" evasion variants to find the gaps attackers would exploit.</p>
+      </div>
+      <div class="ar-new-item reveal">
+        <p><span class="mono">Autonomous pentesting</span>
+        </p><h3>A red team that never clocks out</h3>
+        <p>An AI planner picks the tests, Argus runs them through scanners like Nuclei, ZAP and Trivy, then plans the next round from what it found. It stays inside your authorized scope, re-checked before every step.</p>
+      </div>
+      <div class="ar-new-item reveal" data-d="1">
+        <p><span class="mono">Threat intel</span>
+        </p><h3>Fix what's actually being exploited</h3>
+        <p>Every vulnerability is checked against the CISA Known Exploited list and scored for exploit likelihood. Anything attackers are actively using jumps to the top of your queue.</p>
+      </div>
+      <div class="ar-new-item reveal">
+        <p><span class="mono">AI-agent canaries</span>
+        </p><h3>Traps built for AI attackers</h3>
+        <p>Fake LLM keys, fake MCP servers, decoy agent rules files and planted prompt injections. An agent that bites gives itself away instantly.</p>
+      </div>
+      <div class="ar-new-item reveal" data-d="1">
+        <p><span class="mono">Endpoint containment</span>
+        </p><h3>Isolate a compromised laptop in one step</h3>
+        <p>New CrowdStrike and SentinelOne actions contain a device straight from Argus, with the same approvals, dry run and rollback as everything else.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+
+
+
+
+<section class="prose-section" id="quickstart">
+  <div class="container">
+    
+    <figure class="term reveal">
+      <figcaption class="term-cap">
+        <span class="term-label">quickstart</span>
+        
+      </figcaption>
+      <pre><code><span class="p">$</span> git clone https://github.com/thomasunise/argus.git &amp;&amp; cd argus
+<span class="p">$</span> python -m venv .venv &amp;&amp; . .venv/bin/activate
+<span class="p">$</span> pip install -r requirements.txt
+<span class="p">$</span> cp .env.example .env &amp;&amp; python scripts/generate_secrets.py --write
+<span class="p">$</span> uvicorn app.main:app --host 127.0.0.1 --port 8080</code></pre>
+    </figure>
+    <p class="term-note">Open <span class="ic">127.0.0.1:8080</span> and sign in with the admin login from <span class="ic">.env</span>. Run <span class="ic">python scripts/seed_demo.py</span> for synthetic demo data.</p>
+    <p class="ar-note">Going to production? There's Docker Compose for a pilot, a Helm chart for Kubernetes, and Terraform for AWS and Azure. Argus refuses to start in production mode without encryption keys, HTTPS, a write-once audit sink and SSO or two-factor, so an unsafe install can't happen by accident. The full checklist is in <a href="https://github.com/thomasunise/argus/blob/main/docs/DEPLOYMENT.md" target="_blank" rel="noopener">docs/DEPLOYMENT.md</a>.</p>
+  </div>
+</section>
+
+
+<section class="prose-section" id="install">
+  <div class="container">
+    
+    <div class="ar-paths">
+      <div class="ar-path reveal">
+        <p><span class="mono">Do it yourself</span>
+        </p><h3>Free, forever</h3>
+        <p>Clone it, deploy it, make it yours. Best for teams with security engineers who want to own every line.</p>
+        <ul>
+          <li>MIT license: no seats, no usage fees, no vendor lock-in</li>
+          <li>Architecture, threat model, runbooks and a step-by-step go-live guide</li>
+          <li>Issues and contributions welcome on GitHub</li>
+        </ul>
+        <a href="https://github.com/thomasunise/argus" target="_blank" rel="noopener" class="cta-btn ghost">
+          Get it on GitHub
+          <svg viewbox="0 0 16 10" fill="none"><path d="M1 5h14M10 1l4 4-4 4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"></path></svg>
+        </a>
+      </div>
+      <div class="ar-path featured reveal" data-d="1">
+        <p><span class="mono">Done for you</span>
+        </p><h3>I install it and hand it over running</h3>
+        <p>For business owners and lean IT teams who want enterprise-grade protection without hiring a security team to run it. You get the outcome, not the project.</p>
+        <ul>
+          <li>Deployed in your own AWS, Azure or Kubernetes account. You own everything</li>
+          <li>Connected to your cloud, logins, code and devices, with alerts in Slack</li>
+          <li>An attack-simulator report showing what you catch today and the gaps we close</li>
+          <li>Rules tuned to your business, and autonomous response proven in shadow mode before it goes live</li>
+          <li>AI gateway and shadow-AI discovery set up so your team's AI use is safe and visible</li>
+          <li>Your team trained on alerts, approvals and the kill switch</li>
+        </ul>
+        <a data-lead="Argus Installation" href="https://thomasunise.com/contact?topic=Argus%20Installation" class="cta-btn" target="_blank" rel="noopener">
+          Book an install call
+          <svg viewbox="0 0 16 10" fill="none"><path d="M1 5h14M10 1l4 4-4 4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"></path></svg>
+        </a>
+      </div>
+    </div>
+  </div>
+</section>
+
+
+<section class="prose-section faq-section" id="faq">
+  <div class="container">
+    
+    <div class="faq-list reveal">
+      <details class="faq-item">
+        <summary>What is Argus?</summary>
+        <p>Argus is a free, open-source security operations platform you host yourself. It maps your cloud, identity, code, device, network and Kubernetes assets into one evidence graph, detects attacks including fast, AI-driven ones, uses AI agents to triage and investigate, and fixes problems through an action broker with approvals, dry runs, automatic rollback and a kill switch. It also governs your own company's AI use with an AI gateway and shadow-AI discovery.</p>
+      </details>
+      <details class="faq-item">
+        <summary>Can Argus act on its own? Is that safe?</summary>
+        <p>Only if you turn it on. Autonomous response and autonomous pentesting are off by default and need both a deployment setting and a per-tenant opt-in. Playbooks start in shadow mode, run only reversible actions, are capped per hour, and roll back automatically unless someone keeps the change. The AI agents themselves never execute anything: they investigate with read-only access and can only propose actions. Every change goes through the same broker, and the kill switch stops everything instantly.</p>
+      </details>
+      <details class="faq-item">
+        <summary>Can an attacker trick the AI?</summary>
+        <p>Argus is designed on the assumption that someone will try. Everything an agent reads is wrapped and labelled as untrusted data, and the agent is told that instructions found inside evidence are a sign of an attack. The agents are tested against prompt-injection evaluation suites, and because they cannot execute anything themselves, a tricked agent can at most file a request that still has to pass policy and approval.</p>
+      </details>
+      <details class="faq-item">
+        <summary>What does the attack simulator do to my systems?</summary>
+        <p>Nothing. It replays synthetic attack data in a hidden, isolated sandbox that copies your detection settings. It sends no traffic, runs no tools and touches no real system. Simulated detections can't trigger autonomous response, alerts or findings. You get a coverage report showing which attacks your rules would catch and which would get through.</p>
+      </details>
+      <details class="faq-item">
+        <summary>What is shadow AI, and how does Argus help?</summary>
+        <p>Shadow AI is staff using AI tools the business hasn't approved, often by pasting in customer or company data. Argus finds AI services in your network, cloud and SSO data and keeps an inventory you review. Its AI gateway gives your team approved access to OpenAI and Anthropic models with company-held keys, data-loss rules, budgets, prompt-injection flags and a usage log.</p>
+      </details>
+      <details class="faq-item">
+        <summary>Does it replace my SIEM or EDR?</summary>
+        <p>It works with them. Argus takes events in from thirteen sources, including CrowdStrike, SentinelOne, GuardDuty, Wazuh and CloudTrail, can contain devices through CrowdStrike and SentinelOne, and sends alerts to Slack, Jira, ServiceNow, PagerDuty, email and webhooks. Many teams run it alongside existing tools as the layer that connects the evidence, investigates it and governs the response.</p>
+      </details>
+      <details class="faq-item">
+        <summary>Which AI models does it work with?</summary>
+        <p>Anthropic Claude, OpenAI, local models through Ollama, or none at all. With no model configured, the specialists fall back to deterministic logic, so detection and triage still work. Budgets cap every agent run by steps, tokens, time and cost.</p>
+      </details>
+      <details class="faq-item">
+        <summary>Does my data leave my network?</summary>
+        <p>Argus is self-hosted, so the platform and its data stay in your infrastructure. The only outside calls are the ones you set up: the cloud and identity APIs it collects from, the channels you send alerts to, the public threat-intel feeds, and a model provider if you choose a hosted one. With a local model and offline threat-intel files, no AI or intel traffic leaves your network at all.</p>
+      </details>
+      <details class="faq-item">
+        <summary>Is it ready for production?</summary>
+        <p>The platform core (tenancy, sign-in, roles, the audit trail, the job queue, policy and approvals) is tested end to end on SQLite and PostgreSQL in CI. Like any security platform, it should be tuned to your environment: connect the collectors you use, tune the detection rules, and run in monitoring-only mode before enabling any action. That tuning is exactly what the install service covers. Argus is not a certified product.</p>
+      </details>
+      <details class="faq-item">
+        <summary>Does Argus make us SOC 2 or ISO 27001 compliant?</summary>
+        <p>No software does that alone. Argus ships a control mapping for SOC 2, NIST 800-171 and ISO 27001 that shows which controls it can provide evidence for, such as the signed audit trail, role-based access and approval records. That makes the audit faster, but your auditor still assesses your program as a whole.</p>
+      </details>
+      <details class="faq-item">
+        <summary>What does it cost?</summary>
+        <p>The software is free under the MIT license. You pay only for the infrastructure you run it on and any AI model you choose. If you want it installed for you, the install is scoped and priced after a short call about your environment, and you keep everything: the code, the configuration and the credentials.</p>
+      </details>
+      <details class="faq-item">
+        <summary>I'm a business owner, not a security engineer. Is this for me?</summary>
+        <p>If you have cloud accounts, staff logins, customer data or code worth protecting, the protection is for you. You don't need to run it yourself. Book a call, tell me what you use, and I'll tell you plainly whether Argus is the right fit or whether something simpler would serve you better.</p>
+      </details>
+    </div>
+  </div>
+</section>
+
+
+<section class="cta-strip">
+  <div class="container">
+    <div class="cta-wrap reveal">
+      <div>
+        <h2>Get AI-speed protection without hiring a security team.</h2>
+        <p>Thirty minutes. We look at what you run, where you're exposed, and what an install takes. You leave with a plan, a timeline and a fixed price, or a straight answer that you don't need it yet.</p>
+      </div>
+      <a data-lead="Argus Installation" href="https://thomasunise.com/contact?topic=Argus%20Installation" class="cta-btn" target="_blank" rel="noopener">
+        Book an install call
+        <svg viewbox="0 0 16 10" fill="none"><path d="M1 5h14M10 1l4 4-4 4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"></path></svg>
+      </a>
+    </div>
+  </div>
+</section>
+</div></main></div></div>
