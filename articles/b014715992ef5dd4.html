@@ -1,0 +1,336 @@
+<div><div><div class="post-content" id="post-content" itemprop="postContent">
+        <p align="center"><strong>atelier 源码拆解 · 二</strong></p>
+<p align="center"><em>代码注释里留下的那些判断失误</em></p>
+<blockquote>
+<p><a href="https://ystyle.top/2026/10/26/atelier-agent-harness/" target="_blank" rel="noopener">上一篇</a>
+讲 atelier 长什么样。<br>
+这篇讲它是怎么长成这样的——<strong>包括三次判断被自己推翻</strong>。</p>
+<p>本文的依据全部来自代码注释与提交记录。凡是文中提到的教训，代码里都留着对应痕迹。</p>
+<p>还没装上手？先看<a href="https://ystyle.top/2026/10/26/atelier-getting-started/" target="_blank" rel="noopener">第三篇《atelier 怎么用》</a>
+。</p>
+</blockquote>
+<h2 id="一先看结论">一、先看结论</h2>
+<p>atelier 现在有 1029 个测试用例、15 个包。但真正塑造它的是几个<strong>错误判断</strong>：</p>
+<table>
+	<thead>
+			<tr>
+					<th>判断</th>
+					<th>结果</th>
+			</tr>
+	</thead>
+	<tbody>
+			<tr>
+					<td>「加一层抽象会更清晰」</td>
+					<td>设计的投影层<strong>零消费者</strong>，删了</td>
+			</tr>
+			<tr>
+					<td>「用更强的枚举统一语义」</td>
+					<td>两个正交维度，<strong>不能合并</strong></td>
+			</tr>
+			<tr>
+					<td>「压缩结果没变短就不写回」</td>
+					<td>制造了一个隐蔽的行为差异，<strong>修掉了</strong></td>
+			</tr>
+			<tr>
+					<td>「先拆文件再理逻辑」</td>
+					<td>撞墙两次，<strong>顺序反了</strong></td>
+			</tr>
+			<tr>
+					<td>「测试全绿就是好的」</td>
+					<td>1 条用例三次跑一红两绿，<strong>还挖出 2 条假用例</strong></td>
+			</tr>
+	</tbody>
+</table>
+<p>下面一条条讲。</p>
+<h2 id="二第一次自我纠正抽象层没有消费者">二、第一次自我纠正：抽象层没有消费者</h2>
+<h3 id="我最初的设计">我最初的设计</h3>
+<p>主循环跑完，需要一个「结果摘要」给宿主看。我设计了 <code>RunProjection</code>：</p>
+<pre tabindex="0"><code class="language-cangjie" data-lang="cangjie">// 已经删掉的结构体，这里只留个样子
+struct RunProjection {
+    let status: String
+    let turns: Int64
+    let toolCalls: Int64
+    let text: String
+}
+</code></pre><p>还加了一层 <code>outcomeOf()</code> 想统一两个翻译器，让它们都从 projection 取值。</p>
+<h3 id="实测结果">实测结果</h3>
+<p><strong>零消费者。</strong></p>
+<ul>
+<li>A2A 和 AG-UI 的消费端是<strong>逐事件</strong>调用的，它们不想要「跑完之后的总结」</li>
+<li>而 <code>outcomeOf()</code> 需要<strong>完整事件序列</strong>才能算——形态根本不匹配</li>
+</ul>
+<h3 id="删掉之后">删掉之后</h3>
+<p>更关键的是判据变了。原来的验收标准是「代码变简单了吗」，改成了：</p>
+<blockquote>
+<p><strong>「哪一行代码会被删掉？」有具体行会消失，才是真消费者。</strong></p>
+</blockquote>
+<p>用这个判据重新看，<code>RunProjection</code> 和 <code>outcomeOf</code> 一行都删不掉任何东西——它们是纯粹的负担。</p>
+<blockquote>
+<p>于是留下一条通用判据：<strong>「加一层抽象」和「统一判据」往往都是错的直觉。</strong></p>
+</blockquote>
+<h2 id="三第二次自我纠正两个正交维度不能合并">三、第二次自我纠正：两个正交维度不能合并</h2>
+<h3 id="我想做什么">我想做什么</h3>
+<p>Agent 的回合结束有多种原因（正常结束、工具预算耗尽、被钩子拦、被取消、失败……）。我设计了 <code>TurnEndReason</code> 枚举，想用它<strong>替代</strong>已有的 <code>StopReason</code>——「一个字段说清所有事」。</p>
+<h3 id="为什么不行">为什么不行</h3>
+<p>因为它们是<strong>两个正交的问题</strong>：</p>
+<table>
+	<thead>
+			<tr>
+					<th>问什么</th>
+					<th>谁回答</th>
+			</tr>
+	</thead>
+	<tbody>
+			<tr>
+					<td>这个 <strong>run</strong> 结没结束？</td>
+					<td><code>TurnEndReason</code></td>
+			</tr>
+			<tr>
+					<td>这个<strong>回合内</strong>要不要继续？</td>
+					<td><code>StopReason</code>（<code>ToolUse</code> / <code>Length</code> / …）</td>
+			</tr>
+	</tbody>
+</table>
+<p>举例：模型调了工具然后又调了工具，此时 <code>StopReason = ToolUse</code>，但如果 <code>reason</code> 认为「任务已完成」就会提前下发终态——<strong>工具还在跑，协议里终态却不可再更新</strong>。</p>
+<h3 id="最终的设计">最终的设计</h3>
+<p>两个字段并存，各答各的。而且 <code>TurnEndEvent.reason</code> <strong>刻意不设默认值</strong>：</p>
+<pre tabindex="0"><code class="language-cangjie" data-lang="cangjie">public class TurnEndEvent &lt;: AgentEvent {
+    /**
+     * 不设默认值：默认值会把
+     * 「旧的错误收尾」静默当成
+     * Completed，而那正是这个字段
+     * 要消除的那类事实缺口。
+     */
+    public let reason: TurnEndReason
+}
+</code></pre><p>不设默认值的代价是：所有构造点必须逐个改，漏一个就编译报错。<strong>这正是想要的效果</strong>——用编译器强制你把每个收尾原因说清楚。</p>
+<h2 id="四第三次自我纠正一个顺手删造成的隐蔽差异">四、第三次自我纠正：一个「顺手删」造成的隐蔽差异</h2>
+<h3 id="上下文">上下文</h3>
+<p>把压缩策略提成可替换接口 <code>Compactor</code> 时，我重写了默认实现。其中有一段：</p>
+<pre tabindex="0"><code class="language-cangjie" data-lang="cangjie">// 我认为：压缩后如果没变短，
+// 就没必要返回新列表
+if (next.size &gt;= messages.size) {
+    return messages      // ← 丢弃结果
+}
+</code></pre><p>看起来是合理的优化——没变短，等于没压缩。</p>
+<h3 id="实际后果">实际后果</h3>
+<p><strong>3 个压缩用例变红。</strong></p>
+<p>问题出在一个边界情况：</p>
+<pre tabindex="0"><code>单条消息超长（18000 字符）
+  → 单条就超过保留预算 2000
+  → retainTokens 切点算出来是 0
+  → 压缩产出「检查点 + 原消息」= 1 条
+  → 原消息也是 1 条
+  → size 相等，被判定为「没变短」
+  → 丢弃 → 什么都没发生
+</code></pre><p><strong>但原实现是会返回新列表的</strong>——因为「检查点 + 原消息」虽然条数相同，内容不同：它插入了一条摘要。</p>
+<h3 id="修法与留下的契约">修法与留下的契约</h3>
+<pre tabindex="0"><code class="language-cangjie" data-lang="cangjie">// 注意：这里必须**原样返回 next**
+// （哪怕它没变短）
+// —— 压缩「没变短」由调用方按
+// result.size &lt; messages.size
+// 判定为 noop 并留痕，
+// 不是靠这里丢弃结果。
+// 丢弃结果会带来一个隐蔽的行为差异：
+// 摘要成功但保留区覆盖全文时
+// （单条超长消息就属于这种），
+// 历史本应被替换成「检查点 + 原消息」，
+// 丢弃则什么都不发生。
+</code></pre><p>这段注释现在还在 <code>compactor.cj</code> 里。教训是：</p>
+<blockquote>
+<p><strong>「没有效果」和「没做」是两件事。</strong> 前者要留痕（noop 记录），后者的静默丢弃会让一次成功的操作看起来像没发生。</p>
+</blockquote>
+<h2 id="五548-行拆成-270-行顺序反了两次">五、548 行拆成 270 行：顺序反了两次</h2>
+<h3 id="背景">背景</h3>
+<p>主循环 <code>chatWithEnv</code> 一度有 <strong>548 行</strong>，主循环体 500 行。显然该拆。</p>
+<h3 id="我试错的两次">我试错的两次</h3>
+<table>
+	<thead>
+			<tr>
+					<th>尝试</th>
+					<th>做法</th>
+					<th>结果</th>
+			</tr>
+	</thead>
+	<tbody>
+			<tr>
+					<td>第一版</td>
+					<td>按「阶段类」拆，5 个类共享一个 <code>RunState</code>（8 字段）</td>
+					<td>撞墙</td>
+			</tr>
+			<tr>
+					<td>第二版</td>
+					<td>用 <code>extend</code> 按主题拆成多个文件</td>
+					<td>又撞墙</td>
+			</tr>
+	</tbody>
+</table>
+<p>两次都撞在同一面墙上，但当时没意识到为什么。</p>
+<h3 id="真正的原因">真正的原因</h3>
+<p><strong>问题不在「怎么拆」，在「先拆什么」。</strong></p>
+<p>正确的顺序是：<strong>先理清控制流，再看代码能不能按这个边界切开</strong>。我一开始跳过了第一步，直接想文件怎么分，所以怎么试都不对。</p>
+<h3 id="最终的拆法">最终的拆法</h3>
+<p>按控制流的七个阶段切（不是按文件、也不是按类）：</p>
+<table>
+	<thead>
+			<tr>
+					<th>阶段</th>
+					<th>职责</th>
+			</tr>
+	</thead>
+	<tbody>
+			<tr>
+					<td><code>openTurn</code></td>
+					<td>回合开场、插话处理、归档</td>
+			</tr>
+			<tr>
+					<td><code>compactBeforeRequest</code></td>
+					<td>请求前压缩</td>
+			</tr>
+			<tr>
+					<td><code>invokeProvider</code></td>
+					<td>调模型 + 超窗恢复</td>
+			</tr>
+			<tr>
+					<td><code>executeToolBatch</code></td>
+					<td>批量执行工具</td>
+			</tr>
+			<tr>
+					<td><code>admitToolCall</code></td>
+					<td>准入判定（三分支）</td>
+			</tr>
+			<tr>
+					<td><code>admitAfterHooks</code></td>
+					<td>钩子裁决</td>
+			</tr>
+			<tr>
+					<td><code>admitByAsking</code></td>
+					<td>发起提问</td>
+			</tr>
+	</tbody>
+</table>
+<p>跨回合状态收进一个 <code>RunScope</code>（原来散落 81 处引用，现在阶段方法只收一个引用）：</p>
+<pre tabindex="0"><code class="language-cangjie" data-lang="cangjie">// 阶段方法通过 scope 访问运行时状态，
+// 装配期组件仍在 AgentRuntime 上。
+internal class RunScope {
+    var messages: ArrayList&lt;Message&gt;
+    var turnCount: Int64 = 0
+    var toolCallCount: Int64 = 0
+    var lengthContinuations: Int64 = 0
+    var verifyPasses: Int64 = 0
+    var resumingSameTurn: Bool = false
+    // ...
+}
+</code></pre><h3 id="一个刻意不合并的细节">一个「刻意不合并」的细节</h3>
+<p><code>lengthContinuations</code> 和 <code>verifyPasses</code> 看起来都是「次数」，能不能合并成一个？</p>
+<p>不能。因为它们回答的问题不同：</p>
+<pre tabindex="0"><code>截断续跑：同一条回复没写完
+  → 不推进回合计数
+自验：模型已宣布完成，进入核对
+  → 按新回会计
+</code></pre><p>由此产生一个<strong>有意的</strong>行为：一次自验之后，本回合的续跑预算会重置——因为核对阶段被截断时还得有完整额度自救。整轮上界由 <code>maxTurns</code> 兜住。</p>
+<blockquote>
+<p>这类「看起来能合并、实际不能」的字段，注释里必须写清为什么不合并。否则下一个人（包括三个月后的自己）会顺手合并掉。</p>
+</blockquote>
+<h2 id="六最反直觉的一条flaky-比失败更危险">六、最反直觉的一条：flaky 比失败更危险</h2>
+<h3 id="现象">现象</h3>
+<p>修完一批缺陷后，全量测试「通过」。但有一条用例：</p>
+<pre tabindex="0"><code>第 1 次：红
+第 2 次：绿
+第 3 次：绿
+</code></pre><h3 id="为什么这比红更危险">为什么这比红更危险</h3>
+<ul>
+<li><strong>明确失败</strong>：你知道有问题，会去修</li>
+<li><strong>flaky（时红时绿）</strong>：你倾向于认为「这次是偶发」，然后重跑一次，绿了就走</li>
+</ul>
+<p>而 flaky 背后往往是<strong>产品侧的竞态</strong>。这次留在测试里，下次就留在生产里。</p>
+<h3 id="背后是什么">背后是什么</h3>
+<p>子 Agent 的等待回复有个时序窗口：</p>
+<pre tabindex="0"><code>父：提问已投递 → 子：还没登记等待
+  → 窗口内的回复被判为「回合中消息」
+  → 子一直等到超时
+</code></pre><p>修法是让投递<strong>带上「我会等」的标记</strong>，先登记再投递——用顺序消除窗口，而不是靠加长超时。</p>
+<h3 id="顺带挖出两条假用例">顺带挖出两条假用例</h3>
+<p>自查 flaky 时发现另外两条<strong>恒真</strong>的用例：</p>
+<pre tabindex="0"><code class="language-cangjie" data-lang="cangjie">// 断言「run 结束后状态是 Idle」
+// 但 run 开始前状态也是 Idle
+// —— 这条断言永远成立
+@Assert(status == Idle)
+</code></pre><p>它从来没测过任何东西。</p>
+<blockquote>
+<p>这两条比 flaky 更糟：<strong>flaky 至少还会红一次，假用例永远绿。</strong></p>
+</blockquote>
+<h2 id="七从这些事里抽出的四条判据">七、从这些事里抽出的四条判据</h2>
+<p>回头看，上面所有纠正都可以归到四条可执行的判据：</p>
+<h3 id="判据一抽象要看删掉什么">判据一：抽象要看「删掉什么」</h3>
+<blockquote>
+<p>加一层抽象之前先问：<strong>它会删掉哪些具体的行？</strong><br>
+说不出来就别加。</p>
+</blockquote>
+<h3 id="判据二字段要看会不会一起变">判据二：字段要看「会不会一起变」</h3>
+<blockquote>
+<p>两个字段能不能合并，不看名字像不像，看<strong>它们会不会同时变化</strong>。<br>
+一个变另一个不变（或变化条件不同），就是正交，不能合。</p>
+</blockquote>
+<h3 id="判据三无效果不等于没发生">判据三：无效果不等于没发生</h3>
+<blockquote>
+<p>「操作执行了但没有效果」必须<strong>可观测</strong>（noop 留痕），<br>
+不能靠静默丢弃来「省事」。</p>
+</blockquote>
+<h3 id="判据四全绿要看连跑">判据四：全绿要看连跑</h3>
+<blockquote>
+<p>报告「全绿」之前至少<strong>连跑三次</strong>。<br>
+而且每个断言都要问：<strong>它在操作之前也成立吗？</strong> 成立就是恒真，等于没测。</p>
+</blockquote>
+<h2 id="八这些纠正留下了什么">八、这些纠正留下了什么</h2>
+<p>不是抽象的感悟，而是落在代码里的东西：</p>
+<table>
+	<thead>
+			<tr>
+					<th>遗留物</th>
+					<th>位置</th>
+					<th>作用</th>
+			</tr>
+	</thead>
+	<tbody>
+			<tr>
+					<td><code>TurnEndReason</code> 无默认值</td>
+					<td><code>event.cj</code></td>
+					<td>编译器强制每个收尾点说清原因</td>
+			</tr>
+			<tr>
+					<td><code>compact()</code> 必须原样返回</td>
+					<td><code>compactor.cj</code></td>
+					<td>注释写明了「丢弃会怎样」</td>
+			</tr>
+			<tr>
+					<td><code>RunScope</code> 字段的差异注释</td>
+					<td><code>run_scope.cj</code></td>
+					<td>防止后人把两个正交字段合并</td>
+			</tr>
+			<tr>
+					<td>先登记再投递</td>
+					<td>子 Agent 通信</td>
+					<td>用顺序消除竞态窗口</td>
+			</tr>
+	</tbody>
+</table>
+<p><strong>这大概是「错误判断」最大的价值</strong>：它不只是一次修正，还会变成一个别人绕不过去的约束。</p>
+<h2 id="九小结">九、小结</h2>
+<ul>
+<li>atelier 有 <strong>1029 个测试</strong>，但塑造它的不是这些测试，而是<strong>几次把自己说服的过程推翻</strong></li>
+<li>三次自我纠正：抽象零消费者、正交维度误合并、静默丢弃造成的行为差异</li>
+<li>548 行拆分的<strong>顺序</strong>比<strong>切法</strong>更重要：先理控制流，再想文件</li>
+<li>flaky 比明确失败更危险；恒真的假用例比 flaky 更糟</li>
+<li>四条判据：删掉什么 / 会不会一起变 / 无效果要留痕 / 全绿要连跑</li>
+</ul>
+<blockquote>
+<p>上一篇讲它长什么样（<a href="https://ystyle.top/2026/10/26/atelier-agent-harness/" target="_blank" rel="noopener">把模型变成 Agent 的那层脚手架</a>
+）。<br>
+它的存储底座见 <a href="https://ystyle.top/2026/10/10/badger-cj-porting-notes/" target="_blank" rel="noopener">badger-cj</a>
+。</p>
+</blockquote>
+
+      </div>
+
+      </div></div>
