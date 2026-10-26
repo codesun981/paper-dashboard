@@ -1,0 +1,568 @@
+<div><div><article class="markdown-body entry-content container-lg" itemprop="text"><p dir="auto"><a href="https://github.com/Tencent-Hunyuan/HunyuanWorld-Mirror/blob/main/README_zh.md" target="_blank" rel="noopener">中文阅读</a></p>
+<div class="markdown-heading" dir="auto"><h1 tabindex="-1" class="heading-element" dir="auto"><strong>HunyuanWorld-Mirror [ICML 2026]</strong></h1><a id="user-content-hunyuanworld-mirror-icml-2026" class="anchor" aria-label="Permalink: HunyuanWorld-Mirror [ICML 2026]" href="https://github.com/Tencent-Hunyuan/HunyuanWorld-Mirror#hunyuanworld-mirror-icml-2026" target="_blank" rel="noopener"><svg data-component="Octicon" class="octicon octicon-link" viewbox="0 0 16 16" version="1.1" aria-hidden="true"><path d="m7.775 3.275 1.25-1.25a3.5 3.5 0 1 1 4.95 4.95l-2.5 2.5a3.5 3.5 0 0 1-4.95 0 .751.751 0 0 1 .018-1.042.751.751 0 0 1 1.042-.018 1.998 1.998 0 0 0 2.83 0l2.5-2.5a2.002 2.002 0 0 0-2.83-2.83l-1.25 1.25a.751.751 0 0 1-1.042-.018.751.751 0 0 1-.018-1.042Zm-4.69 9.64a1.998 1.998 0 0 0 2.83 0l1.25-1.25a.751.751 0 0 1 1.042.018.751.751 0 0 1 .018 1.042l-1.25 1.25a3.5 3.5 0 1 1-4.95-4.95l2.5-2.5a3.5 3.5 0 0 1 4.95 0 .751.751 0 0 1-.018 1.042.751.751 0 0 1-1.042.018 1.998 1.998 0 0 0-2.83 0l-2.5 2.5a1.998 1.998 0 0 0 0 2.83Z"></path></svg></a></div>
+<p align="center" dir="auto">
+  <a target="_blank" rel="noopener" href="https://github.com/Tencent-Hunyuan/HunyuanWorld-Mirror/blob/main/assets/teaser.jpg"><img src="https://github.com/Tencent-Hunyuan/HunyuanWorld-Mirror/raw/main/assets/teaser.jpg" alt="HunyuanWorld-Mirror Teaser" loading="lazy"></a>
+</p>
+<p align="center" dir="auto">
+<a href="https://3d-models.hunyuan.tencent.com/world/" rel="noopener" target="_blank"><img src="https://camo.githubusercontent.com/cafdcb5612b1ab28528d47af9245604f8f7b0792562c7c5151fff90340a3d6cc/68747470733a2f2f696d672e736869656c64732e696f2f62616467652f50726f6a6563742d506167652d677265656e" loading="lazy"></a>
+<a href="https://3d-models.hunyuan.tencent.com/world/worldMirror1_0/HYWorld_Mirror_Tech_Report.pdf" rel="noopener" target="_blank"><img src="https://camo.githubusercontent.com/9e665191353cbb99c3a190cb01e4f97270cb0e05091ded221d25a36291d0ce93/68747470733a2f2f696d672e736869656c64732e696f2f62616467652f546563686e697175652d5265706f72742d726564" loading="lazy"></a>
+<a href="https://huggingface.co/tencent/HunyuanWorld-Mirror" rel="noopener" target="_blank"><img src="https://camo.githubusercontent.com/4cf691142cf0c473ba7ee6e189cd96109576e2ed5b861e866748cb1a32feddbe/68747470733a2f2f696d672e736869656c64732e696f2f62616467652f25463025394625413425393725323048756767696e67253230466163652d4d6f64656c2d626c7565" loading="lazy"></a>
+<a href="https://huggingface.co/spaces/tencent/HunyuanWorld-Mirror" rel="noopener" target="_blank"><img src="https://camo.githubusercontent.com/a511aac99358c00aaabe58c1dc97c40d1c3e79845a2d5aa8c266b0c6542ab538/68747470733a2f2f696d672e736869656c64732e696f2f62616467652f25463025394625413425393725323048756767696e67253230466163652d44656d6f2d6f72616e6765" loading="lazy"></a>
+<a href="https://discord.gg/dNBrdrGGMa" rel="noopener" target="_blank"><img src="https://camo.githubusercontent.com/911ab3ed0b115cea54057f38824cb7e1019c205f8459536de446df944644c448/68747470733a2f2f696d672e736869656c64732e696f2f62616467652f446973636f72642d77686974652e7376673f6c6f676f3d646973636f7264" loading="lazy"></a>
+  <a href="https://x.com/TencentHunyuan" rel="noopener" target="_blank"><img src="https://camo.githubusercontent.com/8305b6d945db7fde368df24e79e3703907933efdd2271236b470092dadcba4e9/68747470733a2f2f696d672e736869656c64732e696f2f62616467652f48756e7975616e2d626c61636b2e7376673f6c6f676f3d78" loading="lazy"></a>
+</p><p align="center" dir="auto">
+</p><p dir="auto">HunyuanWorld-Mirror is a versatile feed-forward model for comprehensive 3D geometric prediction. It integrates diverse geometric priors (<strong>camera poses</strong>, <strong>calibrated intrinsics</strong>, <strong>depth maps</strong>) and simultaneously generates various 3D representations (<strong>point clouds</strong>, <strong>multi-view depths</strong>, <strong>camera parameters</strong>, <strong>surface normals</strong>, <strong>3D Gaussians</strong>) in a single forward pass.</p>
+<details open="" class="details-reset border rounded-2">
+  <summary class="tmp-px-3 py-2">
+    <svg aria-hidden="true" data-component="Octicon" viewbox="0 0 16 16" version="1.1" data-view-component="true" class="octicon octicon-device-camera-video">
+    <path d="M16 3.75v8.5a.75.75 0 0 1-1.136.643L11 10.575v.675A1.75 1.75 0 0 1 9.25 13h-7.5A1.75 1.75 0 0 1 0 11.25v-6.5C0 3.784.784 3 1.75 3h7.5c.966 0 1.75.784 1.75 1.75v.675l3.864-2.318A.75.75 0 0 1 16 3.75Zm-6.5 1a.25.25 0 0 0-.25-.25h-7.5a.25.25 0 0 0-.25.25v6.5c0 .138.112.25.25.25h7.5a.25.25 0 0 0 .25-.25v-6.5ZM11 8.825l3.5 2.1v-5.85l-3.5 2.1Z"></path>
+</svg>
+    <span class="m-1">demo_en_20mb.mp4</span>
+    <span class="dropdown-caret"></span>
+  </summary>
+
+  <video src="https://private-user-images.githubusercontent.com/34498625/504052891-146a9a25-5eb7-4400-aa09-5b58e1d10a5e.mp4?jwt=eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJnaXRodWIuY29tIiwiYXVkIjoicmF3LmdpdGh1YnVzZXJjb250ZW50LmNvbSIsImtleSI6ImtleTUiLCJleHAiOjE3OTI5NzkyMTgsIm5iZiI6MTc5Mjk3ODkxOCwicGF0aCI6Ii8zNDQ5ODYyNS81MDQwNTI4OTEtMTQ2YTlhMjUtNWViNy00NDAwLWFhMDktNWI1OGUxZDEwYTVlLm1wND9YLUFtei1BbGdvcml0aG09QVdTNC1ITUFDLVNIQTI1NiZYLUFtei1DcmVkZW50aWFsPUFLSUFWQ09EWUxTQTUzUFFLNFpBJTJGMjAyNjEwMjYlMkZ1cy1lYXN0LTElMkZzMyUyRmF3czRfcmVxdWVzdCZYLUFtei1EYXRlPTIwMjYxMDI2VDAxNDE1OFomWC1BbXotRXhwaXJlcz0zMDAmWC1BbXotU2lnbmF0dXJlPTBhMjQxNjVhMjRiMmFiZDZlNzc0OWMwZjlkYzdiNTE4MzEyNjc2ODc2ZmY5OGMyOGMyZDE2YjA5OTEyZmUwOWYmWC1BbXotU2lnbmVkSGVhZGVycz1ob3N0JnJlc3BvbnNlLWNvbnRlbnQtdHlwZT12aWRlbyUyRm1wNCJ9.8Ohc_ZTIH0L9vWURU4UVjawZkZxalGGaKmNmVzIziVA" data-canonical-src="https://private-user-images.githubusercontent.com/34498625/504052891-146a9a25-5eb7-4400-aa09-5b58e1d10a5e.mp4?jwt=eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJnaXRodWIuY29tIiwiYXVkIjoicmF3LmdpdGh1YnVzZXJjb250ZW50LmNvbSIsImtleSI6ImtleTUiLCJleHAiOjE3OTI5NzkyMTgsIm5iZiI6MTc5Mjk3ODkxOCwicGF0aCI6Ii8zNDQ5ODYyNS81MDQwNTI4OTEtMTQ2YTlhMjUtNWViNy00NDAwLWFhMDktNWI1OGUxZDEwYTVlLm1wND9YLUFtei1BbGdvcml0aG09QVdTNC1ITUFDLVNIQTI1NiZYLUFtei1DcmVkZW50aWFsPUFLSUFWQ09EWUxTQTUzUFFLNFpBJTJGMjAyNjEwMjYlMkZ1cy1lYXN0LTElMkZzMyUyRmF3czRfcmVxdWVzdCZYLUFtei1EYXRlPTIwMjYxMDI2VDAxNDE1OFomWC1BbXotRXhwaXJlcz0zMDAmWC1BbXotU2lnbmF0dXJlPTBhMjQxNjVhMjRiMmFiZDZlNzc0OWMwZjlkYzdiNTE4MzEyNjc2ODc2ZmY5OGMyOGMyZDE2YjA5OTEyZmUwOWYmWC1BbXotU2lnbmVkSGVhZGVycz1ob3N0JnJlc3BvbnNlLWNvbnRlbnQtdHlwZT12aWRlbyUyRm1wNCJ9.8Ohc_ZTIH0L9vWURU4UVjawZkZxalGGaKmNmVzIziVA" controls="controls" muted="muted" class="d-block rounded-bottom-2 border-top width-fit">
+
+  </video>
+</details>
+
+
+<ul dir="auto">
+<li><strong>[May 20, 2026]</strong>: 🚀🚀🚀 WorldMirror is accepted to ICML 2026!</li>
+<li><strong>[Apr 16, 2026]</strong>: 🤗 We release <a href="https://github.com/Tencent-Hunyuan/HY-World-2.0" target="_blank" rel="noopener">HY-World-2.0</a> with <a href="https://github.com/Tencent-Hunyuan/HY-World-2.0#code-usage--worldmirror-20" target="_blank" rel="noopener">WorldMirror-2.0</a>, state-of-the-art 3D world model!</li>
+<li><strong>[Dec 17, 2025]</strong>:  🤗 We release <a href="https://github.com/Tencent-Hunyuan/HY-WorldPlay" target="_blank" rel="noopener">HunyuanWorld-1.5</a>, enabling real-time world creation and play!</li>
+<li><strong>[Nov 7, 2025]</strong>: 🚀🚀🚀 We release the training and evaluation code. See <a href="https://github.com/Tencent-Hunyuan/HunyuanWorld-Mirror#%F0%9F%A4%96-training" target="_blank" rel="noopener">Training Instructions</a> and <a href="https://github.com/Tencent-Hunyuan/HunyuanWorld-Mirror#%F0%9F%93%8A-evaluation" target="_blank" rel="noopener">Evaluation Instructions</a>.</li>
+<li><strong>[Oct 22, 2025]</strong>: We release the inference code and model weights. <a href="https://huggingface.co/tencent/HunyuanWorld-Mirror" rel="noopener" target="_blank">Download Pretrained Model</a>.</li>
+</ul>
+<blockquote>
+<p dir="auto">Join our <strong><a href="https://github.com/Tencent-Hunyuan/HunyuanWorld-Mirror" target="_blank" rel="noopener">Wechat</a></strong> and <strong><a href="https://discord.gg/dNBrdrGGMa" rel="noopener" target="_blank">Discord</a></strong> group to discuss and find help from us.</p>
+</blockquote>
+<markdown-accessiblity-table><table>
+<thead>
+<tr>
+<th>Wechat Group</th>
+<th>Xiaohongshu</th>
+<th>X</th>
+<th>Discord</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><a target="_blank" rel="noopener" href="https://github.com/Tencent-Hunyuan/HunyuanWorld-Mirror/blob/main/assets/qrcode/wechat.png"><img src="https://github.com/Tencent-Hunyuan/HunyuanWorld-Mirror/raw/main/assets/qrcode/wechat.png" loading="lazy"></a></td>
+<td><a target="_blank" rel="noopener" href="https://github.com/Tencent-Hunyuan/HunyuanWorld-Mirror/blob/main/assets/qrcode/xiaohongshu.png"><img src="https://github.com/Tencent-Hunyuan/HunyuanWorld-Mirror/raw/main/assets/qrcode/xiaohongshu.png" loading="lazy"></a></td>
+<td><a target="_blank" rel="noopener" href="https://github.com/Tencent-Hunyuan/HunyuanWorld-Mirror/blob/main/assets/qrcode/x.png"><img src="https://github.com/Tencent-Hunyuan/HunyuanWorld-Mirror/raw/main/assets/qrcode/x.png" loading="lazy"></a></td>
+<td><a target="_blank" rel="noopener" href="https://github.com/Tencent-Hunyuan/HunyuanWorld-Mirror/blob/main/assets/qrcode/discord.png"><img src="https://github.com/Tencent-Hunyuan/HunyuanWorld-Mirror/raw/main/assets/qrcode/discord.png" loading="lazy"></a></td>
+</tr>
+</tbody>
+</table></markdown-accessiblity-table>
+
+
+<div class="markdown-heading" dir="auto"><h2 tabindex="-1" class="heading-element" dir="auto">☯️ <strong>HunyuanWorld-Mirror Introduction</strong></h2><a id="user-content-️-hunyuanworld-mirror-introduction" class="anchor" aria-label="Permalink: ☯️ HunyuanWorld-Mirror Introduction" href="https://github.com/Tencent-Hunyuan/HunyuanWorld-Mirror#%EF%B8%8F-hunyuanworld-mirror-introduction" target="_blank" rel="noopener"><svg data-component="Octicon" class="octicon octicon-link" viewbox="0 0 16 16" version="1.1" aria-hidden="true"><path d="m7.775 3.275 1.25-1.25a3.5 3.5 0 1 1 4.95 4.95l-2.5 2.5a3.5 3.5 0 0 1-4.95 0 .751.751 0 0 1 .018-1.042.751.751 0 0 1 1.042-.018 1.998 1.998 0 0 0 2.83 0l2.5-2.5a2.002 2.002 0 0 0-2.83-2.83l-1.25 1.25a.751.751 0 0 1-1.042-.018.751.751 0 0 1-.018-1.042Zm-4.69 9.64a1.998 1.998 0 0 0 2.83 0l1.25-1.25a.751.751 0 0 1 1.042.018.751.751 0 0 1 .018 1.042l-1.25 1.25a3.5 3.5 0 1 1-4.95-4.95l2.5-2.5a3.5 3.5 0 0 1 4.95 0 .751.751 0 0 1-.018 1.042.751.751 0 0 1-1.042.018 1.998 1.998 0 0 0-2.83 0l-2.5 2.5a1.998 1.998 0 0 0 0 2.83Z"></path></svg></a></div>
+
+<p dir="auto">HunyuanWorld-Mirror consists of two key components:</p>
+<p dir="auto"><strong>(1) Multi-Modal Prior Prompting</strong>: A mechanism that embeds diverse prior modalities,
+including calibrated intrinsics, camera pose, and depth, into the feed-forward model. Given any subset of the available priors, we utilize several lightweight encoding layers to convert each modality into structured tokens.</p>
+<p dir="auto"><strong>(2) Universal Geometric Prediction</strong>: A unified architecture capable of handling
+the full spectrum of 3D reconstruction tasks from camera and depth estimation to point map regression, surface normal estimation, and novel view synthesis.</p>
+<p align="left" dir="auto">
+  <a target="_blank" rel="noopener" href="https://github.com/Tencent-Hunyuan/HunyuanWorld-Mirror/blob/main/assets/arch.png"><img src="https://github.com/Tencent-Hunyuan/HunyuanWorld-Mirror/raw/main/assets/arch.png" loading="lazy"></a>
+</p>
+<div class="markdown-heading" dir="auto"><h2 tabindex="-1" class="heading-element" dir="auto">🛠️ Dependencies and Installation</h2><a id="user-content-️-dependencies-and-installation" class="anchor" aria-label="Permalink: 🛠️ Dependencies and Installation" href="https://github.com/Tencent-Hunyuan/HunyuanWorld-Mirror#%EF%B8%8F-dependencies-and-installation" target="_blank" rel="noopener"><svg data-component="Octicon" class="octicon octicon-link" viewbox="0 0 16 16" version="1.1" aria-hidden="true"><path d="m7.775 3.275 1.25-1.25a3.5 3.5 0 1 1 4.95 4.95l-2.5 2.5a3.5 3.5 0 0 1-4.95 0 .751.751 0 0 1 .018-1.042.751.751 0 0 1 1.042-.018 1.998 1.998 0 0 0 2.83 0l2.5-2.5a2.002 2.002 0 0 0-2.83-2.83l-1.25 1.25a.751.751 0 0 1-1.042-.018.751.751 0 0 1-.018-1.042Zm-4.69 9.64a1.998 1.998 0 0 0 2.83 0l1.25-1.25a.751.751 0 0 1 1.042.018.751.751 0 0 1 .018 1.042l-1.25 1.25a3.5 3.5 0 1 1-4.95-4.95l2.5-2.5a3.5 3.5 0 0 1 4.95 0 .751.751 0 0 1-.018 1.042.751.751 0 0 1-1.042.018 1.998 1.998 0 0 0-2.83 0l-2.5 2.5a1.998 1.998 0 0 0 0 2.83Z"></path></svg></a></div>
+<p dir="auto">We recommend using CUDA version 12.4 for the manual installation.</p>
+<div class="highlight highlight-source-shell notranslate position-relative overflow-auto" dir="auto" data-snippet-clipboard-copy-content="# 1. Clone the repository
+git clone https://github.com/Tencent-Hunyuan/HunyuanWorld-Mirror
+cd HunyuanWorld-Mirror
+
+# 2. Create conda environment
+conda create -n hunyuanworld-mirror python=3.10 cmake=3.14.0 -y
+conda activate hunyuanworld-mirror
+
+# 3. Install PyTorch and other dependencies using pip
+# For CUDA 12.4
+pip install torch==2.4.0 torchvision==0.19.0 --index-url https://download.pytorch.org/whl/cu124
+
+# 4. Install pip dependencies
+pip install -r requirements.txt
+
+# 5. Install gsplat for 3D Gaussian Splatting rendering 
+# For CUDA 12.4
+pip install gsplat --index-url https://docs.gsplat.studio/whl/pt24cu124"><pre><span class="pl-c"><span class="pl-c">#</span> 1. Clone the repository</span>
+git clone https://github.com/Tencent-Hunyuan/HunyuanWorld-Mirror
+<span class="pl-c1">cd</span> HunyuanWorld-Mirror
+
+<span class="pl-c"><span class="pl-c">#</span> 2. Create conda environment</span>
+conda create -n hunyuanworld-mirror python=3.10 cmake=3.14.0 -y
+conda activate hunyuanworld-mirror
+
+<span class="pl-c"><span class="pl-c">#</span> 3. Install PyTorch and other dependencies using pip</span>
+<span class="pl-c"><span class="pl-c">#</span> For CUDA 12.4</span>
+pip install torch==2.4.0 torchvision==0.19.0 --index-url https://download.pytorch.org/whl/cu124
+
+<span class="pl-c"><span class="pl-c">#</span> 4. Install pip dependencies</span>
+pip install -r requirements.txt
+
+<span class="pl-c"><span class="pl-c">#</span> 5. Install gsplat for 3D Gaussian Splatting rendering </span>
+<span class="pl-c"><span class="pl-c">#</span> For CUDA 12.4</span>
+pip install gsplat --index-url https://docs.gsplat.studio/whl/pt24cu124</pre></div>
+
+<p dir="auto">We provide a Gradio demo for the HunyuanWorld-Mirror model for quick start.</p>
+<p align="center" dir="auto">
+  <a target="_blank" rel="noopener" href="https://github.com/Tencent-Hunyuan/HunyuanWorld-Mirror/blob/main/assets/gradio_demo.gif"><img src="https://github.com/Tencent-Hunyuan/HunyuanWorld-Mirror/raw/main/assets/gradio_demo.gif" alt="HunyuanWorld-Mirror Gradio Demo" loading="lazy"></a>
+</p>
+
+<p dir="auto">Try our online demo without installation: <a href="https://huggingface.co/spaces/tencent/HunyuanWorld-Mirror" rel="noopener" target="_blank">🤗 Hugging Face Demo</a></p>
+
+<div class="highlight highlight-source-shell notranslate position-relative overflow-auto" dir="auto" data-snippet-clipboard-copy-content="# 1. Install requirements for gradio demo
+pip install -r requirements_demo.txt 
+# For Windows, please replace onnxruntime and gsplat with Windows wheels (comments in requirements_demo.txt)
+# 2. Launch gradio demo locally
+python app.py"><pre><span class="pl-c"><span class="pl-c">#</span> 1. Install requirements for gradio demo</span>
+pip install -r requirements_demo.txt 
+<span class="pl-c"><span class="pl-c">#</span> For Windows, please replace onnxruntime and gsplat with Windows wheels (comments in requirements_demo.txt)</span>
+<span class="pl-c"><span class="pl-c">#</span> 2. Launch gradio demo locally</span>
+python app.py</pre></div>
+<div class="markdown-heading" dir="auto"><h2 tabindex="-1" class="heading-element" dir="auto">📦 Download Pretrained Models</h2><a id="user-content--download-pretrained-models" class="anchor" aria-label="Permalink: 📦 Download Pretrained Models" href="https://github.com/Tencent-Hunyuan/HunyuanWorld-Mirror#-download-pretrained-models" target="_blank" rel="noopener"><svg data-component="Octicon" class="octicon octicon-link" viewbox="0 0 16 16" version="1.1" aria-hidden="true"><path d="m7.775 3.275 1.25-1.25a3.5 3.5 0 1 1 4.95 4.95l-2.5 2.5a3.5 3.5 0 0 1-4.95 0 .751.751 0 0 1 .018-1.042.751.751 0 0 1 1.042-.018 1.998 1.998 0 0 0 2.83 0l2.5-2.5a2.002 2.002 0 0 0-2.83-2.83l-1.25 1.25a.751.751 0 0 1-1.042-.018.751.751 0 0 1-.018-1.042Zm-4.69 9.64a1.998 1.998 0 0 0 2.83 0l1.25-1.25a.751.751 0 0 1 1.042.018.751.751 0 0 1 .018 1.042l-1.25 1.25a3.5 3.5 0 1 1-4.95-4.95l2.5-2.5a3.5 3.5 0 0 1 4.95 0 .751.751 0 0 1-.018 1.042.751.751 0 0 1-1.042.018 1.998 1.998 0 0 0-2.83 0l-2.5 2.5a1.998 1.998 0 0 0 0 2.83Z"></path></svg></a></div>
+<p dir="auto">To download the HunyuanWorld-Mirror model, first install the huggingface-cli:</p>
+<div class="snippet-clipboard-content notranslate position-relative overflow-auto" data-snippet-clipboard-copy-content='python -m pip install "huggingface_hub[cli]"'><pre class="notranslate"><code>python -m pip install "huggingface_hub[cli]"
+</code></pre></div>
+<p dir="auto">Then download the model using the following commands:</p>
+<div class="snippet-clipboard-content notranslate position-relative overflow-auto" data-snippet-clipboard-copy-content="huggingface-cli download tencent/HunyuanWorld-Mirror --local-dir ./ckpts"><pre class="notranslate"><code>huggingface-cli download tencent/HunyuanWorld-Mirror --local-dir ./ckpts
+</code></pre></div>
+<blockquote>
+<p dir="auto"><strong>Note</strong>: For inference, the model weights will be automatically downloaded from Hugging Face when running the inference scripts, so you can skip this manual download step if preferred.</p>
+</blockquote>
+<div class="markdown-heading" dir="auto"><h2 tabindex="-1" class="heading-element" dir="auto">🚀 Inference with Images &amp; Priors</h2><a id="user-content--inference-with-images--priors" class="anchor" aria-label="Permalink: 🚀 Inference with Images &amp; Priors" href="https://github.com/Tencent-Hunyuan/HunyuanWorld-Mirror#-inference-with-images--priors" target="_blank" rel="noopener"><svg data-component="Octicon" class="octicon octicon-link" viewbox="0 0 16 16" version="1.1" aria-hidden="true"><path d="m7.775 3.275 1.25-1.25a3.5 3.5 0 1 1 4.95 4.95l-2.5 2.5a3.5 3.5 0 0 1-4.95 0 .751.751 0 0 1 .018-1.042.751.751 0 0 1 1.042-.018 1.998 1.998 0 0 0 2.83 0l2.5-2.5a2.002 2.002 0 0 0-2.83-2.83l-1.25 1.25a.751.751 0 0 1-1.042-.018.751.751 0 0 1-.018-1.042Zm-4.69 9.64a1.998 1.998 0 0 0 2.83 0l1.25-1.25a.751.751 0 0 1 1.042.018.751.751 0 0 1 .018 1.042l-1.25 1.25a3.5 3.5 0 1 1-4.95-4.95l2.5-2.5a3.5 3.5 0 0 1 4.95 0 .751.751 0 0 1-.018 1.042.751.751 0 0 1-1.042.018 1.998 1.998 0 0 0-2.83 0l-2.5 2.5a1.998 1.998 0 0 0 0 2.83Z"></path></svg></a></div>
+
+<div class="highlight highlight-source-python notranslate position-relative overflow-auto" dir="auto" data-snippet-clipboard-copy-content="from pathlib import Path
+import torch
+from src.models.models.worldmirror import WorldMirror
+from src.utils.inference_utils import extract_load_and_preprocess_images
+
+# --- Setup ---
+device = 'cuda' if torch.cuda.is_available() else 'cpu'
+model = WorldMirror.from_pretrained(&quot;tencent/HunyuanWorld-Mirror&quot;).to(device)
+
+# --- Load Data ---
+# Load a sequence of N images into a tensor
+inputs = {}
+inputs['img'] = extract_load_and_preprocess_images(
+    Path(&quot;path/to/your/data&quot;), # video or directory containing images 
+    fps=1, # fps for extracing frames from video
+    target_size=518
+).to(device)  # [1,N,3,H,W], in [0,1]
+# -- Load Priors (Optional) --
+# Configure conditioning flags and prior paths
+cond_flags = [0, 0, 0]  # [camera_pose, depth, intrinsics]
+prior_data = {
+    'camera_poses': None,      # Camera pose tensor [1, N, 4, 4]
+    'depthmap': None,         # Depth map tensor [1, N, H, W]
+    'camera_intrs': None # Camera intrinsics tensor [1, N, 3, 3]
+}
+for idx, (key, data) in enumerate(prior_data.items()):
+    if data is not None:
+        cond_flags[idx] = 1
+        inputs[key] = data
+
+# --- Inference ---
+with torch.no_grad():
+    predictions = model(views=inputs, cond_flags=cond_flags)"><pre><span class="pl-k">from</span> <span class="pl-s1">pathlib</span> <span class="pl-k">import</span> <span class="pl-v">Path</span>
+<span class="pl-k">import</span> <span class="pl-s1">torch</span>
+<span class="pl-k">from</span> <span class="pl-s1">src</span>.<span class="pl-s1">models</span>.<span class="pl-s1">models</span>.<span class="pl-s1">worldmirror</span> <span class="pl-k">import</span> <span class="pl-v">WorldMirror</span>
+<span class="pl-k">from</span> <span class="pl-s1">src</span>.<span class="pl-s1">utils</span>.<span class="pl-s1">inference_utils</span> <span class="pl-k">import</span> <span class="pl-s1">extract_load_and_preprocess_images</span>
+
+<span class="pl-c"># --- Setup ---</span>
+<span class="pl-s1">device</span> <span class="pl-c1">=</span> <span class="pl-s">'cuda'</span> <span class="pl-k">if</span> <span class="pl-s1">torch</span>.<span class="pl-c1">cuda</span>.<span class="pl-c1">is_available</span>() <span class="pl-k">else</span> <span class="pl-s">'cpu'</span>
+<span class="pl-s1">model</span> <span class="pl-c1">=</span> <span class="pl-v">WorldMirror</span>.<span class="pl-c1">from_pretrained</span>(<span class="pl-s">"tencent/HunyuanWorld-Mirror"</span>).<span class="pl-c1">to</span>(<span class="pl-s1">device</span>)
+
+<span class="pl-c"># --- Load Data ---</span>
+<span class="pl-c"># Load a sequence of N images into a tensor</span>
+<span class="pl-s1">inputs</span> <span class="pl-c1">=</span> {}
+<span class="pl-s1">inputs</span>[<span class="pl-s">'img'</span>] <span class="pl-c1">=</span> <span class="pl-en">extract_load_and_preprocess_images</span>(
+    <span class="pl-en">Path</span>(<span class="pl-s">"path/to/your/data"</span>), <span class="pl-c"># video or directory containing images </span>
+    <span class="pl-s1">fps</span><span class="pl-c1">=</span><span class="pl-c1">1</span>, <span class="pl-c"># fps for extracing frames from video</span>
+    <span class="pl-s1">target_size</span><span class="pl-c1">=</span><span class="pl-c1">518</span>
+).<span class="pl-c1">to</span>(<span class="pl-s1">device</span>)  <span class="pl-c"># [1,N,3,H,W], in [0,1]</span>
+<span class="pl-c"># -- Load Priors (Optional) --</span>
+<span class="pl-c"># Configure conditioning flags and prior paths</span>
+<span class="pl-s1">cond_flags</span> <span class="pl-c1">=</span> [<span class="pl-c1">0</span>, <span class="pl-c1">0</span>, <span class="pl-c1">0</span>]  <span class="pl-c"># [camera_pose, depth, intrinsics]</span>
+<span class="pl-s1">prior_data</span> <span class="pl-c1">=</span> {
+    <span class="pl-s">'camera_poses'</span>: <span class="pl-c1">None</span>,      <span class="pl-c"># Camera pose tensor [1, N, 4, 4]</span>
+    <span class="pl-s">'depthmap'</span>: <span class="pl-c1">None</span>,         <span class="pl-c"># Depth map tensor [1, N, H, W]</span>
+    <span class="pl-s">'camera_intrs'</span>: <span class="pl-c1">None</span> <span class="pl-c"># Camera intrinsics tensor [1, N, 3, 3]</span>
+}
+<span class="pl-k">for</span> <span class="pl-s1">idx</span>, (<span class="pl-s1">key</span>, <span class="pl-s1">data</span>) <span class="pl-c1">in</span> <span class="pl-en">enumerate</span>(<span class="pl-s1">prior_data</span>.<span class="pl-c1">items</span>()):
+    <span class="pl-k">if</span> <span class="pl-s1">data</span> <span class="pl-c1"><span class="pl-c1">is</span> <span class="pl-c1">not</span></span> <span class="pl-c1">None</span>:
+        <span class="pl-s1">cond_flags</span>[<span class="pl-s1">idx</span>] <span class="pl-c1">=</span> <span class="pl-c1">1</span>
+        <span class="pl-s1">inputs</span>[<span class="pl-s1">key</span>] <span class="pl-c1">=</span> <span class="pl-s1">data</span>
+
+<span class="pl-c"># --- Inference ---</span>
+<span class="pl-k">with</span> <span class="pl-s1">torch</span>.<span class="pl-c1">no_grad</span>():
+    <span class="pl-s1">predictions</span> <span class="pl-c1">=</span> <span class="pl-en">model</span>(<span class="pl-s1">views</span><span class="pl-c1">=</span><span class="pl-s1">inputs</span>, <span class="pl-s1">cond_flags</span><span class="pl-c1">=</span><span class="pl-s1">cond_flags</span>)</pre></div>
+
+<div class="highlight highlight-source-python notranslate position-relative overflow-auto" dir="auto" data-snippet-clipboard-copy-content='# Geometry outputs
+pts3d_preds, pts3d_conf = predictions["pts3d"][0], predictions["pts3d_conf"][0]       # 3D point cloud in world coordinate: [S, H, W, 3] and point confidence: [S, H, W]
+depth_preds, depth_conf = predictions["depth"][0], predictions["depth_conf"][0]       # Z-depth in camera frame: [S, H, W, 1] and depth confidence: [S, H, W]
+normal_preds, normal_conf = predictions["normals"][0], predictions["normals_conf"][0] # Surface normal in camera coordinate: [S, H, W, 3] and normal confidence: [S, H, W]
+
+# Camera outputs
+camera_poses = predictions["camera_poses"][0]  # Camera-to-world poses (OpenCV convention): [S, 4, 4]
+camera_intrs = predictions["camera_intrs"][0]  # Camera intrinsic matrices: [S, 3, 3]
+camera_params = predictions["camera_params"][0]   # Camera vector: [S, 9] (translation, quaternion rotation, fov_v, fov_u)
+
+# 3D Gaussian Splatting outputs
+splats = predictions["splats"]
+means = splats["means"][0].reshape(-1, 3)      # Gaussian means: [N, 3]
+opacities = splats["opacities"][0].reshape(-1) # Gaussian opacities: [N]
+scales = splats["scales"][0].reshape(-1, 3)    # Gaussian scales: [N, 3]
+quats = splats["quats"][0].reshape(-1, 4)      # Gaussian quaternions: [N, 4]
+sh = splats["sh"][0].reshape(-1, 1, 3)         # Gaussian spherical harmonics: [N, 1, 3]'><pre><span class="pl-c"># Geometry outputs</span>
+<span class="pl-s1">pts3d_preds</span>, <span class="pl-s1">pts3d_conf</span> <span class="pl-c1">=</span> <span class="pl-s1">predictions</span>[<span class="pl-s">"pts3d"</span>][<span class="pl-c1">0</span>], <span class="pl-s1">predictions</span>[<span class="pl-s">"pts3d_conf"</span>][<span class="pl-c1">0</span>]       <span class="pl-c"># 3D point cloud in world coordinate: [S, H, W, 3] and point confidence: [S, H, W]</span>
+<span class="pl-s1">depth_preds</span>, <span class="pl-s1">depth_conf</span> <span class="pl-c1">=</span> <span class="pl-s1">predictions</span>[<span class="pl-s">"depth"</span>][<span class="pl-c1">0</span>], <span class="pl-s1">predictions</span>[<span class="pl-s">"depth_conf"</span>][<span class="pl-c1">0</span>]       <span class="pl-c"># Z-depth in camera frame: [S, H, W, 1] and depth confidence: [S, H, W]</span>
+<span class="pl-s1">normal_preds</span>, <span class="pl-s1">normal_conf</span> <span class="pl-c1">=</span> <span class="pl-s1">predictions</span>[<span class="pl-s">"normals"</span>][<span class="pl-c1">0</span>], <span class="pl-s1">predictions</span>[<span class="pl-s">"normals_conf"</span>][<span class="pl-c1">0</span>] <span class="pl-c"># Surface normal in camera coordinate: [S, H, W, 3] and normal confidence: [S, H, W]</span>
+
+<span class="pl-c"># Camera outputs</span>
+<span class="pl-s1">camera_poses</span> <span class="pl-c1">=</span> <span class="pl-s1">predictions</span>[<span class="pl-s">"camera_poses"</span>][<span class="pl-c1">0</span>]  <span class="pl-c"># Camera-to-world poses (OpenCV convention): [S, 4, 4]</span>
+<span class="pl-s1">camera_intrs</span> <span class="pl-c1">=</span> <span class="pl-s1">predictions</span>[<span class="pl-s">"camera_intrs"</span>][<span class="pl-c1">0</span>]  <span class="pl-c"># Camera intrinsic matrices: [S, 3, 3]</span>
+<span class="pl-s1">camera_params</span> <span class="pl-c1">=</span> <span class="pl-s1">predictions</span>[<span class="pl-s">"camera_params"</span>][<span class="pl-c1">0</span>]   <span class="pl-c"># Camera vector: [S, 9] (translation, quaternion rotation, fov_v, fov_u)</span>
+
+<span class="pl-c"># 3D Gaussian Splatting outputs</span>
+<span class="pl-s1">splats</span> <span class="pl-c1">=</span> <span class="pl-s1">predictions</span>[<span class="pl-s">"splats"</span>]
+<span class="pl-s1">means</span> <span class="pl-c1">=</span> <span class="pl-s1">splats</span>[<span class="pl-s">"means"</span>][<span class="pl-c1">0</span>].<span class="pl-c1">reshape</span>(<span class="pl-c1">-</span><span class="pl-c1">1</span>, <span class="pl-c1">3</span>)      <span class="pl-c"># Gaussian means: [N, 3]</span>
+<span class="pl-s1">opacities</span> <span class="pl-c1">=</span> <span class="pl-s1">splats</span>[<span class="pl-s">"opacities"</span>][<span class="pl-c1">0</span>].<span class="pl-c1">reshape</span>(<span class="pl-c1">-</span><span class="pl-c1">1</span>) <span class="pl-c"># Gaussian opacities: [N]</span>
+<span class="pl-s1">scales</span> <span class="pl-c1">=</span> <span class="pl-s1">splats</span>[<span class="pl-s">"scales"</span>][<span class="pl-c1">0</span>].<span class="pl-c1">reshape</span>(<span class="pl-c1">-</span><span class="pl-c1">1</span>, <span class="pl-c1">3</span>)    <span class="pl-c"># Gaussian scales: [N, 3]</span>
+<span class="pl-s1">quats</span> <span class="pl-c1">=</span> <span class="pl-s1">splats</span>[<span class="pl-s">"quats"</span>][<span class="pl-c1">0</span>].<span class="pl-c1">reshape</span>(<span class="pl-c1">-</span><span class="pl-c1">1</span>, <span class="pl-c1">4</span>)      <span class="pl-c"># Gaussian quaternions: [N, 4]</span>
+<span class="pl-s1">sh</span> <span class="pl-c1">=</span> <span class="pl-s1">splats</span>[<span class="pl-s">"sh"</span>][<span class="pl-c1">0</span>].<span class="pl-c1">reshape</span>(<span class="pl-c1">-</span><span class="pl-c1">1</span>, <span class="pl-c1">1</span>, <span class="pl-c1">3</span>)         <span class="pl-c"># Gaussian spherical harmonics: [N, 1, 3]</span></pre></div>
+<p dir="auto">Where:</p>
+<ul dir="auto">
+<li><code>S</code> is the number of input views</li>
+<li><code>H, W</code> are the height and width of input images</li>
+<li><code>N</code> is the number of 3D Gaussians</li>
+</ul>
+
+<div class="markdown-heading" dir="auto"><h3 tabindex="-1" class="heading-element" dir="auto">Inference with More Functions</h3><a id="user-content-inference-with-more-functions" class="anchor" aria-label="Permalink: Inference with More Functions" href="https://github.com/Tencent-Hunyuan/HunyuanWorld-Mirror#inference-with-more-functions" target="_blank" rel="noopener"><svg data-component="Octicon" class="octicon octicon-link" viewbox="0 0 16 16" version="1.1" aria-hidden="true"><path d="m7.775 3.275 1.25-1.25a3.5 3.5 0 1 1 4.95 4.95l-2.5 2.5a3.5 3.5 0 0 1-4.95 0 .751.751 0 0 1 .018-1.042.751.751 0 0 1 1.042-.018 1.998 1.998 0 0 0 2.83 0l2.5-2.5a2.002 2.002 0 0 0-2.83-2.83l-1.25 1.25a.751.751 0 0 1-1.042-.018.751.751 0 0 1-.018-1.042Zm-4.69 9.64a1.998 1.998 0 0 0 2.83 0l1.25-1.25a.751.751 0 0 1 1.042.018.751.751 0 0 1 .018 1.042l-1.25 1.25a3.5 3.5 0 1 1-4.95-4.95l2.5-2.5a3.5 3.5 0 0 1 4.95 0 .751.751 0 0 1-.018 1.042.751.751 0 0 1-1.042.018 1.998 1.998 0 0 0-2.83 0l-2.5 2.5a1.998 1.998 0 0 0 0 2.83Z"></path></svg></a></div>
+<p dir="auto">For advanced usage, see <code>infer.py</code> which provides additional features:</p>
+<ul dir="auto">
+<li>Save predictions: point clouds, depth maps, normals, camera parameters, and 3D Gaussian Splatting</li>
+<li>Visualize outputs: depth maps, surface normals, and 3D point clouds</li>
+<li>Render novel views using 3D Gaussians</li>
+<li>Export 3D Gaussian Splatting results and camera parameters to COLMAP format</li>
+</ul>
+<div class="markdown-heading" dir="auto"><h2 tabindex="-1" class="heading-element" dir="auto">🎯 Post 3DGS Optimization (Optional)</h2><a id="user-content--post-3dgs-optimization-optional" class="anchor" aria-label="Permalink: 🎯 Post 3DGS Optimization (Optional)" href="https://github.com/Tencent-Hunyuan/HunyuanWorld-Mirror#-post-3dgs-optimization-optional" target="_blank" rel="noopener"><svg data-component="Octicon" class="octicon octicon-link" viewbox="0 0 16 16" version="1.1" aria-hidden="true"><path d="m7.775 3.275 1.25-1.25a3.5 3.5 0 1 1 4.95 4.95l-2.5 2.5a3.5 3.5 0 0 1-4.95 0 .751.751 0 0 1 .018-1.042.751.751 0 0 1 1.042-.018 1.998 1.998 0 0 0 2.83 0l2.5-2.5a2.002 2.002 0 0 0-2.83-2.83l-1.25 1.25a.751.751 0 0 1-1.042-.018.751.751 0 0 1-.018-1.042Zm-4.69 9.64a1.998 1.998 0 0 0 2.83 0l1.25-1.25a.751.751 0 0 1 1.042.018.751.751 0 0 1 .018 1.042l-1.25 1.25a3.5 3.5 0 1 1-4.95-4.95l2.5-2.5a3.5 3.5 0 0 1 4.95 0 .751.751 0 0 1-.018 1.042.751.751 0 0 1-1.042.018 1.998 1.998 0 0 0-2.83 0l-2.5 2.5a1.998 1.998 0 0 0 0 2.83Z"></path></svg></a></div>
+
+<div class="highlight highlight-source-shell notranslate position-relative overflow-auto" dir="auto" data-snippet-clipboard-copy-content='cd submodules/gsplat/examples
+# install example requirements
+pip install -r requirements.txt
+# install pycolmap2 by rmbrualla
+git clone https://github.com/rmbrualla/pycolmap.git
+cd pycolmap
+# in pyproject.toml, rename name = "pycolmap" to name = "pycolmap2"
+vim pyproject.toml
+# rename folder pycolmap to pycolmap2
+mv pycolmap/ pycolmap2/
+python3 -m pip install -e .'><pre><span class="pl-c1">cd</span> submodules/gsplat/examples
+<span class="pl-c"><span class="pl-c">#</span> install example requirements</span>
+pip install -r requirements.txt
+<span class="pl-c"><span class="pl-c">#</span> install pycolmap2 by rmbrualla</span>
+git clone https://github.com/rmbrualla/pycolmap.git
+<span class="pl-c1">cd</span> pycolmap
+<span class="pl-c"><span class="pl-c">#</span> in pyproject.toml, rename name = "pycolmap" to name = "pycolmap2"</span>
+vim pyproject.toml
+<span class="pl-c"><span class="pl-c">#</span> rename folder pycolmap to pycolmap2</span>
+mv pycolmap/ pycolmap2/
+python3 -m pip install -e <span class="pl-c1">.</span></pre></div>
+
+<p dir="auto">First, run infer.py with <code>--save_colmap</code> and <code>--save_gs</code> flags to generate COLMAP format initialization:</p>
+<div class="highlight highlight-source-shell notranslate position-relative overflow-auto" dir="auto" data-snippet-clipboard-copy-content="python infer.py --input_path /path/to/your/input --output_path /path/to/your/output --save_colmap --save_gs"><pre>python infer.py --input_path /path/to/your/input --output_path /path/to/your/output --save_colmap --save_gs</pre></div>
+<p dir="auto">The reconstruction result (camera parameters, 3D points, and 3D Gaussians) will be saved under <code>/path/to/your/output</code>, such as:</p>
+<div class="snippet-clipboard-content notranslate position-relative overflow-auto" data-snippet-clipboard-copy-content="output/
+├── images/                 # Input images
+├── sparse/
+│   └── 0/
+│       ├── cameras.bin     # Camera intrinsics
+│       ├── images.bin      # Camera poses
+│       └── points3D.bin    # 3D points
+└── gaussians.ply           # 3D Gaussian Splatting initialization"><pre class="notranslate"><code>output/
+├── images/                 # Input images
+├── sparse/
+│   └── 0/
+│       ├── cameras.bin     # Camera intrinsics
+│       ├── images.bin      # Camera poses
+│       └── points3D.bin    # 3D points
+└── gaussians.ply           # 3D Gaussian Splatting initialization
+</code></pre></div>
+<p dir="auto">Then, run the optimization script:</p>
+<div class="highlight highlight-source-shell notranslate position-relative overflow-auto" dir="auto" data-snippet-clipboard-copy-content="python submodules/gsplat/examples/simple_trainer_worldmirror.py default --data_factor 1 --data_dir /path/to/your/inference_output --result_dir /path/to/your/gs_optimization_output"><pre>python submodules/gsplat/examples/simple_trainer_worldmirror.py default --data_factor 1 --data_dir /path/to/your/inference_output --result_dir /path/to/your/gs_optimization_output</pre></div>
+
+<p dir="auto">HunyuanWorld-Mirror achieves state-of-the-art performance across multiple 3D perception tasks, surpassing feed-forward 3D reconstruction methods. It demonstrates superior performance in <strong>point cloud reconstruction, camera pose estimation, surface normal prediction, novel view rendering and depth estimation</strong>. Incorporating 3D priors, such as <strong>camera poses, depth, or intrinsics</strong>, plays a crucial role in enhancing performance across these tasks. For point cloud reconstruction and novel view synthesis tasks, the performance is as follows:</p>
+<div class="markdown-heading" dir="auto"><h3 tabindex="-1" class="heading-element" dir="auto">Point cloud reconstruction</h3><a id="user-content-point-cloud-reconstruction" class="anchor" aria-label="Permalink: Point cloud reconstruction" href="https://github.com/Tencent-Hunyuan/HunyuanWorld-Mirror#point-cloud-reconstruction" target="_blank" rel="noopener"><svg data-component="Octicon" class="octicon octicon-link" viewbox="0 0 16 16" version="1.1" aria-hidden="true"><path d="m7.775 3.275 1.25-1.25a3.5 3.5 0 1 1 4.95 4.95l-2.5 2.5a3.5 3.5 0 0 1-4.95 0 .751.751 0 0 1 .018-1.042.751.751 0 0 1 1.042-.018 1.998 1.998 0 0 0 2.83 0l2.5-2.5a2.002 2.002 0 0 0-2.83-2.83l-1.25 1.25a.751.751 0 0 1-1.042-.018.751.751 0 0 1-.018-1.042Zm-4.69 9.64a1.998 1.998 0 0 0 2.83 0l1.25-1.25a.751.751 0 0 1 1.042.018.751.751 0 0 1 .018 1.042l-1.25 1.25a3.5 3.5 0 1 1-4.95-4.95l2.5-2.5a3.5 3.5 0 0 1 4.95 0 .751.751 0 0 1-.018 1.042.751.751 0 0 1-1.042.018 1.998 1.998 0 0 0-2.83 0l-2.5 2.5a1.998 1.998 0 0 0 0 2.83Z"></path></svg></a></div>
+<markdown-accessiblity-table><table>
+<thead>
+<tr>
+<th>Method</th>
+<th>7-Scenes</th>
+<th></th>
+<th>NRGBD</th>
+<th></th>
+<th>DTU</th>
+<th></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td></td>
+<td>Acc. ⬇</td>
+<td>Comp. ⬇</td>
+<td>Acc. ⬇</td>
+<td>Comp. ⬇</td>
+<td>Acc. ⬇</td>
+<td>Comp. ⬇</td>
+</tr>
+<tr>
+<td>Fast3R</td>
+<td>0.096</td>
+<td>0.145</td>
+<td>0.135</td>
+<td>0.163</td>
+<td>3.340</td>
+<td>2.929</td>
+</tr>
+<tr>
+<td>CUT3R</td>
+<td>0.094</td>
+<td>0.101</td>
+<td>0.104</td>
+<td>0.079</td>
+<td>4.742</td>
+<td>3.400</td>
+</tr>
+<tr>
+<td>VGGT</td>
+<td>0.046</td>
+<td>0.057</td>
+<td>0.051</td>
+<td>0.066</td>
+<td>1.338</td>
+<td>1.896</td>
+</tr>
+<tr>
+<td>π³</td>
+<td>0.048</td>
+<td>0.072</td>
+<td>0.026</td>
+<td>0.028</td>
+<td>1.198</td>
+<td>1.849</td>
+</tr>
+<tr>
+<td><strong>HunyuanWorld-Mirror</strong></td>
+<td>0.043</td>
+<td>0.049</td>
+<td>0.041</td>
+<td>0.045</td>
+<td>1.017</td>
+<td>1.780</td>
+</tr>
+<tr>
+<td><strong>+ Intrinsics</strong></td>
+<td>0.042</td>
+<td>0.048</td>
+<td>0.041</td>
+<td>0.045</td>
+<td>0.977</td>
+<td>1.762</td>
+</tr>
+<tr>
+<td><strong>+ Depths</strong></td>
+<td>0.038</td>
+<td>0.039</td>
+<td>0.032</td>
+<td>0.031</td>
+<td>0.831</td>
+<td>1.022</td>
+</tr>
+<tr>
+<td><strong>+ Camera Poses</strong></td>
+<td>0.023</td>
+<td>0.036</td>
+<td>0.029</td>
+<td>0.032</td>
+<td>0.990</td>
+<td>1.847</td>
+</tr>
+<tr>
+<td><strong>+ All Priors</strong></td>
+<td><strong>0.018</strong></td>
+<td><strong>0.023</strong></td>
+<td><strong>0.016</strong></td>
+<td><strong>0.014</strong></td>
+<td><strong>0.735</strong></td>
+<td><strong>0.935</strong></td>
+</tr>
+</tbody>
+</table></markdown-accessiblity-table>
+
+<markdown-accessiblity-table><table>
+<thead>
+<tr>
+<th>Method</th>
+<th>Re10K</th>
+<th></th>
+<th></th>
+<th>DL3DV</th>
+<th></th>
+<th></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td></td>
+<td>PSNR ⬆</td>
+<td>SSIM ⬆</td>
+<td>LPIPS ⬇</td>
+<td>PSNR ⬆</td>
+<td>SSIM ⬆</td>
+<td>LPIPS ⬇</td>
+</tr>
+<tr>
+<td>FLARE</td>
+<td>16.33</td>
+<td>0.574</td>
+<td>0.410</td>
+<td>15.35</td>
+<td>0.516</td>
+<td>0.591</td>
+</tr>
+<tr>
+<td>AnySplat</td>
+<td>17.62</td>
+<td>0.616</td>
+<td>0.242</td>
+<td>18.31</td>
+<td>0.569</td>
+<td>0.258</td>
+</tr>
+<tr>
+<td><strong>HunyuanWorld-Mirror</strong></td>
+<td>20.62</td>
+<td>0.706</td>
+<td>0.187</td>
+<td>20.92</td>
+<td>0.667</td>
+<td>0.203</td>
+</tr>
+<tr>
+<td><strong>+ Intrinsics</strong></td>
+<td>22.03</td>
+<td>0.765</td>
+<td>0.165</td>
+<td>22.08</td>
+<td>0.723</td>
+<td>0.175</td>
+</tr>
+<tr>
+<td><strong>+ Camera Poses</strong></td>
+<td>20.84</td>
+<td>0.713</td>
+<td>0.182</td>
+<td>21.18</td>
+<td>0.674</td>
+<td>0.197</td>
+</tr>
+<tr>
+<td><strong>+ Intrinsics + Camera Poses</strong></td>
+<td><strong>22.30</strong></td>
+<td><strong>0.774</strong></td>
+<td><strong>0.155</strong></td>
+<td><strong>22.15</strong></td>
+<td><strong>0.726</strong></td>
+<td><strong>0.174</strong></td>
+</tr>
+</tbody>
+</table></markdown-accessiblity-table>
+<div class="markdown-heading" dir="auto"><h3 tabindex="-1" class="heading-element" dir="auto">Boost of Geometric Priors</h3><a id="user-content-boost-of-geometric-priors" class="anchor" aria-label="Permalink: Boost of Geometric Priors" href="https://github.com/Tencent-Hunyuan/HunyuanWorld-Mirror#boost-of-geometric-priors" target="_blank" rel="noopener"><svg data-component="Octicon" class="octicon octicon-link" viewbox="0 0 16 16" version="1.1" aria-hidden="true"><path d="m7.775 3.275 1.25-1.25a3.5 3.5 0 1 1 4.95 4.95l-2.5 2.5a3.5 3.5 0 0 1-4.95 0 .751.751 0 0 1 .018-1.042.751.751 0 0 1 1.042-.018 1.998 1.998 0 0 0 2.83 0l2.5-2.5a2.002 2.002 0 0 0-2.83-2.83l-1.25 1.25a.751.751 0 0 1-1.042-.018.751.751 0 0 1-.018-1.042Zm-4.69 9.64a1.998 1.998 0 0 0 2.83 0l1.25-1.25a.751.751 0 0 1 1.042.018.751.751 0 0 1 .018 1.042l-1.25 1.25a3.5 3.5 0 1 1-4.95-4.95l2.5-2.5a3.5 3.5 0 0 1 4.95 0 .751.751 0 0 1-.018 1.042.751.751 0 0 1-1.042.018 1.998 1.998 0 0 0-2.83 0l-2.5 2.5a1.998 1.998 0 0 0 0 2.83Z"></path></svg></a></div>
+<p align="left" dir="auto">
+  <a target="_blank" rel="noopener" href="https://github.com/Tencent-Hunyuan/HunyuanWorld-Mirror/blob/main/assets/num-prior.png"><img src="https://github.com/Tencent-Hunyuan/HunyuanWorld-Mirror/raw/main/assets/num-prior.png" loading="lazy"></a>
+</p>
+<p dir="auto">For the other tasks, refer to the <a href="https://3d-models.hunyuan.tencent.com/world/worldMirror1_0/HYWorld_Mirror_Tech_Report.pdf" rel="noopener" target="_blank">technique report</a> for detailed performance comparisons.</p>
+
+<div class="markdown-heading" dir="auto"><h3 tabindex="-1" class="heading-element" dir="auto">Training Data Preparation</h3><a id="user-content-training-data-preparation" class="anchor" aria-label="Permalink: Training Data Preparation" href="https://github.com/Tencent-Hunyuan/HunyuanWorld-Mirror#training-data-preparation" target="_blank" rel="noopener"><svg data-component="Octicon" class="octicon octicon-link" viewbox="0 0 16 16" version="1.1" aria-hidden="true"><path d="m7.775 3.275 1.25-1.25a3.5 3.5 0 1 1 4.95 4.95l-2.5 2.5a3.5 3.5 0 0 1-4.95 0 .751.751 0 0 1 .018-1.042.751.751 0 0 1 1.042-.018 1.998 1.998 0 0 0 2.83 0l2.5-2.5a2.002 2.002 0 0 0-2.83-2.83l-1.25 1.25a.751.751 0 0 1-1.042-.018.751.751 0 0 1-.018-1.042Zm-4.69 9.64a1.998 1.998 0 0 0 2.83 0l1.25-1.25a.751.751 0 0 1 1.042.018.751.751 0 0 1 .018 1.042l-1.25 1.25a3.5 3.5 0 1 1-4.95-4.95l2.5-2.5a3.5 3.5 0 0 1 4.95 0 .751.751 0 0 1-.018 1.042.751.751 0 0 1-1.042.018 1.998 1.998 0 0 0-2.83 0l-2.5 2.5a1.998 1.998 0 0 0 0 2.83Z"></path></svg></a></div>
+<p dir="auto">Please follow the <a href="https://github.com/CUT3R/CUT3R/blob/main/docs/preprocess.md" target="_blank" rel="noopener">CUT3R data preparation instructions</a> to download and prepare the training datasets. Currently, we provide an example dataset of Hypersim.</p>
+
+<p dir="auto">Refer to <a href="https://github.com/Tencent-Hunyuan/HunyuanWorld-Mirror#%F0%9F%9B%A0%EF%B8%8F-dependencies-and-installation" target="_blank" rel="noopener">Installation</a>.</p>
+
+<p dir="auto">Our model training consists of two stages. The quick start commands are:</p>
+<div class="highlight highlight-source-shell notranslate position-relative overflow-auto" dir="auto" data-snippet-clipboard-copy-content="# stage1 for prior, pointmap, camera, depth, and normal
+python training/launch.py train=stage1.yaml 
+# stage2 for 3dgs
+python training/lanuch.py train=stage2.yaml"><pre><span class="pl-c"><span class="pl-c">#</span> stage1 for prior, pointmap, camera, depth, and normal</span>
+python training/launch.py train=stage1.yaml 
+<span class="pl-c"><span class="pl-c">#</span> stage2 for 3dgs</span>
+python training/lanuch.py train=stage2.yaml</pre></div>
+<p dir="auto"><strong>Notes:</strong></p>
+<ul dir="auto">
+<li>This will automatically detect all available GPUs. To specify GPUs, use <code>CUDA_VISIBLE_DEVICES=&lt;CUDA_ID&gt;</code></li>
+<li>If you want to resume training from a checkpoint, you can set the <code>ckpt_path</code> flag to the path of the checkpoint, such as <code>python training/launch.py train=stage1.yaml ckpt_path=path/to/your/checkpoint.ckpt</code>.</li>
+<li>You can comment some validation datasets in <code>data.validation_datasets</code> and adjust <code>wrapper.eval_modalities</code> in the configuration file to reduce the evaluation time.</li>
+</ul>
+<div class="markdown-heading" dir="auto"><h3 tabindex="-1" class="heading-element" dir="auto">Customized Training Commands</h3><a id="user-content-customized-training-commands" class="anchor" aria-label="Permalink: Customized Training Commands" href="https://github.com/Tencent-Hunyuan/HunyuanWorld-Mirror#customized-training-commands" target="_blank" rel="noopener"><svg data-component="Octicon" class="octicon octicon-link" viewbox="0 0 16 16" version="1.1" aria-hidden="true"><path d="m7.775 3.275 1.25-1.25a3.5 3.5 0 1 1 4.95 4.95l-2.5 2.5a3.5 3.5 0 0 1-4.95 0 .751.751 0 0 1 .018-1.042.751.751 0 0 1 1.042-.018 1.998 1.998 0 0 0 2.83 0l2.5-2.5a2.002 2.002 0 0 0-2.83-2.83l-1.25 1.25a.751.751 0 0 1-1.042-.018.751.751 0 0 1-.018-1.042Zm-4.69 9.64a1.998 1.998 0 0 0 2.83 0l1.25-1.25a.751.751 0 0 1 1.042.018.751.751 0 0 1 .018 1.042l-1.25 1.25a3.5 3.5 0 1 1-4.95-4.95l2.5-2.5a3.5 3.5 0 0 1 4.95 0 .751.751 0 0 1-.018 1.042.751.751 0 0 1-1.042.018 1.998 1.998 0 0 0-2.83 0l-2.5 2.5a1.998 1.998 0 0 0 0 2.83Z"></path></svg></a></div>
+<p dir="auto">We have provided a customized training config in <code>training/configs/train/custom.yaml</code>, where you can customize training parameters and model architecture. For example, you can disable certain prediction heads in the configuration file:</p>
+<div class="highlight highlight-source-yaml notranslate position-relative overflow-auto" dir="auto" data-snippet-clipboard-copy-content="wrapper:
+  model:
+    enable_cam: true      # Camera prediction head
+    enable_pts: true      # Point cloud prediction head
+    enable_depth: true    # Depth prediction head
+    enable_norm: false    # Normal prediction head
+    enable_gs: false      # Gaussian Splatting head"><pre><span class="pl-ent">wrapper</span>:
+  <span class="pl-ent">model</span>:
+    <span class="pl-ent">enable_cam</span>: <span class="pl-s">true      </span><span class="pl-c"><span class="pl-c">#</span> Camera prediction head</span>
+    <span class="pl-ent">enable_pts</span>: <span class="pl-s">true      </span><span class="pl-c"><span class="pl-c">#</span> Point cloud prediction head</span>
+    <span class="pl-ent">enable_depth</span>: <span class="pl-s">true    </span><span class="pl-c"><span class="pl-c">#</span> Depth prediction head</span>
+    <span class="pl-ent">enable_norm</span>: <span class="pl-s">false    </span><span class="pl-c"><span class="pl-c">#</span> Normal prediction head</span>
+    <span class="pl-ent">enable_gs</span>: <span class="pl-s">false      </span><span class="pl-c"><span class="pl-c">#</span> Gaussian Splatting head</span></pre></div>
+<p dir="auto">And run the following script:</p>
+<div class="highlight highlight-source-shell notranslate position-relative overflow-auto" dir="auto" data-snippet-clipboard-copy-content="python training/lanuch.py train=custom.yaml"><pre>python training/lanuch.py train=custom.yaml</pre></div>
+<p dir="auto">If you want to train the model with all heads open in a single stage, you can run the following command:</p>
+<div class="highlight highlight-source-shell notranslate position-relative overflow-auto" dir="auto" data-snippet-clipboard-copy-content="python training/launch.py train=all.yaml # adjust max_images_per_gpu in train/all.yaml to avoid OOM"><pre>python training/launch.py train=all.yaml <span class="pl-c"><span class="pl-c">#</span> adjust max_images_per_gpu in train/all.yaml to avoid OOM</span></pre></div>
+<div class="markdown-heading" dir="auto"><h3 tabindex="-1" class="heading-element" dir="auto">Evaluate Training Checkpoints</h3><a id="user-content-evaluate-training-checkpoints" class="anchor" aria-label="Permalink: Evaluate Training Checkpoints" href="https://github.com/Tencent-Hunyuan/HunyuanWorld-Mirror#evaluate-training-checkpoints" target="_blank" rel="noopener"><svg data-component="Octicon" class="octicon octicon-link" viewbox="0 0 16 16" version="1.1" aria-hidden="true"><path d="m7.775 3.275 1.25-1.25a3.5 3.5 0 1 1 4.95 4.95l-2.5 2.5a3.5 3.5 0 0 1-4.95 0 .751.751 0 0 1 .018-1.042.751.751 0 0 1 1.042-.018 1.998 1.998 0 0 0 2.83 0l2.5-2.5a2.002 2.002 0 0 0-2.83-2.83l-1.25 1.25a.751.751 0 0 1-1.042-.018.751.751 0 0 1-.018-1.042Zm-4.69 9.64a1.998 1.998 0 0 0 2.83 0l1.25-1.25a.751.751 0 0 1 1.042.018.751.751 0 0 1 .018 1.042l-1.25 1.25a3.5 3.5 0 1 1-4.95-4.95l2.5-2.5a3.5 3.5 0 0 1 4.95 0 .751.751 0 0 1-.018 1.042.751.751 0 0 1-1.042.018 1.998 1.998 0 0 0-2.83 0l-2.5 2.5a1.998 1.998 0 0 0 0 2.83Z"></path></svg></a></div>
+<p dir="auto">After training, you can evaluate the trained checkpoints in point reconstruction by running the following script:</p>
+<div class="highlight highlight-source-shell notranslate position-relative overflow-auto" dir="auto" data-snippet-clipboard-copy-content="python training/launch.py --config-name=eval.yaml eval=pointmap.yaml wrapper.pretrained=path/to/your/checkpoint.ckpt"><pre>python training/launch.py --config-name=eval.yaml eval=pointmap.yaml wrapper.pretrained=path/to/your/checkpoint.ckpt</pre></div>
+
+<div class="markdown-heading" dir="auto"><h3 tabindex="-1" class="heading-element" dir="auto">Evaluation Data Preparation</h3><a id="user-content-evaluation-data-preparation" class="anchor" aria-label="Permalink: Evaluation Data Preparation" href="https://github.com/Tencent-Hunyuan/HunyuanWorld-Mirror#evaluation-data-preparation" target="_blank" rel="noopener"><svg data-component="Octicon" class="octicon octicon-link" viewbox="0 0 16 16" version="1.1" aria-hidden="true"><path d="m7.775 3.275 1.25-1.25a3.5 3.5 0 1 1 4.95 4.95l-2.5 2.5a3.5 3.5 0 0 1-4.95 0 .751.751 0 0 1 .018-1.042.751.751 0 0 1 1.042-.018 1.998 1.998 0 0 0 2.83 0l2.5-2.5a2.002 2.002 0 0 0-2.83-2.83l-1.25 1.25a.751.751 0 0 1-1.042-.018.751.751 0 0 1-.018-1.042Zm-4.69 9.64a1.998 1.998 0 0 0 2.83 0l1.25-1.25a.751.751 0 0 1 1.042.018.751.751 0 0 1 .018 1.042l-1.25 1.25a3.5 3.5 0 1 1-4.95-4.95l2.5-2.5a3.5 3.5 0 0 1 4.95 0 .751.751 0 0 1-.018 1.042.751.751 0 0 1-1.042.018 1.998 1.998 0 0 0-2.83 0l-2.5 2.5a1.998 1.998 0 0 0 0 2.83Z"></path></svg></a></div>
+<p dir="auto">Please place all evaluation datasets in the <code>data</code> folder, or modify the configuration file at <code>configs/paths/default.yaml</code> accordingly. For data preprocessing:</p>
+
+
+<div class="markdown-heading" dir="auto"><h4 tabindex="-1" class="heading-element" dir="auto">1. Point Map Reconstruction</h4><a id="user-content-1-point-map-reconstruction" class="anchor" aria-label="Permalink: 1. Point Map Reconstruction" href="https://github.com/Tencent-Hunyuan/HunyuanWorld-Mirror#1-point-map-reconstruction" target="_blank" rel="noopener"><svg data-component="Octicon" class="octicon octicon-link" viewbox="0 0 16 16" version="1.1" aria-hidden="true"><path d="m7.775 3.275 1.25-1.25a3.5 3.5 0 1 1 4.95 4.95l-2.5 2.5a3.5 3.5 0 0 1-4.95 0 .751.751 0 0 1 .018-1.042.751.751 0 0 1 1.042-.018 1.998 1.998 0 0 0 2.83 0l2.5-2.5a2.002 2.002 0 0 0-2.83-2.83l-1.25 1.25a.751.751 0 0 1-1.042-.018.751.751 0 0 1-.018-1.042Zm-4.69 9.64a1.998 1.998 0 0 0 2.83 0l1.25-1.25a.751.751 0 0 1 1.042.018.751.751 0 0 1 .018 1.042l-1.25 1.25a3.5 3.5 0 1 1-4.95-4.95l2.5-2.5a3.5 3.5 0 0 1 4.95 0 .751.751 0 0 1-.018 1.042.751.751 0 0 1-1.042.018 1.998 1.998 0 0 0-2.83 0l-2.5 2.5a1.998 1.998 0 0 0 0 2.83Z"></path></svg></a></div>
+<p dir="auto">See the config in <code>configs/eval/pointmap.yaml</code>.</p>
+<div class="highlight highlight-source-shell notranslate position-relative overflow-auto" dir="auto" data-snippet-clipboard-copy-content="python training/launch.py --config-name eval.yaml eval=pointmap.yaml"><pre>python training/launch.py --config-name eval.yaml eval=pointmap.yaml</pre></div>
+<div class="markdown-heading" dir="auto"><h4 tabindex="-1" class="heading-element" dir="auto">2. Surface Normal Estimation</h4><a id="user-content-2-surface-normal-estimation" class="anchor" aria-label="Permalink: 2. Surface Normal Estimation" href="https://github.com/Tencent-Hunyuan/HunyuanWorld-Mirror#2-surface-normal-estimation" target="_blank" rel="noopener"><svg data-component="Octicon" class="octicon octicon-link" viewbox="0 0 16 16" version="1.1" aria-hidden="true"><path d="m7.775 3.275 1.25-1.25a3.5 3.5 0 1 1 4.95 4.95l-2.5 2.5a3.5 3.5 0 0 1-4.95 0 .751.751 0 0 1 .018-1.042.751.751 0 0 1 1.042-.018 1.998 1.998 0 0 0 2.83 0l2.5-2.5a2.002 2.002 0 0 0-2.83-2.83l-1.25 1.25a.751.751 0 0 1-1.042-.018.751.751 0 0 1-.018-1.042Zm-4.69 9.64a1.998 1.998 0 0 0 2.83 0l1.25-1.25a.751.751 0 0 1 1.042.018.751.751 0 0 1 .018 1.042l-1.25 1.25a3.5 3.5 0 1 1-4.95-4.95l2.5-2.5a3.5 3.5 0 0 1 4.95 0 .751.751 0 0 1-.018 1.042.751.751 0 0 1-1.042.018 1.998 1.998 0 0 0-2.83 0l-2.5 2.5a1.998 1.998 0 0 0 0 2.83Z"></path></svg></a></div>
+<p dir="auto">See the config in <code>configs/eval/normal.yaml</code>.</p>
+<div class="highlight highlight-source-shell notranslate position-relative overflow-auto" dir="auto" data-snippet-clipboard-copy-content="python training/launch.py --config-name eval.yaml eval=normal.yaml"><pre>python training/launch.py --config-name eval.yaml eval=normal.yaml</pre></div>
+
+<p dir="auto">See the config in <code>configs/eval/nvs.yaml</code>.</p>
+<div class="highlight highlight-source-shell notranslate position-relative overflow-auto" dir="auto" data-snippet-clipboard-copy-content="python training/launch.py --config-name eval.yaml eval=nvs.yaml"><pre>python training/launch.py --config-name eval.yaml eval=nvs.yaml</pre></div>
+
+<p dir="auto">See the config in <code>configs/eval/depthmap.yaml</code>.</p>
+<div class="highlight highlight-source-shell notranslate position-relative overflow-auto" dir="auto" data-snippet-clipboard-copy-content="python training/launch.py --config-name eval.yaml eval=depthmap.yaml"><pre>python training/launch.py --config-name eval.yaml eval=depthmap.yaml</pre></div>
+<div class="markdown-heading" dir="auto"><h4 tabindex="-1" class="heading-element" dir="auto">5. Camera Pose Estimation</h4><a id="user-content-5-camera-pose-estimation" class="anchor" aria-label="Permalink: 5. Camera Pose Estimation" href="https://github.com/Tencent-Hunyuan/HunyuanWorld-Mirror#5-camera-pose-estimation" target="_blank" rel="noopener"><svg data-component="Octicon" class="octicon octicon-link" viewbox="0 0 16 16" version="1.1" aria-hidden="true"><path d="m7.775 3.275 1.25-1.25a3.5 3.5 0 1 1 4.95 4.95l-2.5 2.5a3.5 3.5 0 0 1-4.95 0 .751.751 0 0 1 .018-1.042.751.751 0 0 1 1.042-.018 1.998 1.998 0 0 0 2.83 0l2.5-2.5a2.002 2.002 0 0 0-2.83-2.83l-1.25 1.25a.751.751 0 0 1-1.042-.018.751.751 0 0 1-.018-1.042Zm-4.69 9.64a1.998 1.998 0 0 0 2.83 0l1.25-1.25a.751.751 0 0 1 1.042.018.751.751 0 0 1 .018 1.042l-1.25 1.25a3.5 3.5 0 1 1-4.95-4.95l2.5-2.5a3.5 3.5 0 0 1 4.95 0 .751.751 0 0 1-.018 1.042.751.751 0 0 1-1.042.018 1.998 1.998 0 0 0-2.83 0l-2.5 2.5a1.998 1.998 0 0 0 0 2.83Z"></path></svg></a></div>
+<p dir="auto">See the config in <code>configs/eval/pose.yaml</code>.</p>
+<div class="highlight highlight-source-shell notranslate position-relative overflow-auto" dir="auto" data-snippet-clipboard-copy-content="python training/launch.py --config-name eval.yaml eval=pose.yaml"><pre>python training/launch.py --config-name eval.yaml eval=pose.yaml</pre></div>
+
+
+
+<p dir="auto">If you find HunyuanWorld-Mirror useful for your research and applications, please cite using this BibTeX:</p>
+<div class="highlight highlight-text-bibtex notranslate position-relative overflow-auto" dir="auto" data-snippet-clipboard-copy-content="@article{liu2025worldmirror,
+  title={WorldMirror: Universal 3D World Reconstruction with Any-Prior Prompting},
+  author={Liu, Yifan and Min, Zhiyuan and Wang, Zhenwei and Wu, Junta and Wang, Tengfei and Yuan, Yixuan and Luo, Yawei and Guo, Chunchao},
+  journal={arXiv preprint arXiv:2510.10726},
+  year={2025}
+}"><pre><span class="pl-k">@article</span>{<span class="pl-en">liu2025worldmirror</span>,
+  <span class="pl-s">title</span>=<span class="pl-s"><span class="pl-pds">{</span>WorldMirror: Universal 3D World Reconstruction with Any-Prior Prompting<span class="pl-pds">}</span></span>,
+  <span class="pl-s">author</span>=<span class="pl-s"><span class="pl-pds">{</span>Liu, Yifan and Min, Zhiyuan and Wang, Zhenwei and Wu, Junta and Wang, Tengfei and Yuan, Yixuan and Luo, Yawei and Guo, Chunchao<span class="pl-pds">}</span></span>,
+  <span class="pl-s">journal</span>=<span class="pl-s"><span class="pl-pds">{</span>arXiv preprint arXiv:2510.10726<span class="pl-pds">}</span></span>,
+  <span class="pl-s">year</span>=<span class="pl-s"><span class="pl-pds">{</span>2025<span class="pl-pds">}</span></span>
+}</pre></div>
+
+<p dir="auto">Please send emails to <a href="mailto:tengfeiwang12@gmail.com" target="_blank" rel="noopener">tengfeiwang12@gmail.com</a> if there is any question.</p>
+
+<p dir="auto">We would like to thank <a href="https://github.com/Tencent-Hunyuan/HunyuanWorld-1.0" target="_blank" rel="noopener">HunyuanWorld</a>. We also sincerely thank the authors and contributors of <a href="https://github.com/facebookresearch/vggt" target="_blank" rel="noopener">VGGT</a>, <a href="https://github.com/facebookresearch/fast3r" target="_blank" rel="noopener">Fast3R</a>, <a href="https://github.com/CUT3R/CUT3R" target="_blank" rel="noopener">CUT3R</a>, and <a href="https://github.com/naver/dust3r" target="_blank" rel="noopener">DUSt3R</a> for their outstanding open-source work and pioneering research.</p>
+</article></div></div>
