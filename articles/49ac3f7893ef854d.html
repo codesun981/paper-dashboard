@@ -1,0 +1,12 @@
+<div><div><header class="article-hd">
+        <h1 class="article-tit">研究人员公布微软身份验证器的高危安全漏洞 可冒充微软应用获得账户令牌</h1>
+        <p class="article-byline">
+            <a class="commnum" href="https://m.cnbeta.com.tw/comment/1583968.htm" target="_blank" rel="noopener"><i></i>0</a>
+            <span><a href="https://www.cnbeta.com.tw/" target="_blank" rel="noopener"><span>cnBeta.COM</span></a>  </span>
+        <time class="time">2026-10-27 10:55:49</time></p>
+    </header>
+
+    <div class="article-summ"><p><b>摘要：</b></p><p>网络安全研究员奥菲克莱文日前发布报告披露 AuthMask 攻击链：恶意Android应用程序可以借助微软身份验证器的身份验证代理，冒充已经安装的微软应用获取账户令牌。该漏洞编号 CVE-2026-80097，安全研究员已经提前通报给微软进行修复，微软则在 9 月发布更新修复漏洞。</p></div>
+    <div class="articleCont" id="artibody">
+    <p class="article-global"></p>    <p><img src="https://static.cnbetacdn.com/article/2026/1027/723f62063090c5d.jpg" loading="lazy"></p><p>微软身份验证器可以只作为 TOTP 验证器使用，即生成 6 位数动态验证码。但微软身份验证器也为微软应用提供身份验证代理服务，即用户通过身份验证器确认后用于登录企业账号获取 Microsoft 365 资源。</p><p>问题出在微软开放给其他应用调用的组件中，研究发现调用应用可以在请求中自行填写应用名称、包名、客户端 ID 和重定向地址。身份验证器会根据请求声称的应用身份检查重定向地址，但没有用实际发起调用的应用身份完成授权判断。</p><p>例如恶意应用可以声称自己是设备上已经安装的 Microsoft Teams，由于该应用的签名和重定向地址确实存在于设备中，于是微软身份验证器会接受这项伪装，最后将真实令牌返回给实际发起请求的应用。</p><p>安全研究员测试多种应用身份伪装，以 Microsoft Teams 为例，伪装后取得 Microsoft Graph 委派权限包括读取和发送邮件、访问文件、修改日历、发送 Microsoft Teams 消息以及操作 SharePoint 内容。访问令牌也可以直接访问对应资源，刷新令牌还可以在有效期内换取新的访问令牌。</p><p>根据研究，利用缺陷攻击者还可以管理用户的身份验证方式、创建和删除通行密钥，这让风险不止于涉及数据读取，也可能触及到账户本身的登录安全设置等。</p><p>研究人员发现漏洞后已经负责任地将其通报给微软，受影响的主要是Android版微软身份验证器 6.0.0~6.2606.4246，微软在 9 月 8 日发布 6.2606.4246 版修复该问题。</p><p>为避免部分用户长时间未升级新版本，研究人员并未在漏洞修复后就公布漏洞细节，现在已经过去 50 天，研究人员才公布漏洞情况，估计接下来就会有攻击者利用相关缺陷寻找攻击机会。</p>    </div>
+    </div></div>
