@@ -1,0 +1,31 @@
+<div><div><div class="entry-head">
+                            <h1 class="entry-title">Windows 带外更新移除对受入侵 eMudhra 证书的信任</h1>
+                            <p class="entry-info">
+                                                                    <span class="vcard">
+                                        <a class="nickname url fn j-user-card" data-user="1" href="https://www.ruancan.com/i/1" data-wpel-link="internal" target="_blank" rel="noopener">RC-pulish</a>
+                                    </span>
+                                    <span class="dot">•</span>
+                                                                <time class="entry-date published" datetime="2026-10-29T13:26:04+08:00" pubdate>
+                                    2026-10-29 13:26                                </time>
+                                <span class="dot">•</span>
+                                <a href="https://www.ruancan.com/p/category/news" rel="noopener" data-wpel-link="internal" target="_blank">业界</a>                                                                        <span class="dot">•</span>
+                                        <span>阅读 48</span>
+                                                                </p>
+                        </div>
+                        
+                                                <div class="entry-content text-justify">
+                            <p>据微软安全响应中心（Microsoft Security Response Center），<b>微软发布了带外 Windows 更新 KB5134133 和 KB5134125，移除对与受入侵的 eMudhra 证书颁发机构相关的七张证书的信任。 KB5134133 适用于 Windows 11 24H2 、 25H2 和 26H2，而 KB5134125 适用于 Windows 10 21H2 和 22H2 。</b>这两个更新均于 10 月 26 日发布。这些更新针对特定的一类设备：无法访问互联网的系统、无法连接到微软证书更新服务的设备，以及自动证书信任列表（CTL）更新已关闭的机器。通常接收 CTL 更新的 Windows 设备已经通过该渠道获得信任变更。</p>
+<p><b>【微软为何移除 eMudhra 根证书】</b><br>此次发布是在发现八个 eMudhra 中间证书颁发机构私钥之后进行的，这些私钥强度足够弱，几乎可以瞬间被恢复。这八个密钥均于 2025 年 4 月生成，其值小于 256，这意味着任何人只需测试 256 个可能的数字即可恢复它们。借助这些密钥，攻击者可以为合法网站伪造证书并拦截加密流量。 eMudhra 在披露后吊销了这八张中间证书。 Mozilla 、谷歌（Google）和苹果（Apple）也开始在其产品中吊销它们。微软的第一项回应是更新 Windows 禁止证书信任列表，封禁了这八个中间机构，其中六个用于 TLS，两个用于代码签名。针对 Microsoft Edge 和 WebView2 的 CRLSet 更新无需浏览器更新即可封禁受影响的 TLS 证书。新的带外发布更进一步。微软表示，它 “从 Windows 信任列表中移除与受影响层级相关的七张证书：六张 eMudhra G3 根证书和一张 AAA Certificate Services 交叉签名证书。” 微软还表示，同样的七张证书将于 10 月 27 日从 Edge 信任列表中移除。该公司强调，移除根证书是比吊销已知受入侵中间证书更广泛的信任决定。有特定兼容性要求的组织可以根据自身的安全评估和政策，选择在本地信任某张证书。</p><p class="code-block code-block-1">
+
+<ins class="adsbygoogle" data-ad-layout="in-article" data-ad-format="fluid" data-ad-client="ca-pub-0960119895887202" data-ad-slot="8059884428"></ins>
+</p>
+
+<p><b>【IT 管理员应该做什么】</b><br>微软建议管理员在离线的 Windows 系统上安装该更新，并检查链接到被移除根证书的证书，因为这些证书可能需要更换。<br>– 识别处于离线状态、无法连接到微软证书更新服务或已禁用自动 CTL 更新的 Windows 11 24H2 、 25H2 或 26H2 设备以及 Windows 10 21H2 或 22H2 设备。<br>– 在 Windows 11 系统上安装 KB5134133，在 Windows 10 系统上安装 KB5134125 。<br>– 审计内部服务、应用程序和已签名代码，检查是否使用了由六张 eMudhra G3 根证书或 AAA Certificate Services 交叉签名证书签发的证书。<br>– 更换受影响的证书，或者仅在兼容性需求已通过内部安全审查的情况下记录本地信任例外。</p>
+<p>已接收自动 CTL 更新的设备无需为此次变更安装该带外更新包。微软仍在调查其余 eMudhra 根证书，并表示可能会根据需要做出更多信任变更。</p>
+<p class="code-block code-block-2">
+<span><em><a href="https://t.me/Ruancancom" target="_blank" rel="noopener" data-wpel-link="external" class="wpel-icon-left"><span class="wpel-icon wpel-image wpel-icon-1"></span>本站电报频道</a>  / <a href="https://t.me/+WHmyr8xg0D43Ytya" target="_blank" rel="noopener" data-wpel-link="external" class="wpel-icon-left"><span class="wpel-icon wpel-image wpel-icon-1"></span>电报群</a></em></span></p>
+
+
+                                                                                </div>
+
+                        </div></div>
