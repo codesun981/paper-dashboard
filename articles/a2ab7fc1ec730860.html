@@ -1,0 +1,180 @@
+<div><div><div class="prose prose-tech markdown-content max-w-none" data-astro-cid-ce2bgkb3>  <p>在手机里导入一份 PDF，几秒后能通过全文搜索找到它，再用本地模型根据段落回答问题，看起来已经是一套完整的个人知识库。可一旦用户希望在电脑上继续阅读、修改笔记或撤销这份资料，原来不太显眼的边界便会同时出现：到底应该同步 PDF 本身，还是 OCR 结果和 Embedding？手机与电脑用不同模型，向量索引能不能复用？电脑离线三天后重新联网，会不会把手机上已删除的内容“恢复”出来？更关键的是，已经从知识库撤销的证据，为什么可能还出现在下一次 AI 回答里？</p>
+<p><strong>工程判断是：跨设备同步首先是“权威资料及其变更的复制问题”，随后才是检索能力恢复、冲突合并与隐私治理问题。</strong> 原始资料、授权变更和删除记录需要可追溯的同步契约；FTS、Embedding、摘要与 Rerank 缓存应有独立的版本和失效机制。将这些对象混成一份需要全端原样复制的数据库，初期开发看似简单，长期则容易在模型升级、离线恢复和删除请求上付出代价。</p>
+<h2 id="先决定同步对象而不是先选数据库">先决定同步对象，而不是先选数据库</h2>
+<p>假设用户在 iPhone 导入一本 200 页的扫描 PDF，手机端完成 OCR、分块与全文索引后，又生成一套本地向量。随后用户在 macOS 电脑上打开同一知识库。此时至少发生了三个独立事件：第一，电脑取得用户有权访问的原始资料及版本；第二，电脑依据自身解析器、模型和索引配置恢复搜索能力；第三，若双方存在同时修改或删除，需要对这些操作建立一致且可复核的决定。三者可以分阶段完成，不能都被一个“同步成功”状态代替。</p>
+<p><img alt="权威原文和授权记录需要同步，FTS、Chunk、Embedding 等索引按设备重建" loading="lazy" src="https://www.xbstack.com/_astro/02-sync-vs-rebuild-zh.BKEH96z2_2afCQj.webp"></p>
+<p><em>图 1｜跨端同步权威资料，派生索引在设备本地根据来源版本重建；GPT 绘制工程示意图，非产品运行截图。</em></p>
+<p>下表给出一套<strong>建议的数据职责划分</strong>，并不是任何框架或 RecalAI 已有实现的事实。</p>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<table><thead><tr><th>对象</th><th>建议处理</th><th>必须保留的边界</th></tr></thead><tbody><tr><td>PDF、图片、文档原件及手工编辑的笔记</td><td>按用户授权同步原始内容或加密对象</td><td>内容哈希、来源 ID、版本、访问范围</td></tr><tr><td>文档元数据、知识空间成员、授权变更</td><td>同步受验证的变更记录</td><td>身份、设备和租户隔离</td></tr><tr><td>删除 / 撤销操作</td><td>以持久墓碑（tombstone）等可传播事件同步</td><td>离线设备确认、旧版重放、墓碑回收</td></tr><tr><td>OCR 文本与 Chunk</td><td>可重建，是否缓存式同步由实际成本决定</td><td>解析器、分块版本及源版本</td></tr><tr><td>FTS、向量索引、Embedding</td><td>默认本机生成；只有兼容并通过校验时才复用缓存</td><td>模型标识、维度、索引格式、失效策略</td></tr><tr><td>推理缓存、Rerank、临时会话状态</td><td>优先设备本地管理</td><td>不能反向覆盖权威资料</td></tr><tr><td>长期用户记忆与对话历史</td><td>另立授权、作用域和冲突策略</td><td>不能与外部 PDF 资料混作同一类事实</td></tr></tbody></table>
+<p>这里最容易误判的是 Embedding。它并非天然不能同步，但“相同浮点数组”不等于“各设备都能正确检索”。向量的语义取决于生成模型、版本、维度、归一化规则、Chunk 划分和索引约定。手机使用轻量模型、桌面使用更大模型时，直接搬运旧向量可能导致维度不匹配，或者在接口恰好兼容的情况下引入难以察觉的质量偏差。更稳妥的策略是将向量标记为依赖明确版本的派生缓存：能验证兼容性就复用，否则回到原始资料重新计算。具体是“重新计算更省钱”，还是“传输兼容向量更省电”，必须由真实设备与数据规模决定。</p>
+<p>这一点在<strong>本地 AI、端侧模型</strong>的多端部署中尤其具体。用于生成回答的 <a href="https://deepmind.google/models/gemma/gemma-3/" rel="noopener" target="_blank">Gemma 3 1B</a> 或 <a href="https://www.liquid.ai/blog/lfm2-5-2-6b" rel="noopener" target="_blank">LFM2.5-2.6B</a>，与负责知识库向量化的 <a href="https://ai.google.dev/gemma/docs/embeddinggemma/model_card_2" rel="noopener" target="_blank">EmbeddingGemma 2</a> 或 <a href="https://github.com/QwenLM/Qwen3-Embedding" rel="noopener" target="_blank">Qwen3-Embedding-0.6B</a> 承担不同任务，不能把生成模型名称当作 Embedding 兼容性依据。例如两台设备即使用同一个问答模型，只要检索侧使用了不同的向量模型、输出维度或分块配置，也需要分别校验或重建索引。这里列出的型号是<strong>模型角色与版本管理示例</strong>，并不是本文已经完成的四模型跨设备性能对比，更不意味着它们都已在 RecalAI 真机上通过验收。</p>
+<p><a href="https://docs.any.org/understanding/local-first.html" rel="noopener" target="_blank">Any 的 Local-first 文档</a>给出了一个值得参考的边界：本地写入先落地，后台交换变更，而搜索索引属于本地派生状态，不随同步日志传播。这是一个实际系统的技术选择，不能推广成所有 AI 产品的行业标准；但它提醒开发者，真正需要跨设备保持一致的是<strong>用户内容与有效变更</strong>，而不是每台设备生成的全部中间产物。另一个更直接的现有实现是 <a href="https://github.com/sqliteai/sqlite-memory" rel="noopener" target="_blank">SQLite-Memory 的公开仓库</a>：其 README 已明确说明只同步内容表，Embedding 与部分本机来源状态不参与同步，并在复制合并后执行重建。也就是说，<strong>“同步资料、设备本机重建向量”并不是 XBSTACK 首创</strong>。本文独立增量必须落在可复核的删除传播、FTS5 索引一致性、旧版本重放阻断和回答前证据复核上，而不是包装现有框架设计为新发现。</p>
+<h2 id="三层架构源数据日志设备索引和-ai-证据">三层架构：源数据日志、设备索引和 AI 证据</h2>
+<p><img alt="权威资料层、设备索引层与 AI 证据层的三层同步架构" loading="lazy" src="https://www.xbstack.com/_astro/03-three-layer-architecture-zh.vasi3sYL_1wyxkB.webp"></p>
+<p><em>图 2｜三层分工及版本校验关口；架构示意图，不代表已经部署该流程。</em></p>
+<p>对个人 AI 知识库，可以把跨端链路拆成三层。最底层是权威数据层：原件对象、资料元数据、知识空间授权、变更日志与撤销记录；中间层是设备物化层：OCR、Chunk、FTS、Embedding、ANN 和摘要的生成与失效；最上层是 AI 证据层：FTS 与向量混合召回、重排、Evidence Selection、引用回源与回答生成。同步系统负责传播有权限的源数据变化，索引器只处理得到授权且版本有效的资料，问答模块也不能绕过最终的证据状态核验。</p>
+<pre class="language-text" data-language="text"><code is:raw="" class="language-text">设备 A：原件 + SourceManifest + ChangeLog
+             │ 版本化变更 / 加密传输
+             ▼
+     同步中转 / 对等连接
+             │ 权限验证、去重、差量传播
+             ▼
+设备 B：原件 + SourceManifest + ChangeLog
+             │
+             ├── OCR / Chunk → FTS
+             ├── Embedding → Vector Index
+             └── 版本与撤销状态 ──────────┐
+                                          ▼
+查询 → 混合召回 → Rerank → Evidence Selection → 引用核验 → 回答
+                     ↑                ↑
+               第一轮有效性过滤    再次检查来源版本 / 权限
+</code></pre>
+<p>这种设计要处理的是两个不同的一致性目标。<strong>存储层最终收敛</strong>意味着所有已经联通、接受同一组有效变更的副本，最终得到一致的资料与撤销判断；<strong>回答层当前安全</strong>意味着某个设备即使还有旧索引，也不能在已知撤销的情况下把过期证据送进 Prompt。前者依赖复制协议和冲突规则，后者依赖查询及组装时的版本门禁。不要把“全网最终一致”误认为“每一台离线设备都立刻知道撤销”。</p>
+<p>一个最小可审计的变更事件可以包含以下字段。它是<strong>概念契约，不是未经审计即可上线的协议或现成 API</strong>：</p>
+<pre class="language-json" data-language="json"><code is:raw="" class="language-json"><span class="token punctuation">{</span>
+  <span class="token property">"event_id"</span><span class="token operator">:</span> <span class="token string">"evt_01_example"</span><span class="token punctuation">,</span>
+  <span class="token property">"space_id"</span><span class="token operator">:</span> <span class="token string">"space_example"</span><span class="token punctuation">,</span>
+  <span class="token property">"source_id"</span><span class="token operator">:</span> <span class="token string">"doc_01_example"</span><span class="token punctuation">,</span>
+  <span class="token property">"operation"</span><span class="token operator">:</span> <span class="token string">"revoke"</span><span class="token punctuation">,</span>
+  <span class="token property">"source_revision"</span><span class="token operator">:</span> <span class="token number">18</span><span class="token punctuation">,</span>
+  <span class="token property">"parent_revision"</span><span class="token operator">:</span> <span class="token number">17</span><span class="token punctuation">,</span>
+  <span class="token property">"actor_device_id"</span><span class="token operator">:</span> <span class="token string">"device_a"</span><span class="token punctuation">,</span>
+  <span class="token property">"content_hash"</span><span class="token operator">:</span> <span class="token null keyword">null</span><span class="token punctuation">,</span>
+  <span class="token property">"deleted"</span><span class="token operator">:</span> <span class="token boolean">true</span><span class="token punctuation">,</span>
+  <span class="token property">"key_epoch"</span><span class="token operator">:</span> <span class="token number">4</span><span class="token punctuation">,</span>
+  <span class="token property">"schema_version"</span><span class="token operator">:</span> <span class="token number">1</span>
+<span class="token punctuation">}</span>
+</code></pre>
+<p>这里的 event_id 负责幂等去重，source_id 标识逻辑资料，source_revision 负责判断同一资料的版本，key_epoch 只是密钥轮换状态的标识，不能代替真正的加密协议。若存在多端并发写入，仅靠一个整数版本<strong>无法自动解决因果冲突</strong>；必须明确由可信服务端分配单调版本，或改用携带 actor / 依赖关系的变更日志、版本向量或合适的 CRDT。事件还应有来自身份层的认证、授权和防重放校验。上面的示例为了展示结构，特意不包含真实内容、用户身份信息或密钥。</p>
+<h2 id="离线冲突不能靠客户端时间戳和最后一个请求定胜负">离线冲突：不能靠客户端时间戳和“最后一个请求”定胜负</h2>
+<p>常见做法是 Last Write Wins（LWW，最后写入者获胜）。它对单一配置项可能够用，但物理时间戳会受设备时间漂移影响；网络上最后抵达的数据，也未必是最后发生的业务编辑。对于多设备协作笔记，可以评估携带因果关系的操作日志、CRDT 或保留冲突副本。对于扫描 PDF 之类二进制原件，冲突通常需要保留两份版本或提示用户选择，不能假定逐字符合并。Automerge 的<a href="https://automerge.org/docs/reference/documents/conflicts/" rel="noopener" target="_blank">官方冲突文档</a>也指出，并发修改同一属性可能存在多个冲突值，即使框架能选出确定性的展示值，也不代表产品层已替用户作出正确决定。</p>
+<p>已有开源实现提供了有用的对照，不应把墓碑或“只同步源数据”写成新发现。<a href="https://localai.io/docs/features/chat-history/" rel="noopener" target="_blank">LocalAI 官方 Chat History 文档</a>说明它如何针对<strong>会话数据</strong>保存删除墓碑，以 <code>410 Gone</code> 拒绝已删除会话的后续写入，同时由服务端为每次变更分配版本。<a href="https://github.com/sqliteai/sqlite-memory/blob/main/API.md" rel="noopener" target="_blank">SQLite-Memory 的同步 API</a>则已经实现内容同步、按模型重建本地向量与 FTS5 索引；其文档也描述 <code>memory_reindex()</code> 在合并后修复哈希与向量。两者分别解决会话和文档检索的一部分问题，不能因此推导出已经完整覆盖<strong>原件授权、跨设备墓碑、FTS5 派生索引和 RAG 引用校验</strong>这一整条验收链路。本文提供的是受限但可复验的跨层故障模型，而不是这些机制的首创声明。</p>
+<p><img alt="离线设备收到删除墓碑前仍可能显示旧文档，重连后应使检索失效" loading="lazy" src="https://www.xbstack.com/_astro/04-offline-tombstone-zh.B__nJnrV_1JogCv.webp"></p>
+<p><em>图 3｜离线设备的删除传播边界；图示 v12/v13 为假定例子，不是生产抓包。</em></p>
+<p>删除操作必须比普通编辑更谨慎。假设电脑 B 在离线期间保留资料版本 12，手机 A 已将版本 13 标记为撤销。如果 B 重连后发出一条“存在版本 12”的变更，不能把它无条件当成新资料覆盖撤销。系统至少应保留被删除对象的身份、可比较版本或因果信息、墓碑状态、操作去重及冲突策略，并在历史副本重新出现时拒绝旧版复活。<strong>墓碑不能仅因为经过七天就随意清空</strong>：长期离线设备可能还没有读到它。生产环境需要结合已确认设备集合、设备租约与失联处理规则确定安全回收窗口，必要时让过久未同步的设备强制重新初始化。</p>
+<p><img alt="资料版本、冲突处理、证据筛选和回答前最终引用复核" loading="lazy" src="https://www.xbstack.com/_astro/05-versioning-evidence-zh.40LoOBlb_28cP20.webp"></p>
+<p><em>图 4｜来源 ID、版本、权限与撤销状态需要在回答前再次核查；示意架构非性能测试。</em></p>
+<p>还有一个容易忽略的竞态：查询已经找到某个 Chunk，随后用户撤销源资料，但模型的 Context 还没有组装完成。只在首次召回时过滤会留下时间窗口；更可靠的做法是在 Evidence Selection 完成后、实际注入模型上下文前，再校验 source_id、source_revision、用户权限和撤销状态。它不保证已经开始的推理可以被追溯撤销，却能避免<strong>已知失效来源</strong>继续进入下一次生成。</p>
+<h2 id="sqlite-fts5源表更新与搜索索引并不是同一个事务概念">SQLite FTS5：源表更新与搜索索引并不是同一个事务概念</h2>
+<p>这篇文章的一个实际工程落点是 SQLite FTS5。SQLite 官方说明，当 FTS5 使用 external-content 表时，索引和底层内容表的同步维护由应用负责；官方给出了通过 INSERT、UPDATE、DELETE 触发器维护索引的例子，也明确指出缺失或错误的更新会造成异常查询结果。由此可见，不能因为 source 表已经删除一条记录，就推定全部全文索引一定已清理。详见 <a href="https://www.sqlite.org/fts5.html" rel="noopener" target="_blank">SQLite 官方 FTS5 索引维护文档</a>。</p>
+<p>从同步架构看，目标设备收到较新资料版本后，至少应在一个可恢复的本地事务或幂等任务序列中，更新源记录及索引失效状态，必要时重建 FTS。若使用 FTS5 external-content，必须根据实际创建表模式和当前 SQLite 版本，选择正确的索引维护办法。对删除操作，还应在正式查询时按 source.deleted 与授权状态进行过滤，把“在线不可召回”的契约放在索引维护任务之前。这与“物理擦除索引历史”是两件事。</p>
+<p>FTS5 的 <a href="https://www.sqlite.org/fts5.html#the_secure_delete_configuration_option" rel="noopener" target="_blank">secure-delete 选项</a>以及 SQLite 的 <a href="https://www.sqlite.org/wal.html" rel="noopener" target="_blank">WAL 机制</a>进一步说明为什么删除承诺必须分层。FTS5 某些模式和版本需要额外配置才能降低历史条目残留的可恢复性；数据库文件、WAL、备份、操作系统快照和已复制的远端密文各有生命周期。不能仅凭一次 DELETE 返回成功或 FTS 查询没有结果，就写下“全部设备永久、不可恢复地删除”。特别要注意：本文后面的 SQLite 合成实验使用的是 <strong>SQLite 3.35.5 内存数据库</strong>，没有验证较新 FTS5 secure-delete 特性，更没有测试磁盘残留与物理擦除。</p>
+<h2 id="当天做了什么实验两个夹具十五项断言">当天做了什么实验：两个夹具、十五项断言</h2>
+<p>为避免把架构描述伪装成产品实测，我把验证范围固定为两份可重复的<strong>合成测试</strong>。第一个是 Node.js 小型双设备状态机，文件为 <code>experiments/local-first-ai-sync-20261029/repro.mjs</code>，命令是 <code>node --test experiments/local-first-ai-sync-20261029/repro.mjs</code>。它模拟两个副本，各自维护 source map 和简化关键词索引；只将源记录与墓碑作为复制载荷。2026 年 10 月 29 日执行结果为 <strong>7 项通过、0 失败</strong>。</p>
+<p>第二个实验是 Python 标准库 sqlite3 加内存 SQLite FTS5，文件为 <code>experiments/local-first-ai-sync-20261029/sqlite_fts5_repro.py</code>，命令是 <code>python3 experiments/local-first-ai-sync-20261029/sqlite_fts5_repro.py</code>。该环境报告 SQLite <strong>3.35.5</strong>，对模拟源表建立 FTS5 external-content 索引和更新触发器；本次运行 <strong>8 项通过、0 失败</strong>。其中验证了源资料更新后旧关键词不再命中、删除墓碑传播后两端正式检索不返回该资料、较旧版本无法复活删除记录、一个文档删除不影响其他文档、离线端在收到墓碑前仍能读到旧资料，以及用当前源表重建索引后的查询结果。两套夹具存在重叠断言，<strong>不能把 15 次通过解读为十五种独立生产风险都已验证</strong>。</p>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<table><thead><tr><th>验证问题</th><th>Node.js 模拟</th><th>SQLite FTS5 合成实验</th><th>仍然缺什么</th></tr></thead><tbody><tr><td>源数据传输而不是同步本地索引</td><td>通过</td><td>通过</td><td>文件对象存储、真实网络传输</td></tr><tr><td>源版本变更后更新本机索引</td><td>通过</td><td>通过</td><td>OCR / Chunk / 神经向量的增量重建</td></tr><tr><td>墓碑传达后停止正式检索</td><td>通过</td><td>通过</td><td>跨进程与远端设备的可靠投递确认</td></tr><tr><td>旧版本重放不能复活删除项</td><td>通过</td><td>通过</td><td>真实并发因果顺序、身份授权</td></tr><tr><td>删除局部资料不误删其他资料</td><td>通过</td><td>通过</td><td>真实多租户隔离和备份清理</td></tr><tr><td>离线设备不会即时获知远端删除</td><td>明确观察到</td><td>明确观察到</td><td>用户界面及强制重新同步策略</td></tr><tr><td>同版本删除优先（此夹具规则）</td><td>通过</td><td>通过</td><td>业务冲突策略与正式 CRDT</td></tr><tr><td>FTS 从当前源表重建后的查询</td><td>未覆盖</td><td>通过</td><td>大规模索引性能及磁盘残留</td></tr></tbody></table>
+<p><strong>最有价值的结果不是“全通过”，而是离线限制被真实保留下来。</strong> 手机 A 删除了资料，电脑 B 未收到墓碑前仍能搜索旧版；收到墓碑后，合成查询才停止返回它。实验没有掩盖这一点，也没有用乐观的 UI 状态将其标成已删除。另一个关键前提是这两份夹具都<strong>假定可信逻辑为同一文档分配了可比较、单调的 source_revision</strong>，没有实现真正的多写端无中心并发合并。尚未测试真实 RecalAI 客户端、多端网络、加密密钥、ANN、向量维度兼容性、设备性能、真实用户数据或备份的物理清除。</p>
+<h2 id="安全与隐私同步服务即使不读明文也可能影响授权">安全与隐私：同步服务即使不读明文，也可能影响授权</h2>
+<p>端到端加密不是在上传前加一道 AES 就算完成。真正需要定义的是：每台设备如何取得可信身份，空间密钥怎样分发，新增设备如何获得历史资料，丢失设备如何撤销，密钥轮换后老设备怎样处理，以及恢复凭证遗失时如何避免同时丢失所有资料。云服务只保存密文可以降低服务端看到正文的风险，但仍需评估文件大小、同步频率、设备元数据、访问控制记录等可能暴露的信息。是否允许服务端做 OCR 或 Embedding，则进一步决定了明文处理位置；这和“用户自己填写大模型 API Key”并不是一回事。对强调<strong>数据主权、安全可控</strong>的个人 AI 产品，还应明确用户能否选择资料保存位置、关闭云同步、导出原件、撤销设备和核对删除进度。端侧推理有助于减少将问答内容发送给外部模型服务的需求，但只要启用了跨设备同步、遥测或云端备份，就仍需逐条审查实际数据出站与密钥控制；“本地 AI”并不自动等于数据绝不离开设备。</p>
+<p>服务器收到撤销记录，并不能把此前已经下载到离线设备的明文远程抹掉；设备被封禁也不意味着旧的本地备份失效。即使采用成熟的加密与同步框架，也仍要在用户界面表达清楚“本机不可见”“在线设备已确认”“离线设备待同步”“备份按保留周期处理”等不同状态。微软的<a href="https://learn.microsoft.com/security/zero-trust/sfi/manage-agentic-memory-safety" rel="noopener" target="_blank">Agent Memory Safety 建议</a>强调持久记忆写入授权、来源、隔离与生命周期审计；<a href="https://cheatsheetseries.owasp.org/cheatsheets/AI_Agent_Security_Cheat_Sheet.html" rel="noopener" target="_blank">OWASP AI Agent Security</a>也明确把记忆投毒与跨会话影响列为威胁。两者支持设置独立安全门禁，但不能替代某个产品自己的加密及撤销实测。</p>
+<h2 id="选型与验收什么时候值得引入-crdtp2p-或云中转">选型与验收：什么时候值得引入 CRDT、P2P 或云中转？</h2>
+<p>如果目标只是单机保存资料、离线搜索和可回源引用，先把导入、解析、FTS、向量版本与删除做稳，未必需要立刻引入完整协作协议。如果真正需要手机、平板和桌面共享资料，应先定义复制对象、冲突语义、设备确认、备份和密钥责任，再比较 P2P、加密云中转与服务端可读同步。P2P 不自动解决设备长期离线与多端可达性问题；云中转不自动意味着服务器可以看见正文；CRDT 也不自动解决权限、密钥、原始 PDF 冲突或物理删除。</p>
+<p>一套准备上线的验收不能只展示两个界面上都有同一份 PDF。至少需要使用真实设备完成以下闭环：在 A 导入，B 收到原文并重建检索；B 与 A 离线并发修改，确认冲突如何呈现；A 删除资料，验证本机召回、最终引用与缓存失效；B 离线后重连，验证墓碑传播和旧版本拒绝；删除设备或更换密钥，检查今后授权；再检查服务器对象、备份、索引和日志的实际保留策略。每轮保留源文件哈希、设备/OS、解析和 Embedding 模型版本、操作时间、网络条件、预期与实际结果，才能谈“跨端功能完成”。</p>
+<p>对于 XBSTACK 所规划的 RecalAI，这篇文章暂时只能明确<strong>设计与验收方法</strong>。我没有用它的 iPhone、Android、macOS、Windows 真实客户端跑过上述跨端链路，因此不能声称 RecalAI 已支持这样的同步、已完成端到端加密或已通过删除验证。此前站内的 <a href="https://www.xbstack.com/ai/byok-local-ai-cloud-model-data-privacy/" target="_blank" rel="noopener">BYOK 数据隐私分析</a>解释云端模型和数据出站，<a href="https://www.xbstack.com/ai/recalai-hybrid-retrieval/" target="_blank" rel="noopener">RecalAI 混合检索</a>说明召回与证据选择，<a href="https://www.xbstack.com/ai/agent-memory-system/" target="_blank" rel="noopener">Agent Memory System</a>讨论长期记忆；本文独立回答的是<strong>原始知识及其派生检索状态在多设备之间如何收敛、冲突和撤销</strong>。</p>
+<p>当本地 AI 真正从“单个设备能回答”走向“一个人的多台设备共同使用”时，需要先解决的并不是同步图标该用什么颜色，而是一个可以接受故障、离线和删除审计的契约：<strong>资料能追溯、索引能重建、撤销不被旧版本复活、回答不引用已知失效的来源；同时诚实承认离线设备与物理擦除的边界。</strong> 这套规则不会让多端开发变得轻松，却能避免把最难修复的问题留到用户已经存入大量私人资料之后。</p>
+<h3 id="来源与证据边界">来源与证据边界</h3>
+   </div> </div></div>
