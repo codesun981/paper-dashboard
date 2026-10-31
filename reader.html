@@ -228,9 +228,19 @@ function filtered(){
   r.sort((x,y)=>fSort==="time"?new Date(y.published)-new Date(x.published):score(y)-score(x));
   return r;
 }
+function extraBadges(a){
+  // 2026-10-31 Jev 扩问新字段徽标（阶段1：只展示，不参与排序/过滤）。
+  // 老文章没有新字段时按 0 处理，无徽标降级，不报错。
+  const j=a.jev||{};
+  let h="";
+  if((j.research_fit||0)>=0.5)h+=`<span class="badge">🔬 研究相关</span>`;
+  if((j.practical||0)>=0.5)h+=`<span class="badge">🛠 可实操</span>`;
+  if((j.roundup||0)>=0.5)h+=`<span class="badge">📰 合集</span>`;
+  return h;
+}
 function metaBadges(a){
   const comp=(a.jev.bucket==="ai"&&a.company)?`<span class="badge">${esc(a.company)}</span>`:"";
-  return `<span class="badge">${BUCKET[a.jev.bucket]||a.jev.bucket}</span>`+comp+
+  return `<span class="badge">${BUCKET[a.jev.bucket]||a.jev.bucket}</span>`+comp+extraBadges(a)+
     `<span class="badge score">推荐 ${score(a).toFixed(2)}</span>`+
     `<span>${esc(a.source)}</span><span>${fmtTime(a.published)}</span>`;
 }
@@ -278,7 +288,7 @@ function renderTimeline(reset){
     html+=`<div class="tl-item" data-i="${gi}"><div class="tl-dot"></div>
       <div class="tl-time">${fmtTime(a.published).split(" ")[1]||""}</div>
       <div class="tl-title">${esc(a.title)}</div>
-      <div class="tl-src">${esc(a.source)} · ${BUCKET[a.jev.bucket]||""} · 推荐 ${score(a).toFixed(2)}${a.body?" · 📖":""}</div>
+      <div class="tl-src">${esc(a.source)} · ${BUCKET[a.jev.bucket]||""} · 推荐 ${score(a).toFixed(2)}${a.body?" · 📖":""}${(a.jev.research_fit||0)>=0.5?" · 🔬研究相关":""}${(a.jev.practical||0)>=0.5?" · 🛠可实操":""}${(a.jev.roundup||0)>=0.5?" · 📰合集":""}</div>
       ${a.summary?`<div class="tl-sum">${esc(a.summary)}</div>`:""}</div>`;
   });
   flush();
