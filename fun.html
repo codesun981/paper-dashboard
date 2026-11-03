@@ -1,6 +1,6 @@
 <!DOCTYPE html><html lang="zh-CN"><head><meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>✨ 今日份新鲜 · 便利贴</title><style>
+<title>✨ 今日份新鲜 · 瀑布流</title><style>
 *{box-sizing:border-box;margin:0;padding:0}
 :root{--bg:#f5f5f7;--card:#fff;--ink:#1d1d1f;--sub:#6e6e73;--line:#e5e5ea;--acc:#0071e3}
 @media(prefers-color-scheme:dark){:root{--bg:#000;--card:#1c1c1e;--ink:#f5f5f7;--sub:#98989d;--line:#2c2c2e;--acc:#0a84ff}}
@@ -11,23 +11,22 @@ a{color:var(--acc);text-decoration:none}
 .dateline{font-size:13px;color:var(--sub);letter-spacing:.1em}
 footer{max-width:960px;margin:0 auto;padding:36px 20px 60px;color:var(--sub);font-size:13px;text-align:center}
 
-.hero{max-width:640px;margin:0 auto;padding:30px 20px 6px;text-align:center}
-.hero h1{font-size:clamp(28px,7vw,36px)}
-.hero p{color:var(--sub);margin-top:8px;font-size:14px}
-.wall{max-width:640px;margin:10px auto;padding:10px 20px 20px;display:flex;flex-direction:column;gap:20px;align-items:center}
-.note{width:100%;max-width:440px;padding:22px 20px;border-radius:6px;box-shadow:0 4px 14px rgba(0,0,0,.10);
-background:#fff7ae;transform:rotate(-1.1deg)}
-.note:nth-child(even){background:#d8ecff;transform:rotate(1.2deg)}
-.note:nth-child(3n){background:#ffe3ec;transform:rotate(-.5deg)}
-@media(prefers-color-scheme:dark){.note{background:#3a3413;color:#f5f5f7}
-.note:nth-child(even){background:#16283d}.note:nth-child(3n){background:#3d1626}}
-.pin{width:14px;height:14px;border-radius:50%;background:#e05555;margin:0 auto 10px;box-shadow:0 2px 4px rgba(0,0,0,.25)}
-.modname{font-size:12px;letter-spacing:.2em;opacity:.65;margin-bottom:8px}
-.k{font-size:12px;font-weight:700;opacity:.6;margin-bottom:6px}
+.hero{max-width:1100px;margin:0 auto;padding:30px 20px 6px}
+.hero h1{font-size:32px}
+.hero p{color:var(--sub);margin-top:6px}
+.flow{max-width:1100px;margin:20px auto;padding:0 20px;columns:3;column-gap:18px}
+@media(max-width:900px){.flow{columns:2}}
+@media(max-width:600px){.flow{columns:1}}
+.card{background:var(--card);border-radius:18px;padding:20px;margin:0 0 18px;break-inside:avoid;
+box-shadow:0 2px 12px rgba(0,0,0,.06);border:1px solid var(--line)}
+.card:nth-child(3n){transform:rotate(-.6deg)}
+.card:nth-child(3n+1){transform:rotate(.5deg)}
+.tag{display:inline-block;font-size:12px;padding:3px 10px;border-radius:20px;background:var(--acc);color:#fff;margin-bottom:10px}
 .t{font-size:16px;line-height:1.65}
-.b{font-size:14px;line-height:1.7;margin-top:8px;opacity:.75}
-.big{font-size:clamp(40px,11vw,58px);font-weight:800}
+.b{color:var(--sub);font-size:13.5px;line-height:1.7;margin-top:8px}
+.big{font-size:46px;font-weight:800}
+.modname{font-size:13px;color:var(--sub);margin-bottom:4px}
 </style></head><body>
 <div class="topbar"><a class="back" href="index.html">← 每日看板</a>
-<span class="dateline">2026-11-02</span></div><div class="hero"><h1>✨ 今日份新鲜</h1><p>📌 便利贴版 · 今天的新鲜事，都贴墙上了</p></div><div class="wall"><div class="note"><div class="pin"></div><div class="modname">📖 今日生活指南</div><div class="k">证据B · 别为了外形把身体搞坏 · 性价比极高</div><div class="t">面部填充避开鼻背、眉间、额头这几个部位，更别为省钱找非正规注射</div><div class="b">打填充针后失明的人里，一半多打的是鼻部，其次是眉间、额头和法令纹，八成多用的是玻尿酸。失明的人只有两成视力完全恢复，一成多部分恢复，将近两成还伤到了脑。目前没有一种抢救办法稳定管用，所以要事先避开这些部位。</div><div style="margin-top:8px;font-size:14px"><a href="https://github.com/eternity4719/HowToLiveBetter/blob/main/book/28-别为了外形把身体搞坏.md">看原文 →</a></div></div><div class="note"><div class="pin"></div><div class="modname">📖 今日生活指南</div><div class="k">证据C · 反面清单 · 性价比极高</div><div class="t">不要花大钱买保健品、膏方、滋补品来「调理身体」</div><div class="b">多维、鱼油、维 D 这些常见成分，本节前六条已经一样样查过，都没看出管用。包装上那句「保健食品不是药物，不能代替药物治疗疾病」，是管保健食品的部门规定必须印的。这笔钱要是买给父母、提着上门的，那份心意没有问题，只是东西选错了。</div><div style="margin-top:8px;font-size:14px"><a href="https://github.com/eternity4719/HowToLiveBetter/blob/main/book/06-反面清单.md">看原文 →</a></div></div><div class="note"><div class="pin"></div><div class="modname">📖 今日生活指南</div><div class="k">证据B · 紧急情况 · 性价比极高</div><div class="t">一氧化碳报警器响了，或者一屋子人同时头痛恶心，先出门再打电话</div><div class="b">报警器响了，或者一屋子人同时头痛、恶心、发晕，先把人都带到室外，再打电话。别留在屋里找原因，也别回去关阀门。症状像感冒，「出门就好转」是最强的提示。中国 2018 年报告了 11523 人死于一氧化碳中毒，冬天最多，冬天三个月里约七成死在家里。</div><div style="margin-top:8px;font-size:14px"><a href="https://github.com/eternity4719/HowToLiveBetter/blob/main/book/13-紧急情况.md">看原文 →</a></div></div><div class="note"><div class="pin"></div><div class="modname">📖 今日生活指南</div><div class="k">证据A · 普通人容易踩的法律红线 · 性价比极高</div><div class="t">不网购仿真枪、钢珠枪、气枪，不买来路不明的「玩具枪」</div><div class="b">网上买的钢珠枪、气枪，枪口比动能到了 1.8 焦耳/平方厘米，就按枪支认定。没有许可拿在手里，判 3 年以下，情节严重的判 3 到 7 年。有对夫妇卖「玩具枪」，43 支里有 18 支被鉴定为枪，只因证明不了他们知情才没被起诉。（内容来自《高性价比人生指南》CC-BY-4.0）</div><div style="margin-top:8px;font-size:14px"><a href="https://github.com/eternity4719/HowToLiveBetter/blob/main/book/09-普通人容易踩的法律红线.md">看原文 →</a></div></div><div class="note"><div class="pin"></div><div class="modname">📜 历史上的今天</div><div class="k">2015 年</div><div class="t">首架中国自主研制的大型客机C919在上海總裝完畢。</div><div style="margin-top:8px;font-size:14px"><a href="https://zh.wikipedia.org/wiki/2015%E5%B9%B4">维基百科 →</a></div></div><div class="note"><div class="pin"></div><div class="modname">📜 历史上的今天</div><div class="k">1795 年</div><div class="t">在法国大革命期间，督政府根据新宪法代替7日前解散的国民公会成为法国最高政权的政府。</div><div style="margin-top:8px;font-size:14px"><a href="https://zh.wikipedia.org/wiki/1795%E5%B9%B4">维基百科 →</a></div></div><div class="note"><div class="pin"></div><div class="modname">📜 历史上的今天</div><div class="k">1992 年</div><div class="t">空中巴士A330進行首飛。</div><div style="margin-top:8px;font-size:14px"><a href="https://zh.wikipedia.org/wiki/1992%E5%B9%B4">维基百科 →</a></div></div><div class="note"><div class="pin"></div><div class="modname">🔢 今日数字</div><div class="k">章鱼的心脏数</div><div class="big">3颗</div><div class="b">两颗给鳃供血，一颗给全身；游泳时给全身供血的那颗会停跳——所以章鱼更喜欢爬。</div></div></div><footer>✨ 今日份新鲜 · 每天拆开都不一样<br>
+<span class="dateline">2026-11-03</span></div><div class="hero"><h1>✨ 今日份新鲜</h1><p>🧱 瀑布流版 · 随手一滑都是惊喜</p></div><div class="flow"><div class="card"><div class="modname">📖 今日生活指南</div><span class="tag">证据A · 别把自己搭进去 · 性价比极高</span><div class="t">不把银行卡、手机卡、支付账号借给任何人，「跑分」不是兼职</div><div class="b">把银行卡、手机卡、支付账号租给、借给、卖给别人，这件事本身就违法。罚违法所得的 1 到 10 倍，没有违法所得或者不足 2 万元的，最高罚 20 万元，情节严重的拘留 15 日以下。要是明知对方拿去犯罪还帮着收钱转钱，情节严重的就是帮信罪，判 3 年以下。</div><div style="margin-top:8px;font-size:14px"><a href="https://github.com/eternity4719/HowToLiveBetter/blob/main/book/08-别把自己搭进去.md">看原文 →</a></div></div><div class="card"><div class="modname">📖 今日生活指南</div><span class="tag">证据A · 普通人容易踩的法律红线 · 性价比极高</span><div class="t">身份证不借人，不用别人的身份证，也不拿别人的证件登记、开卡、买票</div><div class="b">把身份证借给、租给、转给别人，警告并罚 200 元以下。冒用别人的身份证，或者用骗领来的，罚 200 到 1000 元，或者拘留 10 日以内。买火车票、住店这类必须实名的场合用假证件或者盗用别人的证件，情节严重的判拘役或者管制。</div><div style="margin-top:8px;font-size:14px"><a href="https://github.com/eternity4719/HowToLiveBetter/blob/main/book/09-普通人容易踩的法律红线.md">看原文 →</a></div></div><div class="card"><div class="modname">📖 今日生活指南</div><span class="tag">证据A · 残疾之后怎么活 · 性价比极高</span><div class="t">精神障碍住院以自愿为原则，只有两种情形可以不经本人同意</div><div class="b">家属或单位一句话，不能把一个人留在精神病院住院。法律只认两种情况，而且要先诊断为严重精神障碍：伤了自己或有这个危险，危害了别人或有这个危险。第一种要监护人同意才能收。第二种有异议的，三天内可以要求再次诊断，之后还能自己委托鉴定。</div><div style="margin-top:8px;font-size:14px"><a href="https://github.com/eternity4719/HowToLiveBetter/blob/main/book/33-残疾之后怎么活.md">看原文 →</a></div></div><div class="card"><div class="modname">📖 今日生活指南</div><span class="tag">证据A · 出国旅行与境外安全 · 性价比极高</span><div class="t">出国带药先查目的地规定：含伪麻黄碱、可待因的感冒药和止咳药，安眠药、精神类药和强效止痛药，带原包装、处方或医生证明，只带自用量</div><div class="b">伪麻黄碱超过 10%、可待因超过 1% 的感冒药和止咳药，在日本按兴奋剂原料或麻醉药品管，要提前申请许可。安眠药带超过一个月的量，日本也要事先办证，新加坡带管制成分的药要提前申请。带原包装和医生证明、只带自用量，才能避开药被没收、罚款甚至判刑。（内容来自《高性价比人生指南》CC-BY-4.0）</div><div style="margin-top:8px;font-size:14px"><a href="https://github.com/eternity4719/HowToLiveBetter/blob/main/book/21-出国旅行与境外安全.md">看原文 →</a></div></div><div class="card"><div class="modname">💡 每日一得</div><span class="tag">一句话</span><div class="t">&quot;先让它跑起来，再让它跑得对，最后让它跑得快。&quot;</div></div><div class="card"><div class="modname">🧸 开源小玩具</div><span class="tag">GitHub</span><div class="t">jiwoochris/artex-global</div><div class="b">Global edition of ARTEX — an LLM multi-agent autonomous penetration-testing framework. English default…</div><div style="margin-top:8px;font-size:14px"><a href="https://github.com/jiwoochris/artex-global">去看看 →</a></div></div><div class="card"><div class="modname">🧸 开源小玩具</div><span class="tag">GitHub</span><div class="t">irraz/vulnerator-ai</div><div class="b">Autonomous OODA-loop pentesting agent. Hermes brain, Kali + Playwright tools over MCP, ATT&amp;CK as the Orient…</div><div style="margin-top:8px;font-size:14px"><a href="https://github.com/irraz/vulnerator-ai">去看看 →</a></div></div></div><footer>✨ 今日份新鲜 · 每天拆开都不一样<br>
 <span style="font-size:12px">由 COCO 每日 08:00 自动生成</span></footer></body></html>
