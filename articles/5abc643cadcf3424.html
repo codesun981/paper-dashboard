@@ -1,0 +1,278 @@
+<div><div><article class="markdown-body entry-content container-lg" itemprop="text">
+<p dir="auto">Companion artifacts for <strong>Hyra</strong>: <strong>H</strong>un<strong>y</strong>uan <strong>R</strong>esearch <strong>A</strong>gent.</p>
+<p dir="auto">This repository collects concrete solutions that Hyra produced across a range of
+open problems in science, mathematics, engineering, and creative design,
+released alongside the Hyra launch post. Each folder holds the final solution
+artifact and, where relevant, the self-contained scripts that reproduce it.</p>
+<blockquote>
+<p dir="auto">📝 Launch post: <strong><a href="https://hy.tencent.com/research/hyra" rel="noopener" target="_blank">hy.tencent.com/research/hyra</a></strong></p>
+<p dir="auto">🚀 Hyra 2.0 blog: <strong><a href="https://hy.tencent.ai/research/hyra2" rel="noopener" target="_blank">hy.tencent.ai/research/hyra2</a></strong></p>
+</blockquote>
+
+<ul dir="auto">
+<li>
+<p dir="auto"><strong>2026-11-04</strong>: 🌊 <strong>HyPDE, a 2D foundation model for PDEs, released with weights and code.</strong>
+<strong>HyPDE</strong>, a 323M-parameter fused-history transformer trained from scratch on
+thirteen 2D physics datasets, forecasts simulated fields from their last six
+frames. Zero-shot on the test split of thirteen datasets of The Well and
+FlowBench, against Walrus (1.29B parameters, released weights, no
+fine-tuning on either side), it has the lower median VRMSE on <strong>9 of 13</strong>
+datasets in one-step forecasting, <strong>10 of 13</strong> over rollout frames 1-20 and
+<strong>8 of 13</strong> over frames 21-60. Weights, the <code>hypde</code> package and the full
+table: <strong><a href="https://github.com/Tencent-Hunyuan/Hyra-results/blob/main/AI4Science/hypde" target="_blank" rel="noopener"><code>AI4Science/hypde/</code></a></strong>.</p>
+</li>
+<li>
+<p dir="auto"><strong>2026-11-03</strong>: 🔐 <strong>Certified distances of non-CSS quantum codes.</strong> The
+qldpc-challenge board labels all 184 of its general (non-CSS) stabilizer codes
+as upper bounds only. <strong>hyqec</strong>, a prover plus an independently written
+certificate checker, proves the exact Pauli-weight distance of <strong>165</strong> of
+them: 122 with SAT proofs checked by <code>drat-trim</code>, 42 with re-executable
+branch-and-bound records, and the board's <code>[[452,115,18]]</code> (<strong>d = 18</strong>) with
+a coverage certificate of 124.6 billion search nodes that the independent
+checker re-executed in full. Code:
+<strong><a href="https://github.com/Tencent-Hunyuan/Hyra-results/blob/main/AI4Science/hyqec" target="_blank" rel="noopener"><code>AI4Science/hyqec/</code></a></strong>.</p>
+</li>
+<li>
+<p dir="auto"><strong>2026-11-02</strong>: 🚀 <strong>Hyra 2.0 blog released.</strong>
+Read <strong><a href="https://hy.tencent.ai/research/hyra2" rel="noopener" target="_blank">Hyra 2.0: The Next Step for Auto Research</a></strong>
+for an overview of Hyra's progress in developing reusable scientific tools,
+models, and workflows.</p>
+</li>
+<li>
+<p dir="auto"><strong>2026-11-02</strong>: 🧫 <strong>HyCell, a single-cell embedding model, released with weights and code.</strong>
+<strong>HyCell</strong>, a 16.1M-parameter model, maps the raw counts of a human cell to
+a 512-dimensional embedding and decodes embeddings back to gene expression.
+On seven atlases held out from pretraining, its frozen embeddings reach an
+overall score of <strong>0.735</strong>, level with Stack (<strong>0.736</strong>, 218M parameters).
+Weights, the <code>hycell</code> package and the technical report:
+<strong><a href="https://github.com/Tencent-Hunyuan/Hyra-results/blob/main/AI4Science/hycell" target="_blank" rel="noopener"><code>AI4Science/hycell/</code></a></strong>.</p>
+</li>
+<li>
+<p dir="auto"><strong>2026-11-02</strong>: ⚛️ <strong>HyFF force fields released with weights and code.</strong> Five
+machine-learning force fields for molecular simulation, from 2.3M to 1.2B
+parameters, covering 83 elements with total charge and spin and trained on
+OMol25. On the full OMol25 validation set, <strong>HyFF Andante</strong> reaches a force
+error comparable to UMA-S-1.2 (7.65 vs 7.55 meV/Å) at <strong>29×</strong> its MD speed,
+and <strong>HyFF Largo</strong> has the lowest energy error of the evaluated models
+(0.364 meV/atom; DPA4-Pro: 0.380) at <strong>9.7×</strong> DPA4-Pro's speed (MD of a
+2,586-atom system on one H20). The <code>hyff</code> package runs NVE, NVT and NPT
+molecular dynamics and batched prediction:
+<strong><a href="https://github.com/Tencent-Hunyuan/Hyra-results/blob/main/AI4Science/hyff" target="_blank" rel="noopener"><code>AI4Science/hyff/</code></a></strong>.</p>
+</li>
+<li>
+<p dir="auto"><strong>2026-11-02</strong>: 🧬 <strong>Two protein models released with weights and code.</strong>
+<strong>HyInv</strong>, a 1.96M-parameter inverse-folding model, and <strong>HyPLM-Flash</strong>, a
+650M-parameter protein language model with a fast INT8 inference engine, are
+published under <code>AI4Science/</code> together with their weights, inference code and
+technical reports: <strong><a href="https://github.com/Tencent-Hunyuan/Hyra-results/blob/main/AI4Science/hyinv" target="_blank" rel="noopener"><code>AI4Science/hyinv/</code></a></strong>,
+<strong><a href="https://github.com/Tencent-Hunyuan/Hyra-results/blob/main/AI4Science/hyplm_flash" target="_blank" rel="noopener"><code>AI4Science/hyplm_flash/</code></a></strong>.</p>
+</li>
+<li>
+<p dir="auto"><strong>2026-11-02</strong>: 📐 <strong>Two results on Petty's and Yau's conjectures.</strong></p>
+<ul dir="auto">
+<li><strong>Petty's equilateral-set conjecture in dimension five.</strong> The highest
+settled dimension rises from <strong>4</strong> (Makeev, 2005) to <strong>5</strong>: every
+five-dimensional real normed space contains <strong>six equidistant points</strong>.
+Paper: <strong><a href="https://github.com/Tencent-Hunyuan/Hyra-results/blob/main/AI4Science/petty_dimension_five" target="_blank" rel="noopener"><code>AI4Science/petty_dimension_five/</code></a></strong>.</li>
+<li><strong>Yau's circle-action conjecture (unrestricted form).</strong> A closed
+<strong>seven-manifold</strong> with strictly positive sectional curvature admits
+<strong>no effective smooth circle action</strong>, giving a counterexample. The
+manifold is not simply connected; the simply connected version remains
+open. Paper:
+<strong><a href="https://github.com/Tencent-Hunyuan/Hyra-results/blob/main/AI4Science/yau_circle_action_conjecture" target="_blank" rel="noopener"><code>AI4Science/yau_circle_action_conjecture/</code></a></strong>.</li>
+</ul>
+</li>
+<li>
+<p dir="auto"><strong>2026-08-19</strong>: 🧾 <strong>Three new results, each with a Lean 4 formalization of its
+finite and numerical core.</strong></p>
+<ul dir="auto">
+<li><strong>Beurling–Ahlfors transform.</strong> Iwaniec's 1982 conjecture predicts the sharp
+<code>Lᵖ</code> operator norm <code>p*−1</code>; the best proven uniform coefficient drops from
+<code>1.575</code> (Bañuelos and Janakiraman, 2008) to <strong>1.523958</strong>. Paper:
+<strong><a href="https://github.com/Tencent-Hunyuan/Hyra-results/blob/main/AI4Science/beurling_ahlfors_bellman" target="_blank" rel="noopener"><code>AI4Science/beurling_ahlfors_bellman/</code></a></strong>.</li>
+<li><strong>Partial Hadamard matrices.</strong> Their asymptotic count is now known
+throughout every power-law range above <code>n²</code>, not just the cubic range
+<code>m ≫ n³</code>, lowering the critical exponent from <strong>3</strong>
+(<a href="https://arxiv.org/abs/2603.30013" rel="noopener" target="_blank">arXiv:2603.30013</a>) to <strong>2</strong>. Paper:
+<strong><a href="https://github.com/Tencent-Hunyuan/Hyra-results/blob/main/AI4Science/partial_hadamard_counting" target="_blank" rel="noopener"><code>AI4Science/partial_hadamard_counting/</code></a></strong>.</li>
+<li><strong>Commutators close to the identity.</strong> The identity is never a commutator,
+but comes within <code>ε</code> at a price: the least <code>‖D‖·‖X‖</code> needed falls from Tao's
+<code>O(log⁵(1/ε))</code>, since refined to <code>O(log⁴)</code>, to <strong>O(log³(1/ε))</strong>, against
+Popa's <code>log(1/ε)</code> lower bound. Paper:
+<strong><a href="https://github.com/Tencent-Hunyuan/Hyra-results/blob/main/AI4Science/commutator_log_cubed" target="_blank" rel="noopener"><code>AI4Science/commutator_log_cubed/</code></a></strong>.</li>
+</ul>
+</li>
+<li>
+<p dir="auto"><strong>2026-08-17</strong>: 📐 <strong>Blaschke–Lebesgue in three dimensions.</strong> The least volume
+of a convex body of constant width <code>w</code> is conjectured to be Meissner's
+<code>≈ 0.419860 w³</code>; the best certified lower bound rises from
+<code>4π/33 · w³ ≈ 0.380799 w³</code> (Nishioka,
+<a href="https://arxiv.org/abs/2606.01754" rel="noopener" target="_blank">arXiv:2606.01754</a>) to <strong>&gt; 0.411040 w³</strong>,
+closing <strong>77.4%</strong> of the remaining gap. Paper:
+<strong><a href="https://github.com/Tencent-Hunyuan/Hyra-results/blob/main/AI4Science/3d_blaschke_lebesgue" target="_blank" rel="noopener"><code>AI4Science/3d_blaschke_lebesgue/</code></a></strong>.</p>
+</li>
+<li>
+<p dir="auto"><strong>2026-07-29</strong>: 🎉 <strong>The sum-vs-difference problem is settled.</strong> For finite
+<code>A ⊆ ℤ</code>, the optimal exponent relating <code>|A+A|</code> to <code>|A−A|</code> has supremum
+<strong>exactly 2</strong>, approached arbitrarily closely but never attained: a complete,
+machine-checked resolution going beyond the <code>sums_diffs</code> record below. Proof:
+<strong><a href="https://github.com/linhaowei1/sum-diff-proof" target="_blank" rel="noopener">sum-diff-proof</a></strong>.</p>
+</li>
+</ul>
+
+<p dir="auto">Each row compares the best prior published result or conjecture status
+(<strong>Prev best</strong>, from the cited sources) against <strong>Hyra</strong>. Arrows mark the better
+direction (↓ lower is better, ↑ higher is better); the Hyra result is in bold.</p>
+<markdown-accessiblity-table></markdown-accessiblity-table>
+<p dir="auto"><strong>Prev-best sources.</strong></p>
+<ul dir="auto">
+<li><sup>a</sup> TTT-Discover: <em>Learning to Discover at Test
+Time</em> (<a href="https://arxiv.org/abs/2601.16175" rel="noopener" target="_blank">arXiv:2601.16175</a>).</li>
+<li><sup>b</sup>
+SimpleTES: <em>Evaluation-driven Scaling for Scientific Discovery</em>
+(<a href="https://arxiv.org/abs/2604.19341" rel="noopener" target="_blank">arXiv:2604.19341</a>).</li>
+<li><sup>c</sup> AdderBoard
+trained-weights leaderboard (<a href="https://github.com/anadim/AdderBoard" target="_blank" rel="noopener">github.com/anadim/AdderBoard</a>).</li>
+<li><sup>d</sup> Olaparib, an approved PARP1 inhibitor (drug baseline).</li>
+<li><sup>e</sup> Recursive: <em>First Steps Toward Automated AI Research</em>
+(<a href="https://github.com/recursive-org/first-steps-toward-automated-ai-research" target="_blank" rel="noopener">github.com/recursive-org/first-steps-toward-automated-ai-research</a>);
+AI4AI baselines: nanoGPT-speedrun, nanochat, and SOL-ExecBench.</li>
+<li><sup>f</sup> Erich Friedman's <em>Packing Center</em>
+(<a href="https://erich-friedman.github.io/packing/" rel="noopener" target="_blank">erich-friedman.github.io/packing</a>).
+Hyra's record-improving packings are credited there as "Found by Haowei Lin":
+<strong>100</strong> across 28 shape-in-shape families, each beating the previously listed
+best.</li>
+<li><sup>g</sup> Baseline: a "copy last frame" (persistence) forecast. Hyra's score is
+the forecast R² on a fully-held-out, half-century-long segment of the record.</li>
+<li><sup>h</sup> Nishioka: <em>An improved lower bound for the three-dimensional
+Blaschke–Lebesgue problem from spectral and dual perspectives</em>
+(<a href="https://arxiv.org/abs/2606.01754" rel="noopener" target="_blank">arXiv:2606.01754</a>), which gives <code>4π/33 ≈ 0.380799109526</code>. Hyra's certified bound is <code>(130838246407123/10¹⁵)·π &gt; 0.411040473721188</code>.</li>
+<li><sup>i</sup> R. Bañuelos and P. Janakiraman, <em>Lᵖ-bounds for the
+Beurling–Ahlfors transform</em> (2008), which gives the uniform coefficient
+<code>1.575</code>. Iwaniec's conjectured sharp value is <code>1</code>.</li>
+<li><sup>j</sup> D. Davis: <em>Counting Partial Hadamard Matrices in the Cubic
+Regime</em> (<a href="https://arxiv.org/abs/2603.30013" rel="noopener" target="_blank">arXiv:2603.30013</a>).</li>
+<li><sup>k</sup> B. Bilich: <em>An O(log⁴(1/ε)) refinement of Tao's construction of
+commutators close to the identity</em>
+(<a href="https://github.com/bilichboris/TaoCommutators" target="_blank" rel="noopener">github.com/bilichboris/TaoCommutators</a>);
+the published exponent is Tao's <code>5</code>, since refined to <code>4</code>.</li>
+<li><sup>l</sup> V. V. Makeev: <em>Equilateral simplices in normed 4-space</em>,
+Zap. Nauchn. Sem. POMI 329 (2005), 88–91; English translation in
+J. Math. Sci. 140(4) (2007), 548–550, establishing the four-dimensional case
+of Petty's equilateral-set conjecture.</li>
+<li><sup>m</sup> S.-T. Yau: <em>Open problems in geometry</em>, Proc. Sympos. Pure
+Math. 54, Part 1 (1993), 1–28; see also <em>Structure of manifolds with positive
+curvature based on geometric analysis</em>, Notices of the ICCM 1(2) (2013),
+24–27, for the smooth circle-action conjecture.</li>
+<li><sup>n</sup> The qldpc-challenge board
+(<a href="https://github.com/unitaryfoundation/qldpc-challenge" target="_blank" rel="noopener">github.com/unitaryfoundation/qldpc-challenge</a>)
+labels every one of its general stabilizer (non-CSS) entries as an upper bound
+(<code>d≤</code>) only, as its certifier does not minimise Pauli weight (<code>TRACKS.md</code>,
+2026-10-27). Codes are from the 2026-10-16 snapshot. Exact distances of other
+non-CSS codes have been computed elsewhere (e.g. Lee et al.,
+<a href="https://arxiv.org/abs/2609.30069" rel="noopener" target="_blank">arXiv:2609.30069</a>); the count is about this
+board. Hyra's 165 are made up as follows. 122 have SAT proofs checked by
+<code>drat-trim</code>; the CNF encoding is hyqec's own. 1 (<code>[[452,115,18]]</code>) has a
+branch-and-bound coverage certificate re-executed by the independent checker.
+42 have branch-and-bound search records that only the same prover can re-run.</li>
+</ul>
+<p dir="auto">Metrics are as defined by each benchmark; comparisons are against the cited
+published results and conjecture statements.</p>
+<p dir="auto"><strong>Metric notes.</strong></p>
+<ul dir="auto">
+<li><strong>C₁</strong>: first autoconvolution/autocorrelation constant, <code>max(f∗f)/(∫f)²</code> (minimize).</li>
+<li><strong>R</strong>: second autocorrelation ratio, <code>‖f∗f‖₂² / (‖f∗f‖₁·‖f∗f‖∞)</code> (maximize).</li>
+<li><strong>C₅</strong>: Erdős minimum-overlap constant (minimize).</li>
+<li><strong>C(A)</strong>: sum-vs-difference exponent, <code>log(|A+A|/|A|) / log(|A−A|/|A|)</code> (maximize).</li>
+<li><strong>params</strong>: unique trainable parameters of a transformer that adds two
+10-digit integers at ≥ 0.99 accuracy (minimize).</li>
+<li><strong>objective</strong>: PARP1 docking objective, <code>Vina score + 10·(1 − QED)</code> (minimize).</li>
+<li><strong>CNOTs added</strong>: extra CNOTs inserted by SWAP routing (minimize; 1 SWAP = 3 CNOTs).</li>
+<li><strong>forecast R²</strong>: rolling-origin, free-running (24-month) forecast R² for monthly
+sunspot numbers (maximize).</li>
+<li><strong>Vol/w³ bound</strong>: largest proven universal lower bound on <code>Vol(K)/w³</code> over all
+convex bodies <code>K ⊂ ℝ³</code> of constant width <code>w</code> (maximize; the conjectured
+optimum is <code>≈ 0.419860</code>).</li>
+<li><strong>C_BA</strong>: smallest proven uniform coefficient in
+<code>‖B‖_{Lᵖ→Lᵖ} ≤ C_BA·(p*−1)</code> for the Beurling–Ahlfors transform, over all
+<code>1 &lt; p &lt; ∞</code> (minimize; the conjectured optimum is <code>1</code>).</li>
+<li><strong>regime exponent</strong>: infimum of the power-law exponents <code>u</code> for which
+<code>m/nᵘ → ∞</code> is known to force the asymptotic formula for <code>N(n,m)</code> (minimize;
+the endpoint value itself is not claimed).</li>
+<li><strong>log exponent</strong>: smallest proven <code>k</code> in <code>m(ε) = O(logᵏ(1/ε))</code> for
+commutators within <code>ε</code> of the identity (minimize; the matching lower bound
+is <code>k = 1</code>).</li>
+<li><strong>dimension settled</strong>: highest dimension <code>n</code> for which every real
+<code>n</code>-dimensional normed space is known to contain <code>n + 1</code> equidistant points,
+as conjectured by Petty (maximize).</li>
+<li><strong>conjecture status</strong>: status of the unrestricted claim that every closed
+manifold admitting strictly positive sectional curvature admits an effective
+smooth circle action. The counterexample has <code>π₁ ≅ (ℤ/6)²</code>; the simply
+connected version remains open.</li>
+<li><strong>board non-CSS codes with exact d</strong>: number of the board's 184 general
+stabilizer codes whose Pauli-weight distance is proven exactly, not only
+bounded (maximize).</li>
+</ul>
+<blockquote>
+<p dir="auto"><strong>Note.</strong> The results above were current as of <strong>2026-07-10</strong>, except
+<code>3d_blaschke_lebesgue</code>, added <strong>2026-08-17</strong>, the three entries added
+<strong>2026-08-19</strong>, <code>petty_dimension_five</code> and <code>yau_circle_action_conjecture</code>,
+added <strong>2026-11-02</strong>, and <code>hyqec</code>, added <strong>2026-11-03</strong>. Several of these
+problems live on public, continuously-updated leaderboards; later entries there
+may <em>warm-start from Hyra's published solutions</em> to reach still-better numbers.</p>
+</blockquote>
+
+<p dir="auto">Trained models, each with its weights, inference code and technical report:</p>
+<ul dir="auto">
+<li><a href="https://github.com/Tencent-Hunyuan/Hyra-results/blob/main/AI4Science/hyinv" target="_blank" rel="noopener"><code>AI4Science/hyinv/</code></a>: <strong>HyInv</strong>, a 1.96-million-parameter
+message-passing graph network for protein inverse folding (backbone →
+sequence), trained with structure-reward reinforcement learning. The 7.8 MB
+weights ship in the folder; see its README for the CLI and Python API.</li>
+<li><a href="https://github.com/Tencent-Hunyuan/Hyra-results/blob/main/AI4Science/hyplm_flash" target="_blank" rel="noopener"><code>AI4Science/hyplm_flash/</code></a>: <strong>HyPLM-Flash</strong>, a
+650-million-parameter protein language model with an INT8 GPU inference engine
+(about 130,000 residues per second on one H20). The 2.6 GB weights are a
+GitHub Release on this repository; <code>weights/download.sh</code> fetches, merges and
+verifies them.</li>
+<li><a href="https://github.com/Tencent-Hunyuan/Hyra-results/blob/main/AI4Science/hycell" target="_blank" rel="noopener"><code>AI4Science/hycell/</code></a>: <strong>HyCell</strong>, a 16.1-million-parameter
+embedding model for single-cell transcriptomes, pretrained without cell-type
+labels on 79.5 million human cells of the CZ CELLxGENE Census. It maps raw
+counts to 512-dimensional embeddings and decodes them back to expression, and
+can be fine-tuned into a cell-type annotator. The 64 MB weights ship in the
+folder as part of the <code>hycell</code> package.</li>
+<li><a href="https://github.com/Tencent-Hunyuan/Hyra-results/blob/main/AI4Science/hyff" target="_blank" rel="noopener"><code>AI4Science/hyff/</code></a>: <strong>HyFF</strong>, five machine-learning force
+fields for molecular simulation (Presto, Vivace, Moderato, Andante and Largo;
+2.3 million to 1.2 billion parameters, 83 elements), with the <code>hyff</code> package
+for single-structure inference, NVE/NVT/NPT molecular dynamics and batched
+prediction. The weights (9 MB to 4.8 GB per model) are a GitHub Release on
+this repository; the package downloads and verifies them on first use.</li>
+</ul>
+
+<p dir="auto">Creative and game-playing demos (no leaderboard comparison):</p>
+<ul dir="auto">
+<li><a href="https://github.com/Tencent-Hunyuan/Hyra-results/blob/main/AI4Fun/reversi" target="_blank" rel="noopener"><code>AI4Fun/reversi/</code></a>: a <strong>AlphaZero-style
+Reversi (Othello) bot</strong> for the <a href="https://www.botzone.org.cn/" rel="noopener" target="_blank">Botzone</a> 8×8
+arena (C++ pattern/n-tuple net + PUCT-MCTS + exact endgame solver).</li>
+<li><a href="https://github.com/Tencent-Hunyuan/Hyra-results/blob/main/AI4Fun/music" target="_blank" rel="noopener"><code>AI4Fun/music/</code></a>: a five-part <strong>arrangement of 望春風</strong>
+(<em>Bāng-chhun-hong</em>, 1933, 鄧雨賢).</li>
+<li><a href="https://github.com/Tencent-Hunyuan/Hyra-results/blob/main/AI4Fun/3d_penguin" target="_blank" rel="noopener"><code>AI4Fun/3d_penguin/</code></a>: a procedural <strong>3-D QQ-penguin</strong>
+built by a single <a href="https://docs.blender.org/api/current/" rel="noopener" target="_blank">Blender</a> <code>bpy</code> script.</li>
+<li><a href="https://github.com/Tencent-Hunyuan/Hyra-results/blob/main/AI4Fun/3d_hunyuan" target="_blank" rel="noopener"><code>AI4Fun/3d_hunyuan/</code></a>: a procedural <strong>3-D Tencent Hunyuan
+(混元) logo orb</strong>.</li>
+</ul>
+
+<p dir="auto">If you use these results, please cite:</p>
+<div class="highlight highlight-text-bibtex notranslate position-relative overflow-auto" dir="auto" data-snippet-clipboard-copy-content="@misc{hyra2026,
+  title        = {Hyra: Hunyuan Research Agent},
+  author       = {{Hyra Team}},
+  year         = {2026},
+  howpublished = {\url{https://hy.tencent.com/research/hyra}},
+}"><pre><span class="pl-k">@misc</span>{<span class="pl-en">hyra2026</span>,
+  <span class="pl-s">title</span>        = <span class="pl-s"><span class="pl-pds">{</span>Hyra: Hunyuan Research Agent<span class="pl-pds">}</span></span>,
+  <span class="pl-s">author</span>       = <span class="pl-s"><span class="pl-pds">{</span>{Hyra Team}<span class="pl-pds">}</span></span>,
+  <span class="pl-s">year</span>         = <span class="pl-s"><span class="pl-pds">{</span>2026<span class="pl-pds">}</span></span>,
+  <span class="pl-s">howpublished</span> = <span class="pl-s"><span class="pl-pds">{</span>\url{https://hy.tencent.com/research/hyra}<span class="pl-pds">}</span></span>,
+}</pre></div>
+
+<p dir="auto">This repository is licensed under the Apache License, Version 2.0; see
+<a href="https://github.com/Tencent-Hunyuan/Hyra-results/blob/main/LICENSE" target="_blank" rel="noopener"><code>LICENSE</code></a>.</p>
+</article></div></div>
