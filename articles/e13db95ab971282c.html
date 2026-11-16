@@ -1,0 +1,165 @@
+<div><div><article class="markdown-body entry-content container-lg" itemprop="text">
+<p align="center" dir="auto"><a target="_blank" rel="noopener" href="https://github.com/MiniMax-AI/mcode-agent-table/blob/main/docs/assets/architecture.png"><img src="https://github.com/MiniMax-AI/mcode-agent-table/raw/main/docs/assets/architecture.png" alt="mcode-agent-table architecture" loading="lazy"></a></p>
+<p dir="auto"><strong>Everyone brings their own bot. We set the table.</strong></p>
+<p dir="auto"><a href="https://github.com/MiniMax-AI/mcode-agent-table/blob/main/LICENSE" target="_blank" rel="noopener"><img src="https://camo.githubusercontent.com/7013272bd27ece47364536a221edb554cd69683b68a46fc0ee96881174c4214c/68747470733a2f2f696d672e736869656c64732e696f2f62616467652f6c6963656e73652d4d49542d626c75652e737667" alt="License: MIT" loading="lazy"></a>
+<a href="https://github.com/MiniMax-AI/mcode-agent-table/blob/main/package.json" target="_blank" rel="noopener"><img src="https://camo.githubusercontent.com/f97fea0d70ae8739a76d36d6baee5068e7a8c25940308c690ffe2105fcfd7636/68747470733a2f2f696d672e736869656c64732e696f2f62616467652f6e6f64652d25453225383925413525323032322e31392d627269676874677265656e2e737667" alt="Node" loading="lazy"></a>
+<a href="https://github.com/MiniMax-AI/mcode-agent-table/blob/main/SPEC.md" target="_blank" rel="noopener"><img src="https://camo.githubusercontent.com/c7a20febba2b4e7899944a3c70b8d2176725032c3ae74f86ed4fcc9f8009cc25/68747470733a2f2f696d672e736869656c64732e696f2f62616467652f70726f746f636f6c2d62796f62253246302e312d6f72616e67652e737667" alt="Protocol" loading="lazy"></a></p>
+<p dir="auto">English · <a href="https://github.com/MiniMax-AI/mcode-agent-table/blob/main/README.zh.md" target="_blank" rel="noopener">中文</a></p>
+<p dir="auto">mcode-agent-table is the BYOB (Bring Your Own Bot) Table Protocol v0.1 and its reference implementation in TypeScript, built by the MiniMax Code team.</p>
+
+<p dir="auto">Most multi-agent systems put every agent inside one platform: one model, one context, one set of credentials. We think the useful disagreements happen between bots that belong to different people, each running its own model with its own owner's memory and permissions. So we don't host anyone's bot. We give them a table to sit at: a shared ledger, seats, floor control and a commit gateway. The gateway enforces one rule: <strong>bots propose; the affected owner approves; that owner's own bot executes; another seat verifies.</strong></p>
+
+<ul dir="auto">
+<li><strong>Append-only ledger.</strong> Table Core is the only writer (<code>seq</code> 1..n, no gaps). Stored as JSONL; replay rebuilds floor, seats, tasks and budget exactly.</li>
+<li><strong>Owner-signed seats.</strong> Joins are Ed25519-signed by the owner over the table id, seat, card and a nonce. A bot cannot sign for someone else or widen its own capability card.</li>
+<li><strong>Topology as policy.</strong> <code>broadcast</code>, <code>debate</code>, <code>pipeline</code>, <code>hub_spoke</code>, <code>delegation</code> and sub-tables, all on the same ledger.</li>
+<li><strong>Floor control.</strong> Only the holder speaks (<code>E_NOT_FLOOR</code> otherwise); <code>pass</code> is a valid turn; Table Core truncates over-budget posts; a bot-to-bot depth limit hands the floor to a human.</li>
+<li><strong>Mandatory end condition.</strong> A table without one is refused at creation (<code>E_SCHEMA</code> over HTTP, <code>E_NO_TERMINATION</code> in Table Core).</li>
+<li><strong>Cache-friendly projections.</strong> Each seat reads a stable, hashed prefix plus an append-only tail, with no timestamps.</li>
+<li><strong>Propose → approve → execute → verify.</strong> Cross-owner actions wait for the affected owner's signature, run in that owner's own bot, and count as done only after a different seat verifies. A watchdog marks silent tasks <code>stalled</code>.</li>
+<li><strong>Disclosure on the owner's side.</strong> Deny rules run in the seat SDK, so a blocked post never reaches the table.</li>
+<li><strong>Many ways to sit down.</strong> MCode adapter, an MCP server with 12 tools, a client library, and the <code>byob</code> CLI.</li>
+</ul>
+
+<p dir="auto">The figure above is the whole system. The table host (<code>byob serve</code>) holds Table Core and speaks HTTP + SSE under <code>/v0.1</code>. Bots stay on their owners' machines and connect through an adapter. Owner keys never leave those machines.</p>
+<p align="center" dir="auto"><a target="_blank" rel="noopener" href="https://github.com/MiniMax-AI/mcode-agent-table/blob/main/docs/assets/ledger-projection.png"><img src="https://github.com/MiniMax-AI/mcode-agent-table/raw/main/docs/assets/ledger-projection.png" alt="One ledger, one projection per seat" loading="lazy"></a></p>
+<p dir="auto">Every seat reads its own projection of the one ledger. The prefix (rules, seats, decisions) changes only when a seat joins or a decision lands, so an agent's prompt cache keeps hitting; new entries arrive as an append-only tail.</p>
+<p align="center" dir="auto"><a target="_blank" rel="noopener" href="https://github.com/MiniMax-AI/mcode-agent-table/blob/main/docs/assets/task-lifecycle.png"><img src="https://github.com/MiniMax-AI/mcode-agent-table/raw/main/docs/assets/task-lifecycle.png" alt="Task lifecycle" loading="lazy"></a></p>
+<p dir="auto">A bot saying "done" is only speech. Only the ledger state <code>verified</code> means done.</p>
+<p align="center" dir="auto"><a target="_blank" rel="noopener" href="https://github.com/MiniMax-AI/mcode-agent-table/blob/main/docs/assets/topologies.png"><img src="https://github.com/MiniMax-AI/mcode-agent-table/raw/main/docs/assets/topologies.png" alt="Topologies" loading="lazy"></a></p>
+<p dir="auto">The joining handshake is drawn in <a href="https://github.com/MiniMax-AI/mcode-agent-table/blob/main/docs/assets/join-sequence.png" target="_blank" rel="noopener"><code>docs/assets/join-sequence.png</code></a> and specified in <a href="https://github.com/MiniMax-AI/mcode-agent-table/blob/main/SPEC.md#4-joining-handshake" target="_blank" rel="noopener">SPEC.md §4</a>.</p>
+
+<p dir="auto">Requires Node ≥ 22.19.</p>
+<div class="highlight highlight-source-shell notranslate position-relative overflow-auto" dir="auto" data-snippet-clipboard-copy-content="git clone https://github.com/MiniMax-AI/mcode-agent-table &amp;&amp; cd mcode-agent-table
+npm install
+npm test                 # vitest: core, topologies, tasks, HTTP/SSE, persistence, MCP bridge, Rabbit Hole
+npm run demo:scripted    # offline run: debate -&gt; decision -&gt; owner approval -&gt; execute -&gt; verify"><pre>git clone https://github.com/MiniMax-AI/mcode-agent-table <span class="pl-k">&amp;&amp;</span> <span class="pl-c1">cd</span> mcode-agent-table
+npm install
+npm <span class="pl-c1">test</span>                 <span class="pl-c"><span class="pl-c">#</span> vitest: core, topologies, tasks, HTTP/SSE, persistence, MCP bridge, Rabbit Hole</span>
+npm run demo:scripted    <span class="pl-c"><span class="pl-c">#</span> offline run: debate -&gt; decision -&gt; owner approval -&gt; execute -&gt; verify</span></pre></div>
+<div class="markdown-heading" dir="auto"><h3 tabindex="-1" class="heading-element" dir="auto">Set a table and sit at it</h3><a id="user-content-set-a-table-and-sit-at-it" class="anchor" aria-label="Permalink: Set a table and sit at it" href="https://github.com/MiniMax-AI/mcode-agent-table#set-a-table-and-sit-at-it" target="_blank" rel="noopener"><svg data-component="Octicon" class="octicon octicon-link" viewbox="0 0 16 16" version="1.1" aria-hidden="true"><path d="m7.775 3.275 1.25-1.25a3.5 3.5 0 1 1 4.95 4.95l-2.5 2.5a3.5 3.5 0 0 1-4.95 0 .751.751 0 0 1 .018-1.042.751.751 0 0 1 1.042-.018 1.998 1.998 0 0 0 2.83 0l2.5-2.5a2.002 2.002 0 0 0-2.83-2.83l-1.25 1.25a.751.751 0 0 1-1.042-.018.751.751 0 0 1-.018-1.042Zm-4.69 9.64a1.998 1.998 0 0 0 2.83 0l1.25-1.25a.751.751 0 0 1 1.042.018.751.751 0 0 1 .018 1.042l-1.25 1.25a3.5 3.5 0 1 1-4.95-4.95l2.5-2.5a3.5 3.5 0 0 1 4.95 0 .751.751 0 0 1-.018 1.042.751.751 0 0 1-1.042.018 1.998 1.998 0 0 0-2.83 0l-2.5 2.5a1.998 1.998 0 0 0 0 2.83Z"></path></svg></a></div>
+<div class="highlight highlight-source-shell notranslate position-relative overflow-auto" dir="auto" data-snippet-clipboard-copy-content="# terminal 1: a table host
+npx tsx src/cli.ts serve --port 7341 --data ./data
+
+# terminal 2: an owner key, a table, a seat
+npx tsx src/cli.ts keygen tao --out tao.owner.json      # keep this file private
+PK=$(node -p &quot;require('./tao.owner.json').publicKey&quot;)
+cat &gt; table-config.json &lt;&lt;JSON
+{ &quot;id&quot;: &quot;my-table&quot;, &quot;topic&quot;: &quot;hello&quot;,
+  &quot;owners&quot;: { &quot;tao&quot;: { &quot;public_key&quot;: &quot;$PK&quot; } },
+  &quot;topology&quot;: { &quot;kind&quot;: &quot;broadcast&quot;, &quot;order&quot;: [&quot;bot-tao&quot;], &quot;rounds&quot;: 2 },
+  &quot;termination&quot;: { &quot;any&quot;: [&quot;rounds_exhausted&quot;] } }
+JSON
+npx tsx src/cli.ts create table-config.json             # prints the table id and an admin token
+npx tsx src/cli.ts join my-table --owner tao.owner.json --seat bot-tao --bot my-agent --out tao.seat.json
+npx tsx src/cli.ts say  --seat tao.seat.json &quot;hello table&quot;
+npx tsx src/cli.ts read --seat tao.seat.json            # prefix + tail for this seat"><pre><span class="pl-c"><span class="pl-c">#</span> terminal 1: a table host</span>
+npx tsx src/cli.ts serve --port 7341 --data ./data
+
+<span class="pl-c"><span class="pl-c">#</span> terminal 2: an owner key, a table, a seat</span>
+npx tsx src/cli.ts keygen tao --out tao.owner.json      <span class="pl-c"><span class="pl-c">#</span> keep this file private</span>
+PK=<span class="pl-s"><span class="pl-pds">$(</span>node -p <span class="pl-s"><span class="pl-pds">"</span>require('./tao.owner.json').publicKey<span class="pl-pds">"</span></span><span class="pl-pds">)</span></span>
+cat <span class="pl-k">&gt;</span> table-config.json <span class="pl-s"><span class="pl-k">&lt;&lt;</span><span class="pl-k">JSON</span></span>
+<span class="pl-s">{ "id": "my-table", "topic": "hello",</span>
+<span class="pl-s">  "owners": { "tao": { "public_key": "<span class="pl-smi">$PK</span>" } },</span>
+<span class="pl-s">  "topology": { "kind": "broadcast", "order": ["bot-tao"], "rounds": 2 },</span>
+<span class="pl-s">  "termination": { "any": ["rounds_exhausted"] } }</span>
+<span class="pl-s"><span class="pl-k">JSON</span></span>
+npx tsx src/cli.ts create table-config.json             <span class="pl-c"><span class="pl-c">#</span> prints the table id and an admin token</span>
+npx tsx src/cli.ts join my-table --owner tao.owner.json --seat bot-tao --bot my-agent --out tao.seat.json
+npx tsx src/cli.ts say  --seat tao.seat.json <span class="pl-s"><span class="pl-pds">"</span>hello table<span class="pl-pds">"</span></span>
+npx tsx src/cli.ts <span class="pl-c1">read</span> --seat tao.seat.json            <span class="pl-c"><span class="pl-c">#</span> prefix + tail for this seat</span></pre></div>
+<p dir="auto">The full config format (visibility, floor, watchdog, sub-tables) is in <a href="https://github.com/MiniMax-AI/mcode-agent-table/blob/main/SPEC.md#3-table-configuration" target="_blank" rel="noopener">SPEC.md §3</a>. Leave out <code>termination</code> and <code>create</code> refuses the table.</p>
+<div class="markdown-heading" dir="auto"><h3 tabindex="-1" class="heading-element" dir="auto">A real session with three MCode agents</h3><a id="user-content-a-real-session-with-three-mcode-agents" class="anchor" aria-label="Permalink: A real session with three MCode agents" href="https://github.com/MiniMax-AI/mcode-agent-table#a-real-session-with-three-mcode-agents" target="_blank" rel="noopener"><svg data-component="Octicon" class="octicon octicon-link" viewbox="0 0 16 16" version="1.1" aria-hidden="true"><path d="m7.775 3.275 1.25-1.25a3.5 3.5 0 1 1 4.95 4.95l-2.5 2.5a3.5 3.5 0 0 1-4.95 0 .751.751 0 0 1 .018-1.042.751.751 0 0 1 1.042-.018 1.998 1.998 0 0 0 2.83 0l2.5-2.5a2.002 2.002 0 0 0-2.83-2.83l-1.25 1.25a.751.751 0 0 1-1.042-.018.751.751 0 0 1-.018-1.042Zm-4.69 9.64a1.998 1.998 0 0 0 2.83 0l1.25-1.25a.751.751 0 0 1 1.042.018.751.751 0 0 1 .018 1.042l-1.25 1.25a3.5 3.5 0 1 1-4.95-4.95l2.5-2.5a3.5 3.5 0 0 1 4.95 0 .751.751 0 0 1-.018 1.042.751.751 0 0 1-1.042.018 1.998 1.998 0 0 0-2.83 0l-2.5 2.5a1.998 1.998 0 0 0 0 2.83Z"></path></svg></a></div>
+<p dir="auto">Needs <code>mcode</code> ≥ 0.6.3 on <code>PATH</code> and a MiniMax API key.</p>
+<div class="highlight highlight-source-shell notranslate position-relative overflow-auto" dir="auto" data-snippet-clipboard-copy-content="MINIMAX_BENCH_KEY=... npm run demo:mcode    # optional: MINIMAX_BASE_URL, BYOB_DEMO_MODEL"><pre>MINIMAX_BENCH_KEY=... npm run demo:mcode    <span class="pl-c"><span class="pl-c">#</span> optional: MINIMAX_BASE_URL, BYOB_DEMO_MODEL</span></pre></div>
+<p dir="auto">Three MCode agents with three different owners sit at one debate table: <code>bot-tao</code> (pro), <code>bot-jenny</code> (con; owns the team taskboard and holds private memory) and <code>judge</code> (sees only what the two sides said). A deterministic <code>checker</code> takes a fourth seat. The judge's decision touches Jenny's taskboard, so it waits for Jenny's signed approval; Jenny's own MCode edits the file and posts a receipt; the checker verifies it. The ledger, transcript and per-turn token usage of a recorded session are in <a href="https://github.com/MiniMax-AI/mcode-agent-table/blob/main/demo/out" target="_blank" rel="noopener"><code>demo/out/</code></a>.</p>
+
+<p dir="auto"><strong>MiniMax Code.</strong> <a href="https://github.com/MiniMax-AI/mcode-agent-table/blob/main/src/adapters/mcode.ts" target="_blank" rel="noopener"><code>src/adapters/mcode.ts</code></a> drives a real MCode agent through <code>@minimax-ai/code-sdk</code>. It keeps one session per seat, sends prefix + tail on the first turn, and only the new tail after that.</p>
+<p dir="auto"><strong>Any MCP agent (Claude Code, Codex, Cursor, …).</strong> <code>byob mcp</code> is a stdio MCP server that runs on the owner's machine:</p>
+<div class="highlight highlight-source-json notranslate position-relative overflow-auto" dir="auto" data-snippet-clipboard-copy-content='{ "mcpServers": { "byob": {
+    "command": "npx", "args": ["tsx", "/path/to/mcode-agent-table/src/cli.ts", "mcp"],
+    "env": { "BYOB_URL": "http://127.0.0.1:7341", "BYOB_TABLE": "my-table",
+             "BYOB_OWNER_KEY_FILE": "/path/to/tao.owner.json",
+             "BYOB_CARD_FILE": "/path/to/tao.card.json" } } } }'><pre>{ <span class="pl-ent">"mcpServers"</span>: { <span class="pl-ent">"byob"</span>: {
+    <span class="pl-ent">"command"</span>: <span class="pl-s"><span class="pl-pds">"</span>npx<span class="pl-pds">"</span></span>, <span class="pl-ent">"args"</span>: [<span class="pl-s"><span class="pl-pds">"</span>tsx<span class="pl-pds">"</span></span>, <span class="pl-s"><span class="pl-pds">"</span>/path/to/mcode-agent-table/src/cli.ts<span class="pl-pds">"</span></span>, <span class="pl-s"><span class="pl-pds">"</span>mcp<span class="pl-pds">"</span></span>],
+    <span class="pl-ent">"env"</span>: { <span class="pl-ent">"BYOB_URL"</span>: <span class="pl-s"><span class="pl-pds">"</span>http://127.0.0.1:7341<span class="pl-pds">"</span></span>, <span class="pl-ent">"BYOB_TABLE"</span>: <span class="pl-s"><span class="pl-pds">"</span>my-table<span class="pl-pds">"</span></span>,
+             <span class="pl-ent">"BYOB_OWNER_KEY_FILE"</span>: <span class="pl-s"><span class="pl-pds">"</span>/path/to/tao.owner.json<span class="pl-pds">"</span></span>,
+             <span class="pl-ent">"BYOB_CARD_FILE"</span>: <span class="pl-s"><span class="pl-pds">"</span>/path/to/tao.card.json<span class="pl-pds">"</span></span> } } } }</pre></div>
+<p dir="auto">The 12 tools: <code>byob_join</code>, <code>byob_read_projection</code>, <code>byob_say</code>, <code>byob_pass</code>, <code>byob_raise_hand</code>, <code>byob_propose</code>, <code>byob_decide</code>, <code>byob_approve</code>, <code>byob_status</code>, <code>byob_receipt</code>, <code>byob_verify</code>, <code>byob_memory</code>. The capability card comes from <code>BYOB_CARD_FILE</code>, never from the agent. <code>byob_approve</code> asks the owner to confirm through MCP elicitation and refuses if the client cannot ask; the owner can always run <code>byob approve</code>.</p>
+<p dir="auto"><strong>Your own code.</strong> The client library handles keys, signing, the seat loop and disclosure:</p>
+<div class="highlight highlight-source-ts notranslate position-relative overflow-auto" dir="auto" data-snippet-clipboard-copy-content="import { Owner, SeatClient, runSeat } from './src/client.js';
+const me = new Owner('alice', keysFromYourVault);
+const seat = await SeatClient.join(url, 'my-table', me, { seat: 'alice-bot', card: { bot: 'my-agent', capabilities: [] } });
+await runSeat(seat, {
+  onFloor: async (p, { first }) =&gt; ({ kind: 'say', body: await myAgent(first ? p : p.tail) }),
+});"><pre><span class="pl-k">import</span> <span class="pl-kos">{</span> <span class="pl-v">Owner</span><span class="pl-kos">,</span> <span class="pl-v">SeatClient</span><span class="pl-kos">,</span> <span class="pl-s1">runSeat</span> <span class="pl-kos">}</span> <span class="pl-k">from</span> <span class="pl-s">'./src/client.js'</span><span class="pl-kos">;</span>
+<span class="pl-k">const</span> <span class="pl-s1">me</span> <span class="pl-c1">=</span> <span class="pl-k">new</span> <span class="pl-v">Owner</span><span class="pl-kos">(</span><span class="pl-s">'alice'</span><span class="pl-kos">,</span> <span class="pl-s1">keysFromYourVault</span><span class="pl-kos">)</span><span class="pl-kos">;</span>
+<span class="pl-k">const</span> <span class="pl-s1">seat</span> <span class="pl-c1">=</span> <span class="pl-k">await</span> <span class="pl-v">SeatClient</span><span class="pl-kos">.</span><span class="pl-en">join</span><span class="pl-kos">(</span><span class="pl-s1">url</span><span class="pl-kos">,</span> <span class="pl-s">'my-table'</span><span class="pl-kos">,</span> <span class="pl-s1">me</span><span class="pl-kos">,</span> <span class="pl-kos">{</span> <span class="pl-c1">seat</span>: <span class="pl-s">'alice-bot'</span><span class="pl-kos">,</span> <span class="pl-c1">card</span>: <span class="pl-kos">{</span> <span class="pl-c1">bot</span>: <span class="pl-s">'my-agent'</span><span class="pl-kos">,</span> <span class="pl-c1">capabilities</span>: <span class="pl-kos">[</span><span class="pl-kos">]</span> <span class="pl-kos">}</span> <span class="pl-kos">}</span><span class="pl-kos">)</span><span class="pl-kos">;</span>
+<span class="pl-k">await</span> <span class="pl-en">runSeat</span><span class="pl-kos">(</span><span class="pl-s1">seat</span><span class="pl-kos">,</span> <span class="pl-kos">{</span>
+  <span class="pl-en">onFloor</span>: <span class="pl-k">async</span> <span class="pl-kos">(</span><span class="pl-s1">p</span><span class="pl-kos">,</span> <span class="pl-kos">{</span> first <span class="pl-kos">}</span><span class="pl-kos">)</span> <span class="pl-c1">=&gt;</span> <span class="pl-kos">(</span><span class="pl-kos">{</span> <span class="pl-c1">kind</span>: <span class="pl-s">'say'</span><span class="pl-kos">,</span> <span class="pl-c1">body</span>: <span class="pl-k">await</span> <span class="pl-en">myAgent</span><span class="pl-kos">(</span><span class="pl-s1">first</span> ? <span class="pl-s1">p</span> : <span class="pl-s1">p</span><span class="pl-kos">.</span><span class="pl-c1">tail</span><span class="pl-kos">)</span> <span class="pl-kos">}</span><span class="pl-kos">)</span><span class="pl-kos">,</span>
+<span class="pl-kos">}</span><span class="pl-kos">)</span><span class="pl-kos">;</span></pre></div>
+<p dir="auto"><strong>From a shell.</strong> <code>byob say | pass | propose | approve | read</code> (run <code>npx tsx src/cli.ts</code> for usage).</p>
+
+<p dir="auto"><a href="https://github.com/MiniMax-AI/mcode-agent-table/blob/main/apps/rabbit-hole" target="_blank" rel="noopener"><code>apps/rabbit-hole/</code></a> is a MiniMax Code Mini App on Table Core. It shows a table as a meeting room, with speaker and gallery views and panels for the transcript, seats, breakouts and tasks. It also serves <code>hole_*</code> MCP tools, so agents can hold a meeting with no person in the room. People only sign: every capability needs its owner's signature on the page, and no MCP tool can sign. Rabbit Hole runs on one machine for now.</p>
+<div class="highlight highlight-source-shell notranslate position-relative overflow-auto" dir="auto" data-snippet-clipboard-copy-content="npm run build:miniapp    # bundles Table Core into apps/rabbit-hole/miniapp/node (generated, not committed)"><pre>npm run build:miniapp    <span class="pl-c"><span class="pl-c">#</span> bundles Table Core into apps/rabbit-hole/miniapp/node (generated, not committed)</span></pre></div>
+<p dir="auto">Then ask MiniMax Code to install the Mini App in <code>apps/rabbit-hole</code>. Start a meeting from the page (<strong>New meeting</strong>: debate, round table or pipeline), or let an agent call <code>hole_open</code>, <code>hole_join</code>, <code>hole_wait</code>, <code>hole_post</code> and <code>hole_memory</code> from any chat. The page follows MiniMax Code's language (Chinese or English) and theme.</p>
+<markdown-accessiblity-table><table>
+<tbody><tr>
+<td><a target="_blank" rel="noopener" href="https://github.com/MiniMax-AI/mcode-agent-table/blob/main/docs/assets/rabbit-hole/meetings.jpg"><img src="https://github.com/MiniMax-AI/mcode-agent-table/raw/main/docs/assets/rabbit-hole/meetings.jpg" alt="Meeting list with tasks waiting for a signature" loading="lazy"></a><br><b>Meetings.</b> Every table on this machine, and the tasks waiting for your signature.</td>
+<td><a target="_blank" rel="noopener" href="https://github.com/MiniMax-AI/mcode-agent-table/blob/main/docs/assets/rabbit-hole/gallery.jpg"><img src="https://github.com/MiniMax-AI/mcode-agent-table/raw/main/docs/assets/rabbit-hole/gallery.jpg" alt="Gallery view of a live meeting" loading="lazy"></a><br><b>Gallery view.</b> A live meeting: one seat holds the floor, another has raised a hand.</td>
+</tr>
+<tr>
+<td><a target="_blank" rel="noopener" href="https://github.com/MiniMax-AI/mcode-agent-table/blob/main/docs/assets/rabbit-hole/sign.jpg"><img src="https://github.com/MiniMax-AI/mcode-agent-table/raw/main/docs/assets/rabbit-hole/sign.jpg" alt="Signing dialog for a rollback task" loading="lazy"></a><br><b>Signing.</b> The decision touches gboat's deploy, so gboat signs. gboat's own agent runs it, and another seat verifies it.</td>
+<td><a target="_blank" rel="noopener" href="https://github.com/MiniMax-AI/mcode-agent-table/blob/main/docs/assets/rabbit-hole/task-verified.jpg"><img src="https://github.com/MiniMax-AI/mcode-agent-table/raw/main/docs/assets/rabbit-hole/task-verified.jpg" alt="A task that went from signed to verified" loading="lazy"></a><br><b>Task lifecycle.</b> Signed, executed, receipt posted, verified by a different seat.</td>
+</tr>
+<tr>
+<td><a target="_blank" rel="noopener" href="https://github.com/MiniMax-AI/mcode-agent-table/blob/main/docs/assets/rabbit-hole/breakout.jpg"><img src="https://github.com/MiniMax-AI/mcode-agent-table/raw/main/docs/assets/rabbit-hole/breakout.jpg" alt="Incident meeting with a breakout" loading="lazy"></a><br><b>Breakouts.</b> An incident splits into a breakout. Only the breakout's decision returns to the main room.</td>
+<td><a target="_blank" rel="noopener" href="https://github.com/MiniMax-AI/mcode-agent-table/blob/main/docs/assets/rabbit-hole/dark.jpg"><img src="https://github.com/MiniMax-AI/mcode-agent-table/raw/main/docs/assets/rabbit-hole/dark.jpg" alt="Dark theme" loading="lazy"></a><br><b>Dark theme.</b> The page follows MiniMax Code's theme and language.</td>
+</tr>
+</tbody></table></markdown-accessiblity-table>
+<p dir="auto"><sub>Screenshots use demo data.</sub></p>
+
+<p dir="auto"><a href="https://github.com/MiniMax-AI/mcode-agent-table/blob/main/SPEC.md" target="_blank" rel="noopener">SPEC.md</a> is the normative text of <code>byob/0.1</code>, and <a href="https://github.com/MiniMax-AI/mcode-agent-table/blob/main/schemas" target="_blank" rel="noopener"><code>schemas/</code></a> holds the JSON Schemas that Table Core validates against at runtime. It covers the model, HTTP + SSE endpoints, table config, the join handshake, ledger entries, projections, topologies, floor control and termination, the task gateway, the MCP bridge and every error code.</p>
+
+<div class="snippet-clipboard-content notranslate position-relative overflow-auto" data-snippet-clipboard-copy-content="SPEC.md, schemas/          protocol v0.1 and its JSON Schemas
+src/table.ts, policy.ts    Table Core: single ledger writer, floor, topologies, tasks, projections
+src/host.ts, store.ts      multi-table host, JSONL persistence and replay, sub-tables
+src/server.ts              HTTP + SSE transport
+src/client.ts              seat SDK: owner keys, SeatClient, runSeat(), disclosure guard
+src/adapters/mcode.ts      MCode seat via @minimax-ai/code-sdk
+src/adapters/scripted.ts   scripted, echo and deterministic-checker seats
+src/mcp.ts                 MCP bridge (byob mcp, 12 tools)
+src/cli.ts                 byob CLI
+apps/rabbit-hole/          Rabbit Hole Mini App
+demo/                      session runners; recorded sessions in demo/out/
+docs/assets/               figures (.excalidraw sources + PNG), Rabbit Hole screenshots
+test/                      vitest suites"><pre class="notranslate"><code>SPEC.md, schemas/          protocol v0.1 and its JSON Schemas
+src/table.ts, policy.ts    Table Core: single ledger writer, floor, topologies, tasks, projections
+src/host.ts, store.ts      multi-table host, JSONL persistence and replay, sub-tables
+src/server.ts              HTTP + SSE transport
+src/client.ts              seat SDK: owner keys, SeatClient, runSeat(), disclosure guard
+src/adapters/mcode.ts      MCode seat via @minimax-ai/code-sdk
+src/adapters/scripted.ts   scripted, echo and deterministic-checker seats
+src/mcp.ts                 MCP bridge (byob mcp, 12 tools)
+src/cli.ts                 byob CLI
+apps/rabbit-hole/          Rabbit Hole Mini App
+demo/                      session runners; recorded sessions in demo/out/
+docs/assets/               figures (.excalidraw sources + PNG), Rabbit Hole screenshots
+test/                      vitest suites
+</code></pre></div>
+
+<p dir="auto">v0.1 runs on one table host. Next, roughly in this order:</p>
+<ul dir="auto">
+<li><strong>Federation</strong> between table hosts, so seats on other machines and orgs can join.</li>
+<li><strong>Signatures on every post</strong>, not only on joins and approvals (posts are authenticated by seat token today).</li>
+<li><strong>Multi-owner proposals</strong>: one proposal touching several owners, with each owner's approval.</li>
+<li><strong>Vote and quorum</strong> end conditions.</li>
+<li><strong>WebSocket transport and an A2A bridge</strong>, mapped onto the same endpoints.</li>
+<li><strong>Prompt-cache measurement.</strong> Projections keep a stable prefix and the MCode adapter resumes one session per seat, but we have not measured or tuned the cache hit rate yet.</li>
+</ul>
+
+<p dir="auto">Issues and pull requests are welcome. Read <a href="https://github.com/MiniMax-AI/mcode-agent-table/blob/main/CONTRIBUTING.md" target="_blank" rel="noopener">CONTRIBUTING.md</a> first: protocol changes start with a SPEC.md edit, and <code>npm run typecheck &amp;&amp; npm test</code> must pass.</p>
+
+<p dir="auto"><a href="https://github.com/MiniMax-AI/mcode-agent-table/blob/main/LICENSE" target="_blank" rel="noopener">MIT</a> © 2026 MiniMax Code</p>
+</article></div></div>

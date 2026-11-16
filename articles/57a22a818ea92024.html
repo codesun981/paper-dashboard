@@ -1,0 +1,252 @@
+<div><div><article itemscope itemtype="http://schema.org/BlogPosting">
+        
+
+
+
+
+<p><a href="https://github.com/wsdjeg/chat.nvim" target="_blank" rel="noopener">chat.nvim</a> v1.12.0 在 2026-11-15 打上 tag。release notes 里 28 条 feat、35 条 fix，飞书和 Telegram 从单文件拆成了模块目录，Discord 这一版也补齐了同形状的子模块。</p>
+
+<p>这一版新加的东西主要在三个方向：缓存和上下文从「心里有数」变成「屏幕上看得见、配置里调得动」；用量单独记一份账，能按小时看；飞书从「能收发消息」做到「能按人管权限、能私聊、每人一个工作目录」。下面按功能逐项写，配置名和默认行为都带上。</p>
+
+<h2 id="一缓存探针第一次看到前缀断在哪">一、缓存探针：第一次看到前缀断在哪</h2>
+
+<p>缓存能不能命中，取决于请求前缀是否逐字节相同：system prompt、tools 数组、已经发出的消息。差一个字节，从那一位往后全部按原价计费。</p>
+
+<p>这个道理早就知道，但我一直没有工具去确认每次请求到底断在哪。v1.12 新加 <code class="language-plaintext highlighter-rouge">lua/chat/sessions/cache_probe.lua</code>，给每个请求打指纹，跟同会话的上一次请求比，断点位置和原因都写进日志。</p>
+
+<p>指纹只取字符串前 4096 字节，并把长度也混进哈希：</p>
+
+<div class="language-lua highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kd">local</span> <span class="n">SAMPLE_BYTES</span> <span class="o">=</span> <span class="mi">4096</span>
+
+<span class="kd">local</span> <span class="k">function</span> <span class="nf">hash_string</span><span class="p">(</span><span class="n">s</span><span class="p">)</span>
+  <span class="k">if</span> <span class="nb">type</span><span class="p">(</span><span class="n">s</span><span class="p">)</span> <span class="o">~=</span> <span class="s1">'string'</span> <span class="k">then</span>
+    <span class="k">return</span> <span class="s1">'0'</span>
+  <span class="k">end</span>
+  <span class="kd">local</span> <span class="n">n</span> <span class="o">=</span> <span class="o">#</span><span class="n">s</span>
+  <span class="kd">local</span> <span class="n">h</span> <span class="o">=</span> <span class="mi">2166136261</span>
+  <span class="kd">local</span> <span class="n">limit</span> <span class="o">=</span> <span class="n">n</span> <span class="o">&lt;</span> <span class="n">SAMPLE_BYTES</span> <span class="ow">and</span> <span class="n">n</span> <span class="ow">or</span> <span class="n">SAMPLE_BYTES</span>
+  <span class="k">for</span> <span class="n">i</span> <span class="o">=</span> <span class="mi">1</span><span class="p">,</span> <span class="n">limit</span> <span class="k">do</span>
+    <span class="n">h</span> <span class="o">=</span> <span class="p">(</span><span class="n">h</span> <span class="o">*</span> <span class="mi">31</span> <span class="o">+</span> <span class="n">s</span><span class="p">:</span><span class="n">byte</span><span class="p">(</span><span class="n">i</span><span class="p">))</span> <span class="o">%</span> <span class="mi">4294967296</span>
+  <span class="k">end</span>
+  <span class="n">h</span> <span class="o">=</span> <span class="p">(</span><span class="n">h</span> <span class="o">*</span> <span class="mi">31</span> <span class="o">+</span> <span class="n">n</span><span class="p">)</span> <span class="o">%</span> <span class="mi">4294967296</span>
+  <span class="k">return</span> <span class="nb">tostring</span><span class="p">(</span><span class="n">h</span><span class="p">)</span>
+<span class="k">end</span>
+</code></pre></div></div>
+
+<p>工具输出动辄几千行，全量哈希没必要。只取头部再混入长度，一个被截断的长字符串就不会冒充短字符串。这块是脏活，够用就行。</p>
+
+<p>挂点三个，每个都是 best-effort，探针自己出错不能拖垮请求：<code class="language-plaintext highlighter-rouge">protocol.request</code> 调 <code class="language-plaintext highlighter-rouge">begin_request</code>，<code class="language-plaintext highlighter-rouge">tools.request_tools</code> 调 <code class="language-plaintext highlighter-rouge">record_tools</code>，<code class="language-plaintext highlighter-rouge">progress.set_progress_usage</code> 调 <code class="language-plaintext highlighter-rouge">record_usage</code>。</p>
+
+<p>日志分两类。健康的那种长这样：</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>[cache] session=2026-11-15-09-14-22 req=#12 append +3 messages, prefix intact (45)
+</code></pre></div></div>
+
+<p>断了的长这样：</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>[cache] session=... req=#13 break=#7/46 reason=tools (messages before the break stay cached)
+</code></pre></div></div>
+
+<p>词表一共五个：<code class="language-plaintext highlighter-rouge">append</code>、<code class="language-plaintext highlighter-rouge">system</code>、<code class="language-plaintext highlighter-rouge">tools</code>、<code class="language-plaintext highlighter-rouge">messages</code>、<code class="language-plaintext highlighter-rouge">truncated</code>。断点之前的消息还在缓存里，只有后面那段重新计费，所以日志把 <code class="language-plaintext highlighter-rouge">break=#7/46</code> 这个位置单独标出来，方便判断损失有多大。</p>
+
+<p>第一次跑出 <code class="language-plaintext highlighter-rouge">reason=tools</code> 的时候我盯着看了半分钟，因为那一回合我根本没碰工具配置。</p>
+
+<h2 id="二chatusage把三种-provider-的用量压成一张表">二、chat.usage：把三种 provider 的用量压成一张表</h2>
+
+<p>探针能定位断点，但缓存命中有没有变好，还得看数字。这一版顺手把用量解析收拢成一个模块 <code class="language-plaintext highlighter-rouge">lua/chat/usage.lua</code>。</p>
+
+<p>起因是很久以前某个会话里缓存那一栏永远是 0%。我一开始以为 DeepSeek 压根不返回这个数字，翻文档才发现它返回了，只是字段名跟 OpenAI 不一样。把三家摊开对比：</p>
+
+<table>
+  <thead>
+    <tr>
+      <th>provider</th>
+      <th>字段</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>OpenAI / DashScope</td>
+      <td><code class="language-plaintext highlighter-rouge">usage.prompt_tokens_details.cached_tokens</code></td>
+    </tr>
+    <tr>
+      <td>DeepSeek</td>
+      <td><code class="language-plaintext highlighter-rouge">usage.prompt_cache_hit_tokens</code></td>
+    </tr>
+    <tr>
+      <td>Anthropic</td>
+      <td><code class="language-plaintext highlighter-rouge">usage.cache_read_input_tokens</code></td>
+    </tr>
+  </tbody>
+</table>
+
+<p>渲染那边原来只认第一种，<code class="language-plaintext highlighter-rouge">chat.usage</code> 做的就是把任意 provider 的 payload 压成同一张表 <code class="language-plaintext highlighter-rouge">{ total, prompt, completion, cached }</code>，另外带 <code class="language-plaintext highlighter-rouge">hit_ratio</code>、<code class="language-plaintext highlighter-rouge">summary</code>、<code class="language-plaintext highlighter-rouge">sum</code> 三个派生值。取不到的字段返回 0 而不是 nil，调用方不用到处写 <code class="language-plaintext highlighter-rouge">or 0</code>。</p>
+
+<p>模块里那段注释我写得很直白，因为下次改的人大概率还是会想加分支：</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>Every provider reports usage with its own shape, so the UI kept
+re-implementing "which field holds the cached tokens" in several places and
+got it wrong in most of them (only the OpenAI `prompt_tokens_details` shape
+was understood, so DeepSeek and Anthropic cache hits always displayed 0%).
+</code></pre></div></div>
+
+<h2 id="三slide_step上下文窗口按批推进">三、slide_step：上下文窗口按批推进</h2>
+
+<p>截断窗口以前每回合都往前挪一格。<code class="language-plaintext highlighter-rouge">keep_recent</code> 是固定的，但起点取 <code class="language-plaintext highlighter-rouge">#messages - keep_recent</code>，消息一多，起点每条都动，前缀跟着断，只是断点靠后一点，日志里 <code class="language-plaintext highlighter-rouge">reason=messages</code> 一路刷。</p>
+
+<p>新配置 <code class="language-plaintext highlighter-rouge">slide_step</code> 把起点按批推进：</p>
+
+<div class="language-lua highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kd">local</span> <span class="n">raw_cutoff</span> <span class="o">=</span> <span class="o">#</span><span class="n">other_messages</span> <span class="o">-</span> <span class="n">config</span><span class="p">.</span><span class="n">keep_recent</span>
+<span class="kd">local</span> <span class="n">cutoff_idx</span> <span class="o">=</span> <span class="n">raw_cutoff</span>
+<span class="kd">local</span> <span class="n">step</span> <span class="o">=</span> <span class="nb">tonumber</span><span class="p">(</span><span class="n">config</span><span class="p">.</span><span class="n">slide_step</span><span class="p">)</span> <span class="ow">or</span> <span class="mi">0</span>
+<span class="k">if</span> <span class="n">step</span> <span class="o">&gt;</span> <span class="mi">1</span> <span class="k">then</span>
+  <span class="n">cutoff_idx</span> <span class="o">=</span> <span class="nb">math.floor</span><span class="p">(</span><span class="n">raw_cutoff</span> <span class="o">/</span> <span class="n">step</span><span class="p">)</span> <span class="o">*</span> <span class="n">step</span>
+  <span class="k">if</span> <span class="n">cutoff_idx</span> <span class="o">&lt;</span> <span class="mi">1</span> <span class="k">then</span>
+    <span class="k">return</span> <span class="n">messages</span><span class="p">,</span> <span class="kc">false</span>
+  <span class="k">end</span>
+<span class="k">end</span>
+</code></pre></div></div>
+
+<p>窗口在 <code class="language-plaintext highlighter-rouge">keep_recent</code> 和 <code class="language-plaintext highlighter-rouge">keep_recent + slide_step</code> 之间来回震荡，攒够一个 step 才往前跳一次，跳一次断一次，中间那些回合前缀完全一致。默认 <code class="language-plaintext highlighter-rouge">slide_step = 1</code>，也就是保持旧行为；我这边的会话设成 10。</p>
+
+<p>代价有两个：窗口会略微超出预算，截断的时机晚于 <code class="language-plaintext highlighter-rouge">trigger_threshold</code>。都认了。</p>
+
+<h2 id="四窗口提示固定在数组末尾">四、窗口提示固定在数组末尾</h2>
+
+<p>截断之后要插一条提示，告诉模型「早期消息被裁掉了，需要历史可以调 get_history」。位置我以前选在最新一条 user 消息之前，看起来最自然。</p>
+
+<p>问题是这条提示的内容里带着每次请求都会变的数字：总消息数、当前窗口的起止。它只要落在数组头部，第一个字节就变了，整个前缀作废。而截断后只剩一条 user 消息的单轮窗口，它必然落在头部。结果是每请求断一次，只剩 tools 数组还在缓存里。</p>
+
+<p>现在它固定是最后一条。代码注释里我把这段写得很长，因为下次再有人想把它挪回去，得先看完。</p>
+
+
+
+<p>lazy tool loading 按需加载工具，每个回合重新算一遍要发哪些。工具是「用到了才加」，顺序自然跟着调用顺序走。system prompt 一样的会话，tools 数组顺序不同，后面全不匹配。</p>
+
+<p>1.12 把顺序冻成 append-only：</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>tools.essential → 本回合第一次出现的懒加载工具 → find_tool 永远最后
+</code></pre></div></div>
+
+<p>已经在数组里的工具再调用、再被 <code class="language-plaintext highlighter-rouge">find_tool</code> 激活，都不动位置，只有真正新出现的工具追加一格。</p>
+
+<p>配套改了 <code class="language-plaintext highlighter-rouge">find_tool</code> 的返回值。以前它会回显工具的完整 schema，现在只回一句 <code class="language-plaintext highlighter-rouge">Enabled tool "git_log".</code>，schema 靠下一次请求的 tools 列表生效。省下的 token 不算多，但它确实让返回值变成了几行字。</p>
+
+<h2 id="六用量账本写到盘上按时段查">六、用量账本：写到盘上，按时段查</h2>
+
+<p>探针和命中率是给人看的，账单是给月底看的。这版把用量单独记一份，<code class="language-plaintext highlighter-rouge">lua/chat/usage_stats.lua</code>，落盘在 <code class="language-plaintext highlighter-rouge">{storage_dir}/usage_stats.json</code>。</p>
+
+<p>结构三层，record shape 完全一致：</p>
+
+<table>
+  <thead>
+    <tr>
+      <th>层</th>
+      <th>键</th>
+      <th>保留</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><code class="language-plaintext highlighter-rouge">total</code></td>
+      <td>无</td>
+      <td>永久，不清理</td>
+    </tr>
+    <tr>
+      <td><code class="language-plaintext highlighter-rouge">hourly</code></td>
+      <td><code class="language-plaintext highlighter-rouge">YYYY-MM-DDTHH</code></td>
+      <td>7 天</td>
+    </tr>
+    <tr>
+      <td><code class="language-plaintext highlighter-rouge">daily</code></td>
+      <td><code class="language-plaintext highlighter-rouge">YYYY-MM-DD</code></td>
+      <td>365 天</td>
+    </tr>
+  </tbody>
+</table>
+
+<p>键用定宽 ISO 字符串，字典序就是时间序，清理的时候直接拿字符串比大小，不用解析成时间。清理是懒的，<code class="language-plaintext highlighter-rouge">record()</code> 里顺手 vacuum，闲置的机器就把旧 bucket 留在盘上，直到下一次请求。</p>
+
+<p>查询有 <code class="language-plaintext highlighter-rouge">total()</code> 和 <code class="language-plaintext highlighter-rouge">range(since)</code>。跨度小于 48 小时合并 hourly 桶，更长合并 daily 桶。窗口起点所在的那个桶整块计入，所以查询结果最多超出一个桶。这个精度问题我没有修，hourly 桶本来就是拿来看趋势的，多一小时不影响判断今天是不是烧超了。</p>
+
+<p>HTTP 侧开了两个新端点，<code class="language-plaintext highlighter-rouge">GET /usage-stats</code> 和 <code class="language-plaintext highlighter-rouge">DELETE /usage-stats</code>。401 现在带 JSON body，客户端不用只靠状态码猜是 key 错了还是路径错了。</p>
+
+<h2 id="七药丸式窗口标题">七、药丸式窗口标题</h2>
+
+<p>UI 上做了个改版，结果窗口和输入窗口的标题都换成药丸排版，中间用窗口自己的边框字符连起来，看上去像是嵌在边框里而不是浮在上面。结果窗口那三颗是：</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>╭ opus | sonnet ╮───╭ 128.4K (96.2K↑/32.2K↓) ╮───╭ 💾 74% ╮
+</code></pre></div></div>
+
+<table>
+  <tbody>
+    <tr>
+      <td>会话标题（跑请求时带 spinner 帧）、累计 token 和 prompt/completion 拆分、缓存命中率。没用量的时候只显示第一颗。输入窗口那三颗是 provider</td>
+      <td>model、cwd、绑定的集成。</td>
+    </tr>
+  </tbody>
+</table>
+
+<p>写这段的时候遇到一个小问题：<code class="language-plaintext highlighter-rouge">title.build</code> 当初是按 varargs 设计的，可选的药丸传 <code class="language-plaintext highlighter-rouge">nil</code> 就行。我中途改成传 table，带洞的数组在 <code class="language-plaintext highlighter-rouge">ipairs</code> 下会静默丢掉第一个空位之后的全部内容，屏幕上只剩一颗药丸，还不报错。改回去了，注释里补了一句为什么不换。</p>
+
+<h2 id="八飞书acl私聊容器card-回复">八、飞书：ACL、私聊容器、card 回复</h2>
+
+<p>这一块跟缓存没关系，是攒下来的功能需求。</p>
+
+<p><code class="language-plaintext highlighter-rouge">lark.lua</code> 原来是一个文件，加了权限和私聊之后放不下，拆成 <code class="language-plaintext highlighter-rouge">lark/{acl,container,poll,send,state,identity,p2p,url,http}.lua</code>，外面留一层 facade。Telegram 这版一起拆了，形状一样。因为一个 bot 服务多个会话的时候，游标、会话、准入策略都得按会话各存一份。</p>
+
+<p>权限三档 <code class="language-plaintext highlighter-rouge">allow_all</code> / <code class="language-plaintext highlighter-rouge">whitelist</code> / <code class="language-plaintext highlighter-rouge">blacklist</code>，加一组 <code class="language-plaintext highlighter-rouge">admins</code>。admins 里的 <code class="language-plaintext highlighter-rouge">open_id</code>、邮箱、手机号都行，邮箱和手机号在 connect 时解析一次然后缓存，<code class="language-plaintext highlighter-rouge">open_id</code> 不花 API 调用。</p>
+
+<p>配置里的白名单和运行时白名单是两层，合并而不是覆盖，运行时优先。这样 <code class="language-plaintext highlighter-rouge">:Chat bridge</code> 之后管理员能在群里直接 <code class="language-plaintext highlighter-rouge">/allow @someone</code>、<code class="language-plaintext highlighter-rouge">/deny @someone</code>，改动当场写进 <code class="language-plaintext highlighter-rouge">lark.json</code>，重启不用改配置。</p>
+
+<p>私聊（P2P）默认拒绝。<code class="language-plaintext highlighter-rouge">allow_all</code> 说的是「绑定的那个群」，不代表谁都能开 DM。要私聊得单独配 <code class="language-plaintext highlighter-rouge">p2p.allow</code>。</p>
+
+<p>每个私聊一个独立工作目录，<code class="language-plaintext highlighter-rouge">&lt;cwd_root&gt;/lark-&lt;chat_id&gt;</code>。两个人在私聊里同时让 bot 改文件，共用一个 cwd 会互相踩，而且他们不该看到对方的工作区。</p>
+
+<p>poll 那边修的都是重启和异常路径：</p>
+
+<ul>
+  <li>启动时把消息游标重置成 now。不清的话重启一次就把历史消息从头再处理一遍，群里会出现 bot 突然回复几个小时前的话</li>
+  <li>tenant token 拿不到时整批丢弃，不逐条重试。逐条重试会让同一条消息被处理好几轮</li>
+  <li>已处理消息 id 的缓存只留最新的一批，内存有上界</li>
+  <li>发送在 token 解析窗口内串行化，否则并发 send 会拿着旧 token 打出去</li>
+  <li>断线时要主动中断当前 poll 链并清掉 timer。有一条缺陷是这样的：disconnect 之后 poll 链还在跑，下一轮拿到空 token 又自己重连</li>
+</ul>
+
+<p>回复从纯文本改成 interactive card，Markdown 有了渲染的地方。</p>
+
+<h2 id="九discord-和-telegram-对齐">九、Discord 和 Telegram 对齐</h2>
+
+<p>两边这一版补了同样的两件事：准入和私聊容器。</p>
+
+<p>Discord 加了 <code class="language-plaintext highlighter-rouge">/allow</code>、<code class="language-plaintext highlighter-rouge">/deny</code>、<code class="language-plaintext highlighter-rouge">/acl</code>，还支持把整个 guild 的文本频道一次性注册进来，每个频道各自一个游标和一个会话；私聊按 peer 分配工作区。Telegram 启动时会跳过积压的 update，不然重开 Neovim 会一次性把离线期间的群消息全处理一遍。</p>
+
+<h2 id="十零碎">十、零碎</h2>
+
+<p><code class="language-plaintext highlighter-rouge">find_tool</code> 的 <code class="language-plaintext highlighter-rouge">query</code> 现在收数组，一次能激活好几个工具，省一个往返。不记得名字可以打缩写，<code class="language-plaintext highlighter-rouge">gcm</code> 会解析到 <code class="language-plaintext highlighter-rouge">git_commit</code>，规则是「查询字符按顺序出现在工具名里」，只在精确匹配和子串匹配都落空、且查询长度 ≥ 3 时启用。</p>
+
+<p><code class="language-plaintext highlighter-rouge">bitable</code> 加了 <code class="language-plaintext highlighter-rouge">create_field</code> / <code class="language-plaintext highlighter-rouge">update_field</code> / <code class="language-plaintext highlighter-rouge">delete_field</code> 三个新动作。飞书改字段名也要求把 <code class="language-plaintext highlighter-rouge">type</code> 一起传回去，所以 <code class="language-plaintext highlighter-rouge">list_fields</code> 的输出里 field name 和 id 都给了，模型直接抄。</p>
+
+<p><code class="language-plaintext highlighter-rouge">fetch_web</code> 修了两处。一是 loopback 地址不再走 proxy，本机跑着 HTTP server 却因为环境变量里的 <code class="language-plaintext highlighter-rouge">http_proxy</code> 连不上，这个坑我自己踩过一次。二是响应体里的非 UTF-8 字节会被清掉，不然上游 API 直接回 <code class="language-plaintext highlighter-rouge">NonUTF8Body</code>。</p>
+
+<p>会话层三个修复：<code class="language-plaintext highlighter-rouge">reasoning_content</code> 不再往请求里重发（多数 provider 不接受自己之前吐的思考内容）；首开 <code class="language-plaintext highlighter-rouge">:Chat</code> 会进上一次的旧会话，现在建新的；会话被 HTTP 那边删掉时，TUI 会切回上一个会话而不是留在一个空窗口。</p>
+
+<h2 id="升级">升级</h2>
+
+<p>lazy.nvim 直接拉最新 tag 就行。</p>
+
+<p>需要留意的有三件：</p>
+
+<ol>
+  <li><code class="language-plaintext highlighter-rouge">usage_stats.json</code> 是新文件，不想记录就设 <code class="language-plaintext highlighter-rouge">usage_stats = { enable = false }</code></li>
+  <li>tools 数组的顺序和 <code class="language-plaintext highlighter-rouge">find_tool</code> 的返回值都变了。如果你的 skill 或者外部脚本 grep 了 <code class="language-plaintext highlighter-rouge">find_tool</code> 的旧输出文本，会 grep 不到</li>
+  <li>飞书多了 <code class="language-plaintext highlighter-rouge">acl</code> 和 <code class="language-plaintext highlighter-rouge">p2p</code> 两节配置，不配就还是 <code class="language-plaintext highlighter-rouge">allow_all</code>，行为跟以前一样</li>
+</ol>
+
+<p>相关链接：</p>
+
+
+
+
+        </article>
+        </div></div>

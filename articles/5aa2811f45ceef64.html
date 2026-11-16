@@ -1,0 +1,97 @@
+<div><div><article class="markdown-body entry-content container-lg" itemprop="text">
+<blockquote>
+<p dir="auto">Teaching LLM inference from first principles by building a small engine in C++ and CUDA.</p>
+</blockquote>
+<p dir="auto">The series follows what happens between a prompt and a generated token, from loading model weights to running each part of the transformer on the GPU.</p>
+
+<p dir="auto">Read <a href="https://github.com/samir-sarwar/samir-vllm/blob/main/InferenceFromScratch.pdf" target="_blank" rel="noopener">Inference from Scratch (PDF)</a> for 80+ pages of my handwritten notes and diagrams. I developed all of the writing in this PDF myself, with <strong>NO AI writing</strong>.</p>
+<div class="markdown-heading" dir="auto"><h2 tabindex="-1" class="heading-element" dir="auto">Build series | 6+ Hours of footage</h2><a id="user-content-build-series--6-hours-of-footage" class="anchor" aria-label="Permalink: Build series | 6+ Hours of footage" href="https://github.com/samir-sarwar/samir-vllm#build-series--6-hours-of-footage" target="_blank" rel="noopener"><svg data-component="Octicon" class="octicon octicon-link" viewbox="0 0 16 16" version="1.1" aria-hidden="true"><path d="m7.775 3.275 1.25-1.25a3.5 3.5 0 1 1 4.95 4.95l-2.5 2.5a3.5 3.5 0 0 1-4.95 0 .751.751 0 0 1 .018-1.042.751.751 0 0 1 1.042-.018 1.998 1.998 0 0 0 2.83 0l2.5-2.5a2.002 2.002 0 0 0-2.83-2.83l-1.25 1.25a.751.751 0 0 1-1.042-.018.751.751 0 0 1-.018-1.042Zm-4.69 9.64a1.998 1.998 0 0 0 2.83 0l1.25-1.25a.751.751 0 0 1 1.042.018.751.751 0 0 1 .018 1.042l-1.25 1.25a3.5 3.5 0 1 1-4.95-4.95l2.5-2.5a3.5 3.5 0 0 1 4.95 0 .751.751 0 0 1-.018 1.042.751.751 0 0 1-1.042.018 1.998 1.998 0 0 0-2.83 0l-2.5 2.5a1.998 1.998 0 0 0 0 2.83Z"></path></svg></a></div>
+<markdown-accessiblity-table></markdown-accessiblity-table>
+<p dir="auto">Companion notes for every video are in the <a href="https://github.com/samir-sarwar/samir-vllm/blob/main/proper_notes/README.md" target="_blank" rel="noopener">study-notes index</a>, with separate <a href="https://github.com/samir-sarwar/samir-vllm/blob/main/proper_notes/markdown" target="_blank" rel="noopener">Markdown</a> and <a href="https://github.com/samir-sarwar/samir-vllm/blob/main/proper_notes/pdf" target="_blank" rel="noopener">PDF</a> folders. You can also read the <a href="https://github.com/samir-sarwar/samir-vllm/blob/main/proper_notes/pdf/samir_vllm_complete_study_notes.pdf" target="_blank" rel="noopener">complete PDF collection</a>.</p>
+
+<ul dir="auto">
+<li>A C++17 / CUDA project, built with CMake and linked with ICU for Unicode-aware tokenization.</li>
+<li>Direct <code>model.safetensors</code> loading: parse metadata, validate tensor offsets, and copy the raw BF16 weights to GPU memory. There is also a memory-mapped loader implementation to avoid an extra CPU-side copy.</li>
+<li>A fixed Llama 3.2 1B Instruct weight layout, with direct pointers to the embedding, normalization, attention, and MLP tensors across all 16 layers.</li>
+<li>A local BPE tokenizer that supports Unicode, special tokens, encode/decode, and the Instruct chat prompt format; its expected output is covered by a dedicated test executable.</li>
+<li>A CUDA embedding-gather kernel and prefill path that copies prompt token IDs to the GPU and allocates activations.</li>
+<li>A CUDA RMSNorm kernel for the 2,048-wide hidden state: it reduces in FP32 and applies the learned BF16 weights throughout the forward pass.</li>
+<li>Dense causal prefill now runs all 16 layers: Q/K/V projection, RoPE, grouped-query attention, output projection, the attention residual, post-attention RMSNorm, SwiGLU MLP, and the MLP residual.</li>
+<li>The final RMSNorm and tied embedding/LM-head projection produce FP32 logits; GPU argmax selects each next token.</li>
+<li>A shared BF16 KV page pool with a block table per sequence and layer. Each physical page holds 16 tokens of K and V; prefill fills prompt pages and decode appends one new token at its absolute RoPE position.</li>
+<li>Greedy response generation with Instruct chat formatting, end-of-turn/end-of-text stopping, and configurable output length within the 2,048-token context.</li>
+<li>Persistent scratch buffers and one cuBLAS handle shared by prefill and decode. Q storage is reused for output/MLP projections, and normalization storage is reused for attention output.</li>
+<li>Batched decode with runtime-sized buffers, packed projections, and separate KV page mappings and attention lengths per sequence. Request count does not enlarge the KV pool.</li>
+<li>Static batching and a continuous scheduler that admit queued prompts according to available page budgets, then return their pages and budgets on completion.</li>
+<li>Direct paged decode attention with FP32 online softmax. Each query head streams its sequence's cached pages and accumulates weighted values without gathering a contiguous prefix or storing attention scores.</li>
+</ul>
+<p dir="auto">Part 8 explains <a href="https://github.com/samir-sarwar/samir-vllm/blob/main/proper_notes/markdown/youtubePT8_prefill_decode_kv_cache.md" target="_blank" rel="noopener">Prefill, Decode, and the KV Cache</a>. Part 9 follows with <a href="https://github.com/samir-sarwar/samir-vllm/blob/main/proper_notes/markdown/youtubePT9_static_continuous_batching.md" target="_blank" rel="noopener">Static and Continuous Batching</a>, including the current paged cache and online-softmax decode attention.</p>
+
+<p dir="auto">The Llama 3.2 1B inference path includes dense causal prefill, paged decode attention, and static or continuous batching. Model dimensions and the 2,048-token context remain fixed for this learning engine. The KV pool defaults to 128 MiB and can be set with <code>--kv-cache-mib N</code>; active request capacity follows the workload's page budgets rather than a fixed two-request limit.</p>
+<p dir="auto">Admission guarantees room for each request's maximum processed prefix: <code>prompt_tokens + allowed_new_tokens - 1</code>, rounded up to 16-token pages in each of the 16 layers. The allowed output budget is clamped to the context limit, and the final predicted token is returned without being processed again. These admission credits are separate from physical pages, which are assigned lazily. Early completion releases both the assigned pages and the remaining credits.</p>
+<p dir="auto">Requests wait in FIFO order when their budgets cannot fit alongside active requests. Active requests have room to finish, so future page-boundary growth cannot exhaust the pool or deadlock generation. A request whose budget exceeds the entire pool is rejected with a clear error. This conservative policy avoids preemption and recomputation; a large requested output budget can limit concurrency even if the model eventually stops early.</p>
+<p dir="auto"><code>--stats</code> reports the pool size, peak active requests, largest decode batch, peak assigned pages, admission waits, and final free-page count. Prefill still processes one prompt at a time between decode iterations.</p>
+<p dir="auto">BF16 computations can round differently at different batch sizes. When vocabulary logits are nearly tied, greedy output tokens can therefore differ between individual and batched runs. Bitwise output equality across batch sizes is not guaranteed.</p>
+
+
+<ul dir="auto">
+<li>A CUDA-capable NVIDIA GPU and CUDA Toolkit</li>
+<li>CMake 3.24+</li>
+<li>A C++17 compiler</li>
+<li>ICU development libraries</li>
+<li>The <code>nlohmann/json</code> header</li>
+<li>Model weights at <code>models/llama-3.2-1b-instruct/model.safetensors</code></li>
+<li>The matching tokenizer at <code>models/llama-3.2-1b-instruct/tokenizer.model</code> (copy it from <code>models/Llama-3.2-1B-Instruct/original/tokenizer.model</code>)</li>
+</ul>
+<div class="highlight highlight-source-shell notranslate position-relative overflow-auto" dir="auto" data-snippet-clipboard-copy-content='mkdir -p models/llama-3.2-1b-instruct
+cp models/Llama-3.2-1B-Instruct/original/tokenizer.model models/llama-3.2-1b-instruct/
+cmake -S . -B build
+cmake --build build -j
+./build/samir-vllm "Explain the KV cache in two sentences." 128
+# Continuous batching (default): admit requests whose page budgets fit.
+./build/samir-vllm "Say hello." 64 "Explain the KV cache." "What is RoPE?"
+# Static batching: wait for the current group before admitting more.
+./build/samir-vllm --static "Say hello." 64 "Explain the KV cache." "What is RoPE?"
+# More than two requests share the same default 128 MiB pool.
+./build/samir-vllm --stats "Explain paging." 64 "Explain GQA." "Explain RoPE." "Explain softmax."
+# A smaller pool queues requests when their declared budgets cannot fit together.
+./build/samir-vllm --kv-cache-mib 8 --stats "Explain paging." 64 "Explain GQA." "Explain RoPE."
+./build/tokenizer-test models/llama-3.2-1b-instruct/tokenizer.model'><pre>mkdir -p models/llama-3.2-1b-instruct
+cp models/Llama-3.2-1B-Instruct/original/tokenizer.model models/llama-3.2-1b-instruct/
+cmake -S <span class="pl-c1">.</span> -B build
+cmake --build build -j
+./build/samir-vllm <span class="pl-s"><span class="pl-pds">"</span>Explain the KV cache in two sentences.<span class="pl-pds">"</span></span> 128
+<span class="pl-c"><span class="pl-c">#</span> Continuous batching (default): admit requests whose page budgets fit.</span>
+./build/samir-vllm <span class="pl-s"><span class="pl-pds">"</span>Say hello.<span class="pl-pds">"</span></span> 64 <span class="pl-s"><span class="pl-pds">"</span>Explain the KV cache.<span class="pl-pds">"</span></span> <span class="pl-s"><span class="pl-pds">"</span>What is RoPE?<span class="pl-pds">"</span></span>
+<span class="pl-c"><span class="pl-c">#</span> Static batching: wait for the current group before admitting more.</span>
+./build/samir-vllm --static <span class="pl-s"><span class="pl-pds">"</span>Say hello.<span class="pl-pds">"</span></span> 64 <span class="pl-s"><span class="pl-pds">"</span>Explain the KV cache.<span class="pl-pds">"</span></span> <span class="pl-s"><span class="pl-pds">"</span>What is RoPE?<span class="pl-pds">"</span></span>
+<span class="pl-c"><span class="pl-c">#</span> More than two requests share the same default 128 MiB pool.</span>
+./build/samir-vllm --stats <span class="pl-s"><span class="pl-pds">"</span>Explain paging.<span class="pl-pds">"</span></span> 64 <span class="pl-s"><span class="pl-pds">"</span>Explain GQA.<span class="pl-pds">"</span></span> <span class="pl-s"><span class="pl-pds">"</span>Explain RoPE.<span class="pl-pds">"</span></span> <span class="pl-s"><span class="pl-pds">"</span>Explain softmax.<span class="pl-pds">"</span></span>
+<span class="pl-c"><span class="pl-c">#</span> A smaller pool queues requests when their declared budgets cannot fit together.</span>
+./build/samir-vllm --kv-cache-mib 8 --stats <span class="pl-s"><span class="pl-pds">"</span>Explain paging.<span class="pl-pds">"</span></span> 64 <span class="pl-s"><span class="pl-pds">"</span>Explain GQA.<span class="pl-pds">"</span></span> <span class="pl-s"><span class="pl-pds">"</span>Explain RoPE.<span class="pl-pds">"</span></span>
+./build/tokenizer-test models/llama-3.2-1b-instruct/tokenizer.model</pre></div>
+<p dir="auto">After optional <code>--static</code>, <code>--continuous</code>, <code>--kv-cache-mib N</code>, and <code>--stats</code> flags, the first argument is a prompt and the second is <code>max_new_tokens</code> (default: 128). Any remaining arguments are additional prompts; the token budget applies to each request. Every prompt is formatted as an Instruct user message. Generation stops independently at EOS, EOT, or EOM, or the output/context limit, and each completed response is printed with its token IDs and request number.</p>
+<p dir="auto">Prompts are prefilled one at a time, pausing decode. Each decode step packs one token from every active sequence into the shared buffers. Attention reads only that sequence's cache; requests can have different prompt and output lengths. Continuous batching admits waiting requests when page credits become available, while static batching admits the next group after the current group finishes.</p>
+
+<div class="snippet-clipboard-content notranslate position-relative overflow-auto" data-snippet-clipboard-copy-content="src/           Engine entry point, CUDA kernels, and tokenizer implementation
+include/       Public kernel and tokenizer headers
+tests/         Tokenizer tests
+python/        Tokenizer reference script
+proper_notes/  Study-notes index, markdown/ sources, and pdf/ reading editions
+scripts/       Rebuild the study-note PDFs
+notes.md       Working notes from the build"><pre lang="text" class="notranslate"><code>src/           Engine entry point, CUDA kernels, and tokenizer implementation
+include/       Public kernel and tokenizer headers
+tests/         Tokenizer tests
+python/        Tokenizer reference script
+proper_notes/  Study-notes index, markdown/ sources, and pdf/ reading editions
+scripts/       Rebuild the study-note PDFs
+notes.md       Working notes from the build
+</code></pre></div>
+
+<p dir="auto">The engine source code in <code>src/</code>, <code>include/</code>, <code>tests/</code>, and <code>python/</code>, along with <code>CMakeLists.txt</code>, <code>.gitignore</code>, and this README, is licensed under the <a href="https://github.com/samir-sarwar/samir-vllm/blob/main/LICENSE" target="_blank" rel="noopener">MIT License</a>.</p>
+<p dir="auto">The notes in <code>proper_notes/</code>, <code>notes.md</code>, and <code>podLibraryInstall.md</code>, along with handwritten notes, scans, illustrations, photographs of notes, and PDFs provided with this project, are <strong>all rights reserved</strong> and excluded from MIT. Personal reading and study are permitted. Redistribution, republication, rehosting, resale, or distribution of adapted versions requires prior written permission, whether offered for free or for payment. See <a href="https://github.com/samir-sarwar/samir-vllm/blob/main/LICENSE-NOTES" target="_blank" rel="noopener">LICENSE-NOTES</a> for the full terms and exceptions.</p>
+<p dir="auto">Public repositories can still be viewed and forked within GitHub under <a href="https://docs.github.com/en/site-policy/github-terms/github-terms-of-service#5-license-grant-to-other-users" target="_blank" rel="noopener">GitHub's Terms of Service</a>.</p>
+<div class="markdown-heading" dir="auto"><h3 tabindex="-1" class="heading-element" dir="auto">Model assets and dependencies</h3><a id="user-content-model-assets-and-dependencies" class="anchor" aria-label="Permalink: Model assets and dependencies" href="https://github.com/samir-sarwar/samir-vllm#model-assets-and-dependencies" target="_blank" rel="noopener"><svg data-component="Octicon" class="octicon octicon-link" viewbox="0 0 16 16" version="1.1" aria-hidden="true"><path d="m7.775 3.275 1.25-1.25a3.5 3.5 0 1 1 4.95 4.95l-2.5 2.5a3.5 3.5 0 0 1-4.95 0 .751.751 0 0 1 .018-1.042.751.751 0 0 1 1.042-.018 1.998 1.998 0 0 0 2.83 0l2.5-2.5a2.002 2.002 0 0 0-2.83-2.83l-1.25 1.25a.751.751 0 0 1-1.042-.018.751.751 0 0 1-.018-1.042Zm-4.69 9.64a1.998 1.998 0 0 0 2.83 0l1.25-1.25a.751.751 0 0 1 1.042.018.751.751 0 0 1 .018 1.042l-1.25 1.25a3.5 3.5 0 1 1-4.95-4.95l2.5-2.5a3.5 3.5 0 0 1 4.95 0 .751.751 0 0 1-.018 1.042.751.751 0 0 1-1.042.018 1.998 1.998 0 0 0-2.83 0l-2.5 2.5a1.998 1.998 0 0 0 0 2.83Z"></path></svg></a></div>
+<p dir="auto"><strong>Built with Llama.</strong> The bundled Llama 3.2 tokenizer and any separately downloaded Llama 3.2 weights retain Meta's <a href="https://github.com/samir-sarwar/samir-vllm/blob/main/models/LICENSE-LLAMA-3.2" target="_blank" rel="noopener">Llama 3.2 Community License</a> and <a href="https://github.com/samir-sarwar/samir-vllm/blob/main/models/USE_POLICY.md" target="_blank" rel="noopener">Acceptable Use Policy</a>. They are excluded from MIT. Keep the agreement, policy, and <a href="https://github.com/samir-sarwar/samir-vllm/blob/main/models/NOTICE" target="_blank" rel="noopener">attribution notice</a> with any redistributed Llama materials.</p>
+<p dir="auto">Third-party dependencies, including CUDA, cuBLAS, ICU, and <code>nlohmann/json</code>, retain their respective licenses.</p>
+</article></div></div>

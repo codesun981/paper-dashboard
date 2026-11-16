@@ -1,0 +1,205 @@
+<div><div><article class="markdown-body entry-content container-lg" itemprop="text"><p align="center" dir="auto"><a target="_blank" rel="noopener" href="https://github.com/Tencent-Hunyuan/ORAV-Bench/blob/main/assets/tencent-hy.png"><img src="https://github.com/Tencent-Hunyuan/ORAV-Bench/raw/main/assets/tencent-hy.png" alt="Tencent HY" loading="lazy"></a></p>
+
+<p align="center" dir="auto"><strong>Benchmarking Audio-Video Generation from Multimodal Contexts</strong></p>
+<p align="center" dir="auto">Jiacheng Hua<sup>1,2</sup>, Xiaokun Feng<sup>2</sup>, Jiaqi Hua<sup>1</sup>, Chang Liu<sup>1</sup>, Yilin Wang<sup>1</sup>, Biao Wang<sup>2,†</sup>, Miao Liu<sup>1,‡</sup></p>
+<p align="center" dir="auto"><sup>1</sup> College of AI, Tsinghua University    <sup>2</sup> Tencent Hy</p>
+<p align="center" dir="auto"><sup>†</sup> Project lead    <sup>‡</sup> Corresponding author</p>
+<p align="center" dir="auto"><a href="https://arxiv.org/abs/2609.34843" rel="noopener" target="_blank"><img src="https://camo.githubusercontent.com/a891f4bcb2bfd958eabad22c9cfc53d3db4765615c3e3e5a394367756ef365f2/68747470733a2f2f696d672e736869656c64732e696f2f62616467652f61725869762d323630392e33343834332d6233316231622e737667" alt="Paper: arXiv 2609.34843" loading="lazy"></a> <a href="https://github.com/Tencent-Hunyuan/ORAV-Bench/blob/main/LICENSE" target="_blank" rel="noopener"><img src="https://camo.githubusercontent.com/3eafd48086fd5d817520fceb9a42b8a346b8451c80038127c89e3c7205f7d2a8/68747470733a2f2f696d672e736869656c64732e696f2f62616467652f4c6963656e73652d4170616368652d2d322e302d626c75652e737667" alt="Code license: Apache-2.0" loading="lazy"></a> <a href="https://github.com/Tencent-Hunyuan/ORAV-Bench#quick-start" target="_blank" rel="noopener"><img src="https://camo.githubusercontent.com/5f34ce9db0ef62d27231248cd46dcbaed76754c1c94d1a5c4e7035114baf70a6/68747470733a2f2f696d672e736869656c64732e696f2f62616467652f507974686f6e2d332e3131253230253743253230332e31322d3337373641422e737667" alt="Python 3.11 or 3.12" loading="lazy"></a></p>
+<p align="center" dir="auto"><a href="https://arxiv.org/abs/2609.34843" rel="noopener" target="_blank">Paper</a>  ·  <a href="https://github.com/Tencent-Hunyuan/ORAV-Bench#quick-start" target="_blank" rel="noopener">Quick start</a>  ·  <a href="https://github.com/Tencent-Hunyuan/ORAV-Bench#evaluation" target="_blank" rel="noopener">Evaluation</a>  ·  <a href="https://github.com/Tencent-Hunyuan/ORAV-Bench#pointwise-diagnostics" target="_blank" rel="noopener">Diagnostics</a>  ·  <a href="https://github.com/Tencent-Hunyuan/ORAV-Bench#contributing-model-outputs" target="_blank" rel="noopener">Contribute</a>  ·  <a href="https://github.com/Tencent-Hunyuan/ORAV-Bench#citation" target="_blank" rel="noopener">Citation</a></p>
+
+<p dir="auto"><strong>ORAV Bench</strong> evaluates <strong>Omni Reference Audio-Video Generation</strong>: producing one coherent audio-video event from an instruction and heterogeneous image, video, and audio references. The instruction determines which properties each reference should contribute, how they bind to the output, and which source content should be excluded.</p>
+<p dir="auto"><strong>380 tasks · 2–10 references per task · 9 semantic roles · 30 role compositions</strong></p>
+<p align="center" dir="auto"> <a target="_blank" rel="noopener" href="https://github.com/Tencent-Hunyuan/ORAV-Bench/blob/main/assets/teaser.png"><img src="https://github.com/Tencent-Hunyuan/ORAV-Bench/raw/main/assets/teaser.png" alt="ORAV combines subject, scene, motion, and speech references into an instructed audio-video event." loading="lazy"></a> </p>
+<p dir="auto">This repository provides the <strong>evaluation pipeline</strong>: reference-aware pairwise judging, system ranking, and pointwise diagnostics. The Judge achieves <strong>86.08% effective agreement</strong> with human judgments on a <strong>10% held-out subset</strong> of the benchmark. Benchmark tasks and model generations are released separately: <a href="https://huggingface.co/datasets/ORAV-Bench/ORAV-Bench" rel="noopener" target="_blank">ORAV-Bench</a> and <a href="https://huggingface.co/datasets/ORAV-Bench/ORAV-Bench-Artifacts" rel="noopener" target="_blank">ORAV-Bench-Artifacts</a>.</p>
+<markdown-accessiblity-table><table>
+<thead>
+<tr>
+<th>Reference modality</th>
+<th>Semantic roles</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Image</td>
+<td><code>subject</code>, <code>prop</code>, <code>scene</code>, <code>style</code></td>
+</tr>
+<tr>
+<td>Video</td>
+<td><code>motion</code>, <code>camera_movement</code>, <code>vfx</code></td>
+</tr>
+<tr>
+<td>Audio</td>
+<td><code>speech</code>, <code>music</code></td>
+</tr>
+</tbody>
+</table></markdown-accessiblity-table>
+
+<p dir="auto">ORAV evaluates the contribution of each reference within the complete requested event. A visually blind Listener provides auditory evidence; the Judge compares that evidence with timestamped visual panels in both presentation orders.</p>
+<p dir="auto"><strong>Demonstration.</strong> In the illustrated case, Y realizes the defining motion more closely, while X better matches the camera. ORAV prefers Y based on its contribution to the complete instruction.</p>
+<p align="center" dir="auto"> <a target="_blank" rel="noopener" href="https://github.com/Tencent-Hunyuan/ORAV-Bench/blob/main/assets/evaluation.png"><img src="https://github.com/Tencent-Hunyuan/ORAV-Bench/raw/main/assets/evaluation.png" alt="Reference evidence, contextual comparisons, and a joint ORAV judgment checked in both presentation orders." loading="lazy"></a> </p>
+<markdown-accessiblity-table><table>
+<thead>
+<tr>
+<th>Entry point</th>
+<th>Purpose</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>orav prepare</code></td>
+<td>Prepare full-duration media proxies and timestamped panels for inspection</td>
+</tr>
+<tr>
+<td><code>orav evaluate</code></td>
+<td>Run the Listener and Judge, preserving requests, responses, and comparisons</td>
+</tr>
+<tr>
+<td><code>orav rank</code></td>
+<td>Report system ranking and confidence intervals</td>
+</tr>
+<tr>
+<td><code>orav diagnostics</code></td>
+<td>Measure quality, reference affinity, and speech independently of the Judge</td>
+</tr>
+</tbody>
+</table></markdown-accessiblity-table>
+
+<p dir="auto">Use <strong>Python 3.11 or 3.12</strong>, with <strong>FFmpeg 5.1+ (including libx264) and ffprobe</strong> available on <code>PATH</code>:</p>
+<div class="highlight highlight-source-shell notranslate position-relative overflow-auto" dir="auto" data-snippet-clipboard-copy-content="git clone https://github.com/Tencent-Hunyuan/ORAV-Bench.git
+cd ORAV-Bench
+python -m venv .venv
+source .venv/bin/activate
+python -m pip install -e .
+orav --help"><pre>git clone https://github.com/Tencent-Hunyuan/ORAV-Bench.git
+<span class="pl-c1">cd</span> ORAV-Bench
+python -m venv .venv
+<span class="pl-c1">source</span> .venv/bin/activate
+python -m pip install -e <span class="pl-c1">.</span>
+orav --help</pre></div>
+<p dir="auto">Download the tasks and the model outputs you want to compare. This example selects two models and downloads the exact benchmark revision recorded in the artifacts' <code>benchmark.json</code>. The <code>data/</code> directory is ignored by Git.</p>
+<div class="highlight highlight-source-shell notranslate position-relative overflow-auto" dir="auto" data-snippet-clipboard-copy-content="python -m pip install huggingface_hub
+python - &lt;&lt;'PYDATA'
+import json
+from pathlib import Path
+from huggingface_hub import snapshot_download
+
+artifacts = Path(snapshot_download(
+    repo_id=&quot;ORAV-Bench/ORAV-Bench-Artifacts&quot;, repo_type=&quot;dataset&quot;,
+    local_dir=&quot;data/artifacts&quot;,
+    allow_patterns=[&quot;benchmark.json&quot;, &quot;kling-v3-omni/*&quot;, &quot;minimax-h3/*&quot;],
+))
+binding = json.loads((artifacts / &quot;benchmark.json&quot;).read_text())
+snapshot_download(
+    repo_id=binding[&quot;repo_id&quot;], repo_type=&quot;dataset&quot;,
+    revision=binding[&quot;revision&quot;], local_dir=&quot;data/benchmark&quot;,
+)
+PYDATA
+python scripts/build_manifest.py --tasks data/benchmark/tasks.json --generations data/artifacts/kling-v3-omni/manifest.json data/artifacts/minimax-h3/manifest.json --output runs/example/manifest.json"><pre>python -m pip install huggingface_hub
+python - <span class="pl-s"><span class="pl-k">&lt;&lt;</span>'<span class="pl-k">PYDATA</span>'</span>
+<span class="pl-s">import json</span>
+<span class="pl-s">from pathlib import Path</span>
+<span class="pl-s">from huggingface_hub import snapshot_download</span>
+<span class="pl-s"></span>
+<span class="pl-s">artifacts = Path(snapshot_download(</span>
+<span class="pl-s">    repo_id="ORAV-Bench/ORAV-Bench-Artifacts", repo_type="dataset",</span>
+<span class="pl-s">    local_dir="data/artifacts",</span>
+<span class="pl-s">    allow_patterns=["benchmark.json", "kling-v3-omni/*", "minimax-h3/*"],</span>
+<span class="pl-s">))</span>
+<span class="pl-s">binding = json.loads((artifacts / "benchmark.json").read_text())</span>
+<span class="pl-s">snapshot_download(</span>
+<span class="pl-s">    repo_id=binding["repo_id"], repo_type="dataset",</span>
+<span class="pl-s">    revision=binding["revision"], local_dir="data/benchmark",</span>
+<span class="pl-s">)</span>
+<span class="pl-s"><span class="pl-k">PYDATA</span></span>
+python scripts/build_manifest.py --tasks data/benchmark/tasks.json --generations data/artifacts/kling-v3-omni/manifest.json data/artifacts/minimax-h3/manifest.json --output runs/example/manifest.json</pre></div>
+<p dir="auto">Task prompts remain in <code>tasks/&lt;task_id&gt;/prompt.en.txt</code> and <code>prompt.zh.txt</code>. References are resolved within each task folder; output videos are resolved within each model folder. The join verifies the task definitions and English prompts against the artifacts' input fingerprint.</p>
+<div class="snippet-clipboard-content notranslate position-relative overflow-auto" data-snippet-clipboard-copy-content="data/
+  benchmark/
+    tasks.json
+    tasks/&lt;task_id&gt;/
+      prompt.en.txt
+      prompt.zh.txt
+      refs/...
+  artifacts/
+    benchmark.json
+    &lt;model_id&gt;/
+      manifest.json
+      videos/&lt;task_id&gt;.mp4"><pre lang="text" class="notranslate"><code>data/
+  benchmark/
+    tasks.json
+    tasks/&lt;task_id&gt;/
+      prompt.en.txt
+      prompt.zh.txt
+      refs/...
+  artifacts/
+    benchmark.json
+    &lt;model_id&gt;/
+      manifest.json
+      videos/&lt;task_id&gt;.mp4
+</code></pre></div>
+<p dir="auto">For your own model, create a distinct model folder and record its generation settings and task status in <code>manifest.json</code>, for example:</p>
+<div class="highlight highlight-source-json notranslate position-relative overflow-auto" dir="auto" data-snippet-clipboard-copy-content='{"config": {"model": "my-model"}, "completed": ["subject-motion-7f681a"], "failed": []}'><pre>{<span class="pl-ent">"config"</span>: {<span class="pl-ent">"model"</span>: <span class="pl-s"><span class="pl-pds">"</span>my-model<span class="pl-pds">"</span></span>}, <span class="pl-ent">"completed"</span>: [<span class="pl-s"><span class="pl-pds">"</span>subject-motion-7f681a<span class="pl-pds">"</span></span>], <span class="pl-ent">"failed"</span>: []}</pre></div>
+<p dir="auto">Save each completed output as <code>videos/&lt;task_id&gt;.mp4</code>; omit unsubmitted tasks from both lists. Add the new manifest to <code>--generations</code> and use a new evaluation output directory. For results in another directory, copy the matching root <code>benchmark.json</code> there. The join maps unavailable candidates to <code>null</code> and never substitutes old outputs. You can also supply an evaluation manifest directly using <a href="https://github.com/Tencent-Hunyuan/ORAV-Bench/blob/main/examples/manifest.json" target="_blank" rel="noopener">examples/manifest.json</a>; its paths are relative to the file. All paths in that example are illustrative.</p>
+<p dir="auto">Set the evaluator model names and endpoints in <a href="https://github.com/Tencent-Hunyuan/ORAV-Bench/blob/main/examples/evaluation.json" target="_blank" rel="noopener">examples/evaluation.json</a>. <code>judge</code> and <code>listener</code> select entries from <code>models</code>; each entry configures its own API model and credentials. The Judge supports Responses, Chat Completions, or Gemini; the Listener uses Gemini audio input.</p>
+<p dir="auto">Set the corresponding environment variables and run evaluation and ranking:</p>
+<div class="highlight highlight-source-shell notranslate position-relative overflow-auto" dir="auto" data-snippet-clipboard-copy-content="# Base URLs include the API prefix; credentials are read from the environment.
+export ORAV_ASTRA_BASE_URL='https://YOUR-JUDGE-HOST/v1'
+export ORAV_ASTRA_API_KEY='YOUR-JUDGE-KEY'
+export ORAV_GEMINI_BASE_URL='https://YOUR-LISTENER-HOST/v1beta'
+export ORAV_GEMINI_API_KEY='YOUR-LISTENER-KEY'
+
+# Optional: prepare and inspect media before any API calls.
+orav prepare runs/example/manifest.json --config examples/evaluation.json --output runs/example
+orav evaluate runs/example/manifest.json --config examples/evaluation.json --output runs/example --workers 8
+orav rank runs/example/comparisons.json --output runs/example/ranking.json"><pre><span class="pl-c"><span class="pl-c">#</span> Base URLs include the API prefix; credentials are read from the environment.</span>
+<span class="pl-k">export</span> ORAV_ASTRA_BASE_URL=<span class="pl-s"><span class="pl-pds">'</span>https://YOUR-JUDGE-HOST/v1<span class="pl-pds">'</span></span>
+<span class="pl-k">export</span> ORAV_ASTRA_API_KEY=<span class="pl-s"><span class="pl-pds">'</span>YOUR-JUDGE-KEY<span class="pl-pds">'</span></span>
+<span class="pl-k">export</span> ORAV_GEMINI_BASE_URL=<span class="pl-s"><span class="pl-pds">'</span>https://YOUR-LISTENER-HOST/v1beta<span class="pl-pds">'</span></span>
+<span class="pl-k">export</span> ORAV_GEMINI_API_KEY=<span class="pl-s"><span class="pl-pds">'</span>YOUR-LISTENER-KEY<span class="pl-pds">'</span></span>
+
+<span class="pl-c"><span class="pl-c">#</span> Optional: prepare and inspect media before any API calls.</span>
+orav prepare runs/example/manifest.json --config examples/evaluation.json --output runs/example
+orav evaluate runs/example/manifest.json --config examples/evaluation.json --output runs/example --workers 8
+orav rank runs/example/comparisons.json --output runs/example/ranking.json</pre></div>
+<p dir="auto">The output includes visual panels, auditory evidence, ordered judgments, fused comparisons, and source identities. Ranking uses shared-delivery instances by default. Ties, order conflicts, unavailable responses, and insufficient evidence remain distinct in the comparison records.</p>
+<p dir="auto">For a Chat Completions judge, select <code>"judge": "chat-judge"</code>, replace its <code>model</code>, and set <code>ORAV_CHAT_BASE_URL</code> and <code>ORAV_CHAT_API_KEY</code>. It must support images and JSON Schema outputs. Per-model rate limits, timeouts, and output budgets are set in the same configuration file.</p>
+<p dir="auto">Reuse an output directory to resume identical requests, including cached failures. To reevaluate from scratch, choose a new empty output directory; there is no <code>--force</code> flag. Changed inputs, evaluator settings, or code require a new directory. Use one process per output directory and <code>--workers</code> for concurrency. Ranking counts order conflicts as ties by default; <code>--exclude-conflicts</code> removes them. Use <code>--role motion</code> for a role-conditioned ranking or <code>--no-audio-reference</code> for tasks without audio references. Role-conditioned rankings compare complete tasks carrying that role.</p>
+
+<div class="highlight highlight-source-shell notranslate position-relative overflow-auto" dir="auto" data-snippet-clipboard-copy-content="python -m pip install -e '.[diagnostics]'
+# Install the selected families' dependencies and set local asset paths first.
+orav diagnostics run runs/example/manifest.json --config examples/diagnostics.json \
+  --metrics visual speech audiobox --device cuda:0 --output runs/diagnostics
+orav diagnostics summarize runs/example/manifest.json runs/diagnostics \
+  --output runs/diagnostics-summary.json"><pre>python -m pip install -e <span class="pl-s"><span class="pl-pds">'</span>.[diagnostics]<span class="pl-pds">'</span></span>
+<span class="pl-c"><span class="pl-c">#</span> Install the selected families' dependencies and set local asset paths first.</span>
+orav diagnostics run runs/example/manifest.json --config examples/diagnostics.json \
+  --metrics visual speech audiobox --device cuda:0 --output runs/diagnostics
+orav diagnostics summarize runs/example/manifest.json runs/diagnostics \
+  --output runs/diagnostics-summary.json</pre></div>
+<p dir="auto">Before running, set local asset paths in <a href="https://github.com/Tencent-Hunyuan/ORAV-Bench/blob/main/examples/diagnostics.json" target="_blank" rel="noopener">examples/diagnostics.json</a> and install the selected families' dependencies; some families also require the upstream source checkout. Asset paths are relative to the configuration file. Compatible model checkpoints are accepted without requiring a particular revision or checksum. Runs record the actual assets and package versions for traceability and cache identity. See <a href="https://github.com/Tencent-Hunyuan/ORAV-Bench/blob/main/THIRD_PARTY_NOTICES.md" target="_blank" rel="noopener">third-party notices</a> for upstream components and license notes.</p>
+<p dir="auto">Available families: <code>visual</code>, <code>vbench</code>, <code>dover</code>, <code>aesthetic</code>, <code>audiobox</code>, <code>speech</code>, <code>music</code>, <code>nisqa</code>, <code>face</code>, <code>style</code>, <code>motion</code>, and <code>localization</code>. Choose only the families you need; their measurements remain separate from ORAV preferences and ranking.</p>
+<p dir="auto">CER/WER additionally requires <code>diagnostics.speech_target</code> in each applicable evaluation-manifest task. Localization requires <code>diagnostics.reference_scope</code>, mapping subject/prop reference handles to object categories, as illustrated in <a href="https://github.com/Tencent-Hunyuan/ORAV-Bench/blob/main/examples/manifest.json" target="_blank" rel="noopener">examples/manifest.json</a>. These annotations are optional and are not supplied to the Judge or Listener. Use a separate diagnostics output directory when changing assets or environment; reuse it to resume an identical configuration.</p>
+<p dir="auto">The implementation lives in <code>orav_bench/</code>: media and manifest handling, API clients, Listener/Judge execution, protocol, ranking, and diagnostics. Offline checks are in <code>tests/</code>; install <code>.[dev]</code>, then run <code>ruff check .</code> and <code>pytest</code>.</p>
+<div class="markdown-heading" dir="auto"><h2 tabindex="-1" class="heading-element" dir="auto">Contributing model outputs</h2><a id="user-content-contributing-model-outputs" class="anchor" aria-label="Permalink: Contributing model outputs" href="https://github.com/Tencent-Hunyuan/ORAV-Bench#contributing-model-outputs" target="_blank" rel="noopener"><svg data-component="Octicon" class="octicon octicon-link" viewbox="0 0 16 16" version="1.1" aria-hidden="true"><path d="m7.775 3.275 1.25-1.25a3.5 3.5 0 1 1 4.95 4.95l-2.5 2.5a3.5 3.5 0 0 1-4.95 0 .751.751 0 0 1 .018-1.042.751.751 0 0 1 1.042-.018 1.998 1.998 0 0 0 2.83 0l2.5-2.5a2.002 2.002 0 0 0-2.83-2.83l-1.25 1.25a.751.751 0 0 1-1.042-.018.751.751 0 0 1-.018-1.042Zm-4.69 9.64a1.998 1.998 0 0 0 2.83 0l1.25-1.25a.751.751 0 0 1 1.042.018.751.751 0 0 1 .018 1.042l-1.25 1.25a3.5 3.5 0 1 1-4.95-4.95l2.5-2.5a3.5 3.5 0 0 1 4.95 0 .751.751 0 0 1-.018 1.042.751.751 0 0 1-1.042.018 1.998 1.998 0 0 0-2.83 0l-2.5 2.5a1.998 1.998 0 0 0 0 2.83Z"></path></svg></a></div>
+<p dir="auto">We welcome generation results from model providers and community contributors. Please use the original benchmark prompts and references, preserve task IDs, and include generation settings and failures in the manifest. To contribute, <a href="mailto:hjc21@mails.tsinghua.edu.cn" target="_blank" rel="noopener">email the maintainers</a> with the model name and a download link to outputs in the <a href="https://huggingface.co/datasets/ORAV-Bench/ORAV-Bench-Artifacts" rel="noopener" target="_blank">Artifacts format</a>.</p>
+
+<div class="highlight highlight-text-bibtex notranslate position-relative overflow-auto" dir="auto" data-snippet-clipboard-copy-content="@article{hua2026orav,
+  title   = {ORAV: Benchmarking Audio-Video Generation from Multimodal Contexts},
+  author  = {Hua, Jiacheng and Feng, Xiaokun and Hua, Jiaqi and Liu, Chang and
+             Wang, Yilin and Wang, Biao and Liu, Miao},
+  journal = {arXiv preprint arXiv:2609.34843},
+  year    = {2026},
+  url     = {https://arxiv.org/abs/2609.34843}
+}"><pre><span class="pl-k">@article</span>{<span class="pl-en">hua2026orav</span>,
+  <span class="pl-s">title</span>   = <span class="pl-s"><span class="pl-pds">{</span>ORAV: Benchmarking Audio-Video Generation from Multimodal Contexts<span class="pl-pds">}</span></span>,
+  <span class="pl-s">author</span>  = <span class="pl-s"><span class="pl-pds">{</span>Hua, Jiacheng and Feng, Xiaokun and Hua, Jiaqi and Liu, Chang and</span>
+<span class="pl-s">             Wang, Yilin and Wang, Biao and Liu, Miao<span class="pl-pds">}</span></span>,
+  <span class="pl-s">journal</span> = <span class="pl-s"><span class="pl-pds">{</span>arXiv preprint arXiv:2609.34843<span class="pl-pds">}</span></span>,
+  <span class="pl-s">year</span>    = <span class="pl-s"><span class="pl-pds">{</span>2026<span class="pl-pds">}</span></span>,
+  <span class="pl-s">url</span>     = <span class="pl-s"><span class="pl-pds">{</span>https://arxiv.org/abs/2609.34843<span class="pl-pds">}</span></span>
+}</pre></div>
+<p dir="auto">Machine-readable citation metadata is available in <a href="https://github.com/Tencent-Hunyuan/ORAV-Bench/blob/main/CITATION.cff" target="_blank" rel="noopener">CITATION.cff</a>.</p>
+
+<p dir="auto">Original ORAV code is licensed under <a href="https://github.com/Tencent-Hunyuan/ORAV-Bench/blob/main/LICENSE" target="_blank" rel="noopener">Apache-2.0</a>. Third-party implementations, model weights, APIs, and media retain their respective terms; see <a href="https://github.com/Tencent-Hunyuan/ORAV-Bench/blob/main/THIRD_PARTY_NOTICES.md" target="_blank" rel="noopener">THIRD_PARTY_NOTICES.md</a>.</p>
+<p dir="auto">For questions, contact <a href="mailto:hjc21@mails.tsinghua.edu.cn" target="_blank" rel="noopener">Jiacheng Hua</a> or <a href="mailto:miaoliu@mail.tsinghua.edu.cn" target="_blank" rel="noopener">Miao Liu</a>.</p>
+</article></div></div>

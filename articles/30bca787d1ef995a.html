@@ -1,0 +1,108 @@
+<div><div><article class="markdown-body entry-content container-lg" itemprop="text"><p dir="auto"><a target="_blank" rel="noopener" href="https://github.com/Tencent-Hunyuan/FlashTopK/blob/main/assets/banner.png"><img src="https://github.com/Tencent-Hunyuan/FlashTopK/raw/main/assets/banner.png" alt="FlashTopK, Tencent Hy" loading="lazy"></a></p>
+<div class="markdown-heading" dir="auto"><h1 tabindex="-1" class="heading-element" dir="auto">FlashTopK: Fast Fused Top-k Selection for Sparse Attention Training and Inference</h1><a id="user-content-flashtopk-fast-fused-top-k-selection-for-sparse-attention-training-and-inference" class="anchor" aria-label="Permalink: FlashTopK: Fast Fused Top-k Selection for Sparse Attention Training and Inference" href="https://github.com/Tencent-Hunyuan/FlashTopK#flashtopk-fast-fused-top-k-selection-for-sparse-attention-training-and-inference" target="_blank" rel="noopener"><svg data-component="Octicon" class="octicon octicon-link" viewbox="0 0 16 16" version="1.1" aria-hidden="true"><path d="m7.775 3.275 1.25-1.25a3.5 3.5 0 1 1 4.95 4.95l-2.5 2.5a3.5 3.5 0 0 1-4.95 0 .751.751 0 0 1 .018-1.042.751.751 0 0 1 1.042-.018 1.998 1.998 0 0 0 2.83 0l2.5-2.5a2.002 2.002 0 0 0-2.83-2.83l-1.25 1.25a.751.751 0 0 1-1.042-.018.751.751 0 0 1-.018-1.042Zm-4.69 9.64a1.998 1.998 0 0 0 2.83 0l1.25-1.25a.751.751 0 0 1 1.042.018.751.751 0 0 1 .018 1.042l-1.25 1.25a3.5 3.5 0 1 1-4.95-4.95l2.5-2.5a3.5 3.5 0 0 1 4.95 0 .751.751 0 0 1-.018 1.042.751.751 0 0 1-1.042.018 1.998 1.998 0 0 0-2.83 0l-2.5 2.5a1.998 1.998 0 0 0 0 2.83Z"></path></svg></a></div>
+<p align="center" dir="auto">
+  <a href="https://github.com/Tencent-Hunyuan/FlashTopK/blob/main/LICENSE" target="_blank" rel="noopener"><img alt="License" src="https://camo.githubusercontent.com/53aec1ae7394521e2af38df6c1560d97fcb8152f5edd45d87563432eed72bf7a/68747470733a2f2f696d672e736869656c64732e696f2f62616467652f4c6963656e73652d417061636865253230322e302d626c7565" loading="lazy"></a>
+  <a href="https://arxiv.org/abs/2610.32057" rel="noopener" target="_blank"><img alt="arXiv" src="https://camo.githubusercontent.com/7f54b6dc443363faaf5b6746f580d6c11a0809348f7a7259aa08f12521c85082/68747470733a2f2f696d672e736869656c64732e696f2f62616467652f61725869762d323631302e33323035372d623331623162" loading="lazy"></a>
+</p>
+<p dir="auto">FlashTopK is a fast, exact and deterministic fused top-k selection kernel for learned sparse attention, in both training and inference.</p>
+<p dir="auto">On a full prefill, FlashTopK is 1.7-3.3x faster than dense scoring + FlashInfer top-k (DeepGEMM / cuDNN scoring) on trained indexers, and 1.2-2.0x faster on untrained indexers.</p>
+
+<p dir="auto">[2026/10] We have released <strong><a href="https://arxiv.org/abs/2610.32057" rel="noopener" target="_blank">HyScale: Scaling Long-Context Training for Learned Sparse Attention</a></strong>.</p>
+
+<ul dir="auto">
+<li><strong>Fast:</strong> the fastest open-source implementation.</li>
+<li><strong>Robust:</strong> stays fast on trained and untrained indexers. Adaptive key pruning decides per call whether to skip keys by a score bound.</li>
+<li><strong>Exact:</strong> the true top-k. Rows the sampled threshold misses are rescored on the GPU.</li>
+<li><strong>Deterministic:</strong> the same bits on every run. Ties at the k-th score keep the smallest key indices.</li>
+<li><strong>CP-compatible:</strong> each row's threshold comes from a strided sample of its own window, so <a href="https://github.com/Tencent-Hunyuan/FlashTopK/blob/main/docs/api.md#training-and-context-parallelism" target="_blank" rel="noopener">context parallelism</a> needs no selection from another rank.</li>
+</ul>
+
+<markdown-accessiblity-table></markdown-accessiblity-table>
+<p dir="auto"><a href="https://github.com/Tencent-Hunyuan/FlashTopK/blob/main/docs/hardware.md" target="_blank" rel="noopener">Hardware and model support</a> lists which GPUs are tuned.</p>
+
+
+<p dir="auto">FlashTopK needs Python 3.10+, PyTorch 2.6+, Triton 3.3+ and CuTe DSL (<code>nvidia-cutlass-dsl</code>) 4.5+.</p>
+<div class="highlight highlight-source-shell notranslate position-relative overflow-auto" dir="auto" data-snippet-clipboard-copy-content="pip install -e .            # torch &gt;= 2.6, triton &gt;= 3.3, nvidia-cutlass-dsl &gt;= 4.5, apache-tvm-ffi
+pip install -e .[test]      # pytest for the test suite"><pre>pip install -e <span class="pl-c1">.</span>            <span class="pl-c"><span class="pl-c">#</span> torch &gt;= 2.6, triton &gt;= 3.3, nvidia-cutlass-dsl &gt;= 4.5, apache-tvm-ffi</span>
+pip install -e .[test]      <span class="pl-c"><span class="pl-c">#</span> pytest for the test suite</span></pre></div>
+
+<p dir="auto">For each query <code>t</code>, FlashTopK selects the <code>topk</code> keys <code>s</code> of its window <code>[ks[t], ke[t])</code> with the largest indexer score:</p>
+<math-renderer class="js-display-math" data-run-id="eb3bf80ca56658812a9e6ce828fb4280">$$I_{t,s} = \sigma_s \sum_{h=1}^{H_I} w_{t,h}\,\mathrm{ReLU}\big(\mathbf{q}_{t,h}^{\top}\mathbf{k}_s\big)$$</math-renderer>
+<p dir="auto">Here <strong>q</strong><sub>t,h</sub> is head h of <code>q[t]</code>, <strong>k</strong><sub>s</sub> is <code>kv[s]</code>, w<sub>t,h</sub> is head h's weight in <code>weights[t]</code>, σ<sub>s</sub> is <code>kv_scales[s]</code> (1 for BF16 keys) and H<sub>I</sub> = 32 is the number of heads. A causal prefill chunk of 4096 queries over 128K FP8 keys:</p>
+<div class="highlight highlight-source-python notranslate position-relative overflow-auto" dir="auto" data-snippet-clipboard-copy-content='import torch
+import flashtopk
+
+num_q, seq_len_kv = 4096, 128 * 1024
+q = torch.randn(num_q, 32, 128, device="cuda").to(torch.float8_e4m3fn)        # 32 heads of dimension 128
+kv = torch.randn(seq_len_kv, 128, device="cuda").to(torch.float8_e4m3fn)       # one key per token
+kv_scales = torch.rand(seq_len_kv, device="cuda") * 0.02 + 0.01                # FP8 keys need per-key scales
+weights = torch.randn(num_q, 32, device="cuda") * 0.1                          # per-head weights, float32
+
+# The queries are the last num_q tokens: query i sees keys [0, seq_len_kv - num_q + i + 1).
+ke = torch.arange(seq_len_kv - num_q + 1, seq_len_kv + 1, device="cuda", dtype=torch.int32)
+ks = torch.zeros_like(ke)
+
+indices = flashtopk.select(q, kv, weights, ks, ke, kv_scales, topk=2048)  # [4096, 2048] int32'><pre><span class="pl-k">import</span> <span class="pl-s1">torch</span>
+<span class="pl-k">import</span> <span class="pl-s1">flashtopk</span>
+
+<span class="pl-s1">num_q</span>, <span class="pl-s1">seq_len_kv</span> <span class="pl-c1">=</span> <span class="pl-c1">4096</span>, <span class="pl-c1">128</span> <span class="pl-c1">*</span> <span class="pl-c1">1024</span>
+<span class="pl-s1">q</span> <span class="pl-c1">=</span> <span class="pl-s1">torch</span>.<span class="pl-c1">randn</span>(<span class="pl-s1">num_q</span>, <span class="pl-c1">32</span>, <span class="pl-c1">128</span>, <span class="pl-s1">device</span><span class="pl-c1">=</span><span class="pl-s">"cuda"</span>).<span class="pl-c1">to</span>(<span class="pl-s1">torch</span>.<span class="pl-c1">float8_e4m3fn</span>)        <span class="pl-c"># 32 heads of dimension 128</span>
+<span class="pl-s1">kv</span> <span class="pl-c1">=</span> <span class="pl-s1">torch</span>.<span class="pl-c1">randn</span>(<span class="pl-s1">seq_len_kv</span>, <span class="pl-c1">128</span>, <span class="pl-s1">device</span><span class="pl-c1">=</span><span class="pl-s">"cuda"</span>).<span class="pl-c1">to</span>(<span class="pl-s1">torch</span>.<span class="pl-c1">float8_e4m3fn</span>)       <span class="pl-c"># one key per token</span>
+<span class="pl-s1">kv_scales</span> <span class="pl-c1">=</span> <span class="pl-s1">torch</span>.<span class="pl-c1">rand</span>(<span class="pl-s1">seq_len_kv</span>, <span class="pl-s1">device</span><span class="pl-c1">=</span><span class="pl-s">"cuda"</span>) <span class="pl-c1">*</span> <span class="pl-c1">0.02</span> <span class="pl-c1">+</span> <span class="pl-c1">0.01</span>                <span class="pl-c"># FP8 keys need per-key scales</span>
+<span class="pl-s1">weights</span> <span class="pl-c1">=</span> <span class="pl-s1">torch</span>.<span class="pl-c1">randn</span>(<span class="pl-s1">num_q</span>, <span class="pl-c1">32</span>, <span class="pl-s1">device</span><span class="pl-c1">=</span><span class="pl-s">"cuda"</span>) <span class="pl-c1">*</span> <span class="pl-c1">0.1</span>                          <span class="pl-c"># per-head weights, float32</span>
+
+<span class="pl-c"># The queries are the last num_q tokens: query i sees keys [0, seq_len_kv - num_q + i + 1).</span>
+<span class="pl-s1">ke</span> <span class="pl-c1">=</span> <span class="pl-s1">torch</span>.<span class="pl-c1">arange</span>(<span class="pl-s1">seq_len_kv</span> <span class="pl-c1">-</span> <span class="pl-s1">num_q</span> <span class="pl-c1">+</span> <span class="pl-c1">1</span>, <span class="pl-s1">seq_len_kv</span> <span class="pl-c1">+</span> <span class="pl-c1">1</span>, <span class="pl-s1">device</span><span class="pl-c1">=</span><span class="pl-s">"cuda"</span>, <span class="pl-s1">dtype</span><span class="pl-c1">=</span><span class="pl-s1">torch</span>.<span class="pl-c1">int32</span>)
+<span class="pl-s1">ks</span> <span class="pl-c1">=</span> <span class="pl-s1">torch</span>.<span class="pl-c1">zeros_like</span>(<span class="pl-s1">ke</span>)
+
+<span class="pl-s1">indices</span> <span class="pl-c1">=</span> <span class="pl-s1">flashtopk</span>.<span class="pl-c1">select</span>(<span class="pl-s1">q</span>, <span class="pl-s1">kv</span>, <span class="pl-s1">weights</span>, <span class="pl-s1">ks</span>, <span class="pl-s1">ke</span>, <span class="pl-s1">kv_scales</span>, <span class="pl-s1">topk</span><span class="pl-c1">=</span><span class="pl-c1">2048</span>)  <span class="pl-c"># [4096, 2048] int32</span></pre></div>
+<p dir="auto">The first call in a process compiles the kernels it needs, about 15 seconds in all. <code>Selector.plan()</code> compiles them up front.</p>
+
+<div class="highlight highlight-source-python notranslate position-relative overflow-auto" dir="auto" data-snippet-clipboard-copy-content="flashtopk.select(q, kv, weights, ks, ke, kv_scales=None, topk=2048, ...)  # indices; return_scores=True adds scores
+selector = flashtopk.Selector(topk=2048, dtype=...).plan(max_rows, max_kv)  # owns the workspace, compiles up front
+selector.run(q, kv, weights, ks, ke, kv_scales)                             # select's arguments and outputs
+torch.ops.flashtopk.select(...)                                             # select as a custom op, for torch.compile
+flashtopk.windows_from_cu_seqlens(cu_seqlens_q, cu_seqlens_k)               # causal windows of packed sequences"><pre><span class="pl-s1">flashtopk</span>.<span class="pl-c1">select</span>(<span class="pl-s1">q</span>, <span class="pl-s1">kv</span>, <span class="pl-s1">weights</span>, <span class="pl-s1">ks</span>, <span class="pl-s1">ke</span>, <span class="pl-s1">kv_scales</span><span class="pl-c1">=</span><span class="pl-c1">None</span>, <span class="pl-s1">topk</span><span class="pl-c1">=</span><span class="pl-c1">2048</span>, ...)  <span class="pl-c"># indices; return_scores=True adds scores</span>
+<span class="pl-s1">selector</span> <span class="pl-c1">=</span> <span class="pl-s1">flashtopk</span>.<span class="pl-c1">Selector</span>(<span class="pl-s1">topk</span><span class="pl-c1">=</span><span class="pl-c1">2048</span>, <span class="pl-s1">dtype</span><span class="pl-c1">=</span>...).<span class="pl-c1">plan</span>(<span class="pl-s1">max_rows</span>, <span class="pl-s1">max_kv</span>)  <span class="pl-c"># owns the workspace, compiles up front</span>
+<span class="pl-s1">selector</span>.<span class="pl-c1">run</span>(<span class="pl-s1">q</span>, <span class="pl-s1">kv</span>, <span class="pl-s1">weights</span>, <span class="pl-s1">ks</span>, <span class="pl-s1">ke</span>, <span class="pl-s1">kv_scales</span>)                             <span class="pl-c"># select's arguments and outputs</span>
+<span class="pl-s1">torch</span>.<span class="pl-c1">ops</span>.<span class="pl-c1">flashtopk</span>.<span class="pl-c1">select</span>(...)                                             <span class="pl-c"># select as a custom op, for torch.compile</span>
+<span class="pl-s1">flashtopk</span>.<span class="pl-c1">windows_from_cu_seqlens</span>(<span class="pl-s1">cu_seqlens_q</span>, <span class="pl-s1">cu_seqlens_k</span>)               <span class="pl-c"># causal windows of packed sequences</span></pre></div>
+<p dir="auto">The <a href="https://github.com/Tencent-Hunyuan/FlashTopK/blob/main/docs/api.md" target="_blank" rel="noopener">API reference</a> covers every argument, the workspace, <code>last_info</code>, configuration and training with context parallelism.</p>
+
+<p dir="auto">Speedup of one full prefill (query rows = keys = the sequence length) over dense scoring + FlashInfer top-k on H800, with FP8 or BF16 operands. The <a href="https://github.com/Tencent-Hunyuan/FlashTopK/blob/main/docs/performance.md" target="_blank" rel="noopener">performance report</a> has H20 as well.</p>
+
+<p align="center" dir="auto"><a target="_blank" rel="noopener" href="https://github.com/Tencent-Hunyuan/FlashTopK/blob/main/assets/performance_trained_h800.png"><img src="https://github.com/Tencent-Hunyuan/FlashTopK/raw/main/assets/performance_trained_h800.png" alt="FlashTopK against public top-k selectors on a trained indexer, H800" loading="lazy"></a></p>
+<p dir="auto">FlashTopK is the fastest at every length, and its lead grows with the length.</p>
+
+<p align="center" dir="auto"><a target="_blank" rel="noopener" href="https://github.com/Tencent-Hunyuan/FlashTopK/blob/main/assets/performance_untrained_h800.png"><img src="https://github.com/Tencent-Hunyuan/FlashTopK/raw/main/assets/performance_untrained_h800.png" alt="FlashTopK against public top-k selectors on an untrained indexer, H800" loading="lazy"></a></p>
+<p dir="auto">The score bound skips few keys, so FlashTopK mostly scans; it still leads at every length.</p>
+<p dir="auto">The <a href="https://github.com/Tencent-Hunyuan/FlashTopK/blob/main/docs/performance.md" target="_blank" rel="noopener">performance report</a> describes the setup and the methods compared. It also has the results on random indexer weights and keys. <a href="https://github.com/Tencent-Hunyuan/FlashTopK/blob/main/reproduce/README.md" target="_blank" rel="noopener"><code>reproduce/</code></a> provides pinned setup, inputs, comparison benchmarks and scripts to regenerate the figures.</p>
+
+<ul dir="auto">
+<li>Block-level learned sparse attention, such as CSA in <a href="https://arxiv.org/abs/2606.19348" rel="noopener" target="_blank">DeepSeek-V4</a> and QSA in <a href="https://arxiv.org/abs/2608.30320" rel="noopener" target="_blank">Qwen3.8-Flash-Next</a>.</li>
+<li>Paged KV cache; today the keys must be contiguous, with one contiguous window per query row.</li>
+<li>Indexers with other head counts, such as the 64 heads of DeepSeek-V3.2.</li>
+</ul>
+
+<p dir="auto">FlashTopK is released under the Apache License 2.0. See <a href="https://github.com/Tencent-Hunyuan/FlashTopK/blob/main/LICENSE" target="_blank" rel="noopener"><code>LICENSE</code></a> and <a href="https://github.com/Tencent-Hunyuan/FlashTopK/blob/main/NOTICE" target="_blank" rel="noopener"><code>NOTICE</code></a> for details.</p>
+
+<p dir="auto">FlashTopK builds on <a href="https://github.com/Heisenberg-Yin/LiteTopK" target="_blank" rel="noopener">LiteTopK</a> (gate calibration and candidate selection) and <a href="https://arxiv.org/abs/2610.13990" rel="noopener" target="_blank">DoSA</a> (the score bound of key pruning). <a href="https://github.com/Tencent-Hunyuan/FlashTopK/blob/main/NOTICE" target="_blank" rel="noopener"><code>NOTICE</code></a> lists the files each part derives from.</p>
+
+<div class="highlight highlight-text-bibtex notranslate position-relative overflow-auto" dir="auto" data-snippet-clipboard-copy-content="@misc{deng2026hyscale,
+  title         = {HyScale: Scaling Long-Context Training for Learned Sparse Attention},
+  author        = {Yangshen Deng and Xinjing Huang and Yulong Wang and Yunzhuo Liu and Jun Hu and Shuyong Tan and Chun-Chih Tseng and Mingji Han and Ray Ying and Key Zhang and Luo Mai},
+  year          = {2026},
+  eprint        = {2610.32057},
+  archivePrefix = {arXiv},
+  primaryClass  = {cs.AI},
+  url           = {https://arxiv.org/abs/2610.32057},
+}"><pre><span class="pl-k">@misc</span>{<span class="pl-en">deng2026hyscale</span>,
+  <span class="pl-s">title</span>         = <span class="pl-s"><span class="pl-pds">{</span>HyScale: Scaling Long-Context Training for Learned Sparse Attention<span class="pl-pds">}</span></span>,
+  <span class="pl-s">author</span>        = <span class="pl-s"><span class="pl-pds">{</span>Yangshen Deng and Xinjing Huang and Yulong Wang and Yunzhuo Liu and Jun Hu and Shuyong Tan and Chun-Chih Tseng and Mingji Han and Ray Ying and Key Zhang and Luo Mai<span class="pl-pds">}</span></span>,
+  <span class="pl-s">year</span>          = <span class="pl-s"><span class="pl-pds">{</span>2026<span class="pl-pds">}</span></span>,
+  <span class="pl-s">eprint</span>        = <span class="pl-s"><span class="pl-pds">{</span>2610.32057<span class="pl-pds">}</span></span>,
+  <span class="pl-s">archivePrefix</span> = <span class="pl-s"><span class="pl-pds">{</span>arXiv<span class="pl-pds">}</span></span>,
+  <span class="pl-s">primaryClass</span>  = <span class="pl-s"><span class="pl-pds">{</span>cs.AI<span class="pl-pds">}</span></span>,
+  <span class="pl-s">url</span>           = <span class="pl-s"><span class="pl-pds">{</span>https://arxiv.org/abs/2610.32057<span class="pl-pds">}</span></span>,
+}</pre></div>
+</article></div></div>
