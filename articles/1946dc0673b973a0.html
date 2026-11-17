@@ -1,0 +1,4 @@
+<div><div><div class="markdown_body"><p>大家一定要注意，如果在 iOS 上使用 Claude，一定要开 LockDown Mode，否则会泄漏 WebRTC，我们刚刚冒着牺牲一个号的风险，验证实锤 Claude 一定会探测 WebRTC，如果 WebRTC 有泄漏，基本上就可以定位实际位置，怎么防护都没用。</p>
+<p>macOS 下面，如果用他们的客户端或者 CLI，目前唯一安全的方法，就是全程开 TUN（Surge 叫 Enhanced Mode），如果用网页访问的方式，用我们的橡果浏览器，默认已经帮用户做了这一层防护。</p>
+<p>用之前，一定要检测一下有没有 WebRTC 泄漏。没想到他们真搞 WebRTC 探测。</p>
+</div></div></div>
